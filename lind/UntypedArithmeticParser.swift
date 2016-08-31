@@ -8,37 +8,37 @@
 
 import Result
 
-typealias TermParser = Parser<String.UnicodeScalarView, Term>
+private typealias TermParser = Parser<String.UnicodeScalarView, Term>
 
 /// Parses 0.
-func zero() -> TermParser {
+private func zero() -> TermParser {
   return char("0") *> pure(.zero)
 }
 
 /// Parses true.
-func tmTrue() -> TermParser {
+private func tmTrue() -> TermParser {
   return string("true") *> pure(.tmTrue)
 }
 
 /// Parses false.
-func tmFalse() -> TermParser {
+private func tmFalse() -> TermParser {
   return string("false") *> pure(.tmFalse)
 }
 
-func succ() -> TermParser {
+private func succ() -> TermParser {
   return string("succ") *> term() >>- { t in pure(.succ(t)) }
 }
 
-func pred() -> TermParser {
+private func pred() -> TermParser {
   return string("pred") *> term() >>- { t in pure(.pred(t)) }
 }
 
-func isZero() -> TermParser {
+private func isZero() -> TermParser {
   return string("isZero") *> term() >>- { t in pure(.isZero(t)) }
 }
 
 // Parses an if-then-else statement.
-func ifElse() -> TermParser {
+private func ifElse() -> TermParser {
   let ifString = string("if")
   let thenString = string("then")
   let elseString = string("else")
@@ -60,11 +60,11 @@ private func term() -> TermParser {
 }
 
 /// Parses an untyped arithmetic program.
-func untypedArithmetic() -> Parser<String.UnicodeScalarView, [Term]> {
-  return many(term()) <* endOfInput()
+func untypedArithmetic() -> Parser<String.UnicodeScalarView, Term> {
+  return term() <* endOfInput()
 }
 
-func parseUntypedArithmetic(str: String) -> Result<[Term], ParseError> {
+func parseUntypedArithmetic(str: String) -> Result<Term, ParseError> {
   return parseOnly(untypedArithmetic(), input: str.unicodeScalars)
 }
 

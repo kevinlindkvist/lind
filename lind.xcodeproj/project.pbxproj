@@ -33,6 +33,11 @@
 		B49B766B1D7423F90062464C /* UntypedArithmeticEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76671D741FBC0062464C /* UntypedArithmeticEvaluator.swift */; };
 		B49B766D1D7427AD0062464C /* UntypedArithmeticTests in Resources */ = {isa = PBXBuildFile; fileRef = B49B766C1D7427AD0062464C /* UntypedArithmeticTests */; };
 		B49B766F1D75407D0062464C /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B766E1D75407D0062464C /* TestHelpers.swift */; };
+		B49B76721D75519A0062464C /* UntypedLambdaCalculusTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */; };
+		B49B76731D7552600062464C /* UntypedLambdaCalculusTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */; };
+		B49B76751D75526E0062464C /* UntypedLambdaCalculusParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */; };
+		B49B76771D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76761D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift */; };
+		B49B76781D757A180062464C /* UntypedLambdaCalculusParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +134,9 @@
 		B49B76691D7423780062464C /* UntypedArithmeticEvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedArithmeticEvaluationTests.swift; sourceTree = "<group>"; };
 		B49B766C1D7427AD0062464C /* UntypedArithmeticTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UntypedArithmeticTests; sourceTree = "<group>"; };
 		B49B766E1D75407D0062464C /* TestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusTerms.swift; sourceTree = "<group>"; };
+		B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusParser.swift; sourceTree = "<group>"; };
+		B49B76761D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusParserTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,16 +181,17 @@
 		B49B76131D740DFE0062464C /* lind */ = {
 			isa = PBXGroup;
 			children = (
+				B49B76161D740DFE0062464C /* Info.plist */,
 				B49B76141D740DFE0062464C /* lind.h */,
-				B49B762B1D740E0E0062464C /* Parser.swift */,
-				B49B76511D74102C0062464C /* Parser+UnicodeScalars.swift */,
-				B49B76551D7410E40062464C /* Parser+Combinators.swift */,
-				B49B764B1D740F980062464C /* Reply.swift */,
 				B49B764D1D740F9F0062464C /* ParseError.swift */,
+				B49B762B1D740E0E0062464C /* Parser.swift */,
+				B49B76551D7410E40062464C /* Parser+Combinators.swift */,
+				B49B76511D74102C0062464C /* Parser+UnicodeScalars.swift */,
 				B49B764F1D740FFD0062464C /* Prelude.swift */,
+				B49B764B1D740F980062464C /* Reply.swift */,
 				B49B76531D74107F0062464C /* UnicodeScalarView+Helpers.swift */,
 				B49B765B1D7412690062464C /* Untyped Arithmetic */,
-				B49B76161D740DFE0062464C /* Info.plist */,
+				B49B76701D7551740062464C /* Untyped Lambda Calculus */,
 			);
 			path = lind;
 			sourceTree = "<group>";
@@ -192,6 +201,7 @@
 			children = (
 				B49B765C1D7413420062464C /* UntypedArithmeticParserTests.swift */,
 				B49B76691D7423780062464C /* UntypedArithmeticEvaluationTests.swift */,
+				B49B76761D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift */,
 				B49B766E1D75407D0062464C /* TestHelpers.swift */,
 				B49B766C1D7427AD0062464C /* UntypedArithmeticTests */,
 				B49B76221D740DFF0062464C /* Info.plist */,
@@ -222,6 +232,15 @@
 				B49B76671D741FBC0062464C /* UntypedArithmeticEvaluator.swift */,
 			);
 			name = "Untyped Arithmetic";
+			sourceTree = "<group>";
+		};
+		B49B76701D7551740062464C /* Untyped Lambda Calculus */ = {
+			isa = PBXGroup;
+			children = (
+				B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */,
+				B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */,
+			);
+			name = "Untyped Lambda Calculus";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -404,7 +423,9 @@
 				B49B76521D74102C0062464C /* Parser+UnicodeScalars.swift in Sources */,
 				B49B76561D7410E40062464C /* Parser+Combinators.swift in Sources */,
 				B49B76681D741FBC0062464C /* UntypedArithmeticEvaluator.swift in Sources */,
+				B49B76751D75526E0062464C /* UntypedLambdaCalculusParser.swift in Sources */,
 				B49B76501D740FFD0062464C /* Prelude.swift in Sources */,
+				B49B76721D75519A0062464C /* UntypedLambdaCalculusTerms.swift in Sources */,
 				B49B765A1D7412650062464C /* UntypedArithmeticParser.swift in Sources */,
 				B49B76581D74117C0062464C /* UntypedArithmeticTerms.swift in Sources */,
 				B49B764C1D740F980062464C /* Reply.swift in Sources */,
@@ -416,12 +437,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B49B76731D7552600062464C /* UntypedLambdaCalculusTerms.swift in Sources */,
 				B49B76621D7417670062464C /* Reply.swift in Sources */,
 				B49B766A1D7423780062464C /* UntypedArithmeticEvaluationTests.swift in Sources */,
 				B49B76661D7417670062464C /* UntypedArithmeticTerms.swift in Sources */,
+				B49B76771D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift in Sources */,
 				B49B76641D7417670062464C /* Prelude.swift in Sources */,
 				B49B76631D7417670062464C /* ParseError.swift in Sources */,
 				B49B765E1D74171B0062464C /* UntypedArithmeticParser.swift in Sources */,
+				B49B76781D757A180062464C /* UntypedLambdaCalculusParser.swift in Sources */,
 				B49B765D1D7413420062464C /* UntypedArithmeticParserTests.swift in Sources */,
 				B49B76601D7417670062464C /* Parser+UnicodeScalars.swift in Sources */,
 				B49B765F1D7417670062464C /* Parser.swift in Sources */,

@@ -9,7 +9,18 @@
 import Result
 import XCTest
 
-func parseAndEvaluateLines(lines: [String], parser: String -> Result<[Term], ParseError>, evaluator: [Term] -> [Term]) {
+func assertParseResult<T: Equatable>(str: String, _ t: T, _ parser: String -> Result<T, ParseError>) {
+  switch parser(str) {
+  case let .Success(result):
+    XCTAssertEqual(t, result)
+    break
+  case .Failure(_):
+    XCTAssertTrue(false)
+    break
+  }
+}
+
+func parseAndEvaluateLines(lines: [String], parser: String -> Result<Term, ParseError>, evaluator: Term -> Term) {
     let testCases = lines.flatMap { (line: String) -> (String, String)? in
       let splitLine = line.componentsSeparatedByString(";")
       if splitLine.count == 2 {
