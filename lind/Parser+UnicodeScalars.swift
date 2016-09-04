@@ -73,7 +73,8 @@ func isSpace(c: UnicodeScalar) -> Bool {
   return spaces.contains(c)
 }
 
-func skipSpaces() -> Parser<String.UnicodeScalarView, ()> {
+let skipSpaces = _skipSpaces()
+func _skipSpaces() -> Parser<String.UnicodeScalarView, ()> {
   return skipMany(satisfy(isSpace))
 }
 

@@ -1,5 +1,5 @@
 //
-//  STLCChecker.swift
+//  STLCParser.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 9/4/16.
