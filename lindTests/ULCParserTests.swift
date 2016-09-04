@@ -29,7 +29,7 @@ class UntypedLambdaCalculusParserTests: XCTestCase {
   }
 
   func testVariable() {
-    let expected: ParseResult = (["x": 0], LCTerm.va("x", 0))
+    let expected: ParseResult = (["x": 0], ULCTerm.va("x", 0))
     testParseResult("x", expected: expected)
   }
 
@@ -39,7 +39,7 @@ class UntypedLambdaCalculusParserTests: XCTestCase {
   }
 
   func testAbsAbs() {
-    let innerApp: LCTerm = .app(.va("x", 1), .va("y", 0))
+    let innerApp: ULCTerm = .app(.va("x", 1), .va("y", 0))
     let expected: ParseResult = ([:], .abs("x", .abs("y", .app(innerApp, innerApp))))
     testParseResult("\\x.\\y.(x y) (x y)", expected: expected)
   }
@@ -55,39 +55,39 @@ class UntypedLambdaCalculusParserTests: XCTestCase {
   }
 
   func testAppTwice() {
-    let body: LCTerm = .app(.app(.va("y", 1), .va("z", 2)), .va("d", 3))
-    let expected: LCTerm =  .abs("x", body)
+    let body: ULCTerm = .app(.app(.va("y", 1), .va("z", 2)), .va("d", 3))
+    let expected: ULCTerm =  .abs("x", body)
     testParseResult("\\x.y z d", expected: (["y": 0, "z": 1, "d": 2], expected))
   }
 
 
   func testAppParens() {
-    let lhs: LCTerm = .abs("x", .app(.va("x", 0), .va("d", 1)))
-    let rhs: LCTerm = .abs("z", .app(.va("z", 0), .va("l", 2)))
+    let lhs: ULCTerm = .abs("x", .app(.va("x", 0), .va("d", 1)))
+    let rhs: ULCTerm = .abs("z", .app(.va("z", 0), .va("l", 2)))
     testParseResult("(\\x.x d) (\\z.z l)", expected: (["d": 0, "l": 1], .app(lhs, rhs)))
   }
 
   func testDeBruijn() {
-    let lhs: LCTerm = .abs("x", .app(.va("x", 0), .va("d", 1)))
-    let rhs: LCTerm = .abs("z", .va("z", 0))
+    let lhs: ULCTerm = .abs("x", .app(.va("x", 0), .va("d", 1)))
+    let rhs: ULCTerm = .abs("z", .va("z", 0))
     testParseResult("(\\x.(x d)) (\\z.z) l", expected: (["d": 0, "l": 1], .app(.app(lhs, rhs), .va("l", 1))))
   }
 
   func testSubstitution() {
-    let lhs: LCTerm = .abs("y", .app(.va("x", 1), .va("y", 0)))
-    let rhs: LCTerm = .app(.va("y", 1), .va("z", 2))
+    let lhs: ULCTerm = .abs("y", .app(.va("x", 1), .va("y", 0)))
+    let rhs: ULCTerm = .app(.va("y", 1), .va("z", 2))
     testParseResult("(\\y.(x y)) (y z)", expected: (["x": 0, "y": 1, "z": 2], .app(lhs, rhs)))
   }
 
   func testAppAssociativity() {
-    let lhs: LCTerm = .app(.va("a", 0), .va("b", 1))
-    let expected: LCTerm = .app(lhs, .va("c", 2))
+    let lhs: ULCTerm = .app(.va("a", 0), .va("b", 1))
+    let expected: ULCTerm = .app(lhs, .va("c", 2))
     testParseResult("a b c", expected: (["a": 0, "b": 1, "c": 2], expected))
   }
 
   func testAppAssociativityParens() {
-    let rhs: LCTerm = .app(.va("b", 1), .va("c", 2))
-    let expected: LCTerm = .app(.va("a", 0), rhs)
+    let rhs: ULCTerm = .app(.va("b", 1), .va("c", 2))
+    let expected: ULCTerm = .app(.va("a", 0), rhs)
     testParseResult("a (b c)", expected: (["a": 0, "b": 1, "c": 2], expected))
   }
 

@@ -11,7 +11,7 @@ import Result
 
 class UntypedArithmeticEvaluationTests: XCTestCase {
 
-  private func evaluateString(str: String, ts: Term, fails: Bool = false) {
+  private func evaluateString(str: String, ts: UATerm, fails: Bool = false) {
     switch parseUntypedArithmetic(str) {
     case let .Success(result):
       XCTAssertEqual(ts, evaluateUntypedArithmetic(result))

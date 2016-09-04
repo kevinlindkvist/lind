@@ -10,7 +10,7 @@ import Result
 import Foundation
 
 typealias NamingContext = [String:Int]
-typealias ParseResult = (NamingContext, LCTerm)
+typealias ParseResult = (NamingContext, ULCTerm)
 
 private typealias TermParser = Parser<String.UnicodeScalarView, ParseResult>
 
@@ -82,7 +82,7 @@ private func untypedLambdaCalculus() -> TermParser {
   return term([:]) <* endOfInput()
 }
 
-func parseUntypedLambdaCalculus(str: String) -> Result<(NamingContext, LCTerm), ParseError> {
+func parseUntypedLambdaCalculus(str: String) -> Result<(NamingContext, ULCTerm), ParseError> {
   switch parseOnly(untypedLambdaCalculus(), input: str.unicodeScalars) {
     case let .Success((g, term)): return .Success(g, term)
     case let .Failure(error): return .Failure(error)

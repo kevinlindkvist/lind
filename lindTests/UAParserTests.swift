@@ -11,7 +11,7 @@ import lind
 
 class UntypedArithmeticParserTests: XCTestCase {
 
-  func testParseResult(str: String, _ t: Term) {
+  func testParseResult(str: String, _ t: UATerm) {
     assertParseResult(str, t, parseUntypedArithmetic)
   }
 
@@ -28,17 +28,17 @@ class UntypedArithmeticParserTests: XCTestCase {
   }
 
   func testIfElse() {
-    testParseResult("if true then 0 else false", .ifElse(IfElseTerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmFalse)))
+    testParseResult("if true then 0 else false", .ifElse(IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmFalse)))
   }
 
   func testNestedIfElse() {
-    let innerIf = IfElseTerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmTrue)
-    let outerIf = IfElseTerm(conditional: .tmFalse, trueBranch: .ifElse(innerIf), falseBranch: .tmFalse)
+    let innerIf = IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmTrue)
+    let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .ifElse(innerIf), falseBranch: .tmFalse)
     testParseResult("if false then if true then 0 else true else false", .ifElse(outerIf))
   }
 
   func testCondIfElse() {
-    let outerIf = IfElseTerm(conditional: .tmFalse, trueBranch: .pred(.zero), falseBranch: .tmFalse)
+    let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .pred(.zero), falseBranch: .tmFalse)
     testParseResult("if false then pred 0 else false", .ifElse(outerIf))
   }
 

@@ -20,7 +20,7 @@ func assertParseResult<T: Equatable>(str: String, _ t: T, _ parser: String -> Re
   }
 }
 
-func parseAndEvaluateLines(lines: [String], parser: String -> Result<Term, ParseError>, evaluator: Term -> Term) {
+func parseAndEvaluateLines(lines: [String], parser: String -> Result<UATerm, ParseError>, evaluator: UATerm -> UATerm) {
     let testCases = lines.flatMap { (line: String) -> (String, String)? in
       let splitLine = line.componentsSeparatedByString(";")
       if splitLine.count == 2 {
@@ -30,8 +30,8 @@ func parseAndEvaluateLines(lines: [String], parser: String -> Result<Term, Parse
     }
     testCases.forEach {
       switch (parser($0.0), parser($0.1)) {
-        case let (.Success(firstTerms), .Success(secondTerms)):
-          XCTAssertEqual(secondTerms, evaluator(firstTerms))
+        case let (.Success(firstUATerms), .Success(secondUATerms)):
+          XCTAssertEqual(secondUATerms, evaluator(firstUATerms))
         break
         default:
         XCTAssertTrue(false)
