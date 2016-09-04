@@ -9,9 +9,9 @@
 import Foundation
 
 public indirect enum LCTerm {
-  case variable(name: String)
-  case abstraction(name: String, body: LCTerm)
-  case application(lhs: LCTerm, rhs: LCTerm)
+  case va(String, Int)
+  case abs(String, LCTerm)
+  case app(LCTerm, LCTerm)
 }
 
 extension LCTerm: Equatable {
@@ -20,18 +20,18 @@ extension LCTerm: Equatable {
 extension LCTerm: CustomStringConvertible {
   public var description: String {
     switch self {
-    case let .variable(name: x): return "\(x)"
-    case let .abstraction(name: x, body:t): return "\\\(x).\(t)"
-    case let .application(lhs: lhs, rhs:rhs): return "\(lhs) \(rhs)"
+    case let .va(x, idx): return "\(x):\(idx)"
+    case let .abs(x, t): return "\\\(x).\(t)"
+    case let .app(lhs, rhs): return "(\(lhs) \(rhs))"
     }
   }
 }
 
 public func ==(lhs: LCTerm, rhs: LCTerm) -> Bool {
   switch (lhs, rhs) {
-  case let (.variable(lv), .variable(rv)): return lv == rv
-  case let (.abstraction(lv), .abstraction(rv)): return lv == rv
-  case let (.application(lv), .application(rv)): return lv == rv
-  default: return false
+    case let (.va(ln, li), .va(rn, ri)): return ln == rn && ri == li
+    case let (.abs(lv), .abs(rv)): return lv == rv
+    case let (.app(lv), .app(rv)): return lv == rv
+    default: return false
   }
 }

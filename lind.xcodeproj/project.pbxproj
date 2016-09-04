@@ -38,6 +38,9 @@
 		B49B76751D75526E0062464C /* UntypedLambdaCalculusParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */; };
 		B49B76771D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76761D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift */; };
 		B49B76781D757A180062464C /* UntypedLambdaCalculusParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */; };
+		B49B767A1D76C6BC0062464C /* UntypedLambdaCalculusEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76791D76C6BC0062464C /* UntypedLambdaCalculusEvaluation.swift */; };
+		B49B76811D7B86190062464C /* Dictionary+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76801D7B86190062464C /* Dictionary+Helpers.swift */; };
+		B49B76821D7B93DC0062464C /* Dictionary+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76801D7B86190062464C /* Dictionary+Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -137,6 +140,8 @@
 		B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusTerms.swift; sourceTree = "<group>"; };
 		B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusParser.swift; sourceTree = "<group>"; };
 		B49B76761D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusParserTests.swift; sourceTree = "<group>"; };
+		B49B76791D76C6BC0062464C /* UntypedLambdaCalculusEvaluation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntypedLambdaCalculusEvaluation.swift; sourceTree = "<group>"; };
+		B49B76801D7B86190062464C /* Dictionary+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Helpers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +195,7 @@
 				B49B764F1D740FFD0062464C /* Prelude.swift */,
 				B49B764B1D740F980062464C /* Reply.swift */,
 				B49B76531D74107F0062464C /* UnicodeScalarView+Helpers.swift */,
+				B49B76801D7B86190062464C /* Dictionary+Helpers.swift */,
 				B49B765B1D7412690062464C /* Untyped Arithmetic */,
 				B49B76701D7551740062464C /* Untyped Lambda Calculus */,
 			);
@@ -239,6 +245,7 @@
 			children = (
 				B49B76711D75519A0062464C /* UntypedLambdaCalculusTerms.swift */,
 				B49B76741D75526E0062464C /* UntypedLambdaCalculusParser.swift */,
+				B49B76791D76C6BC0062464C /* UntypedLambdaCalculusEvaluation.swift */,
 			);
 			name = "Untyped Lambda Calculus";
 			sourceTree = "<group>";
@@ -419,11 +426,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				B49B76541D74107F0062464C /* UnicodeScalarView+Helpers.swift in Sources */,
+				B49B767A1D76C6BC0062464C /* UntypedLambdaCalculusEvaluation.swift in Sources */,
 				B49B764E1D740F9F0062464C /* ParseError.swift in Sources */,
 				B49B76521D74102C0062464C /* Parser+UnicodeScalars.swift in Sources */,
 				B49B76561D7410E40062464C /* Parser+Combinators.swift in Sources */,
 				B49B76681D741FBC0062464C /* UntypedArithmeticEvaluator.swift in Sources */,
 				B49B76751D75526E0062464C /* UntypedLambdaCalculusParser.swift in Sources */,
+				B49B76811D7B86190062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B76501D740FFD0062464C /* Prelude.swift in Sources */,
 				B49B76721D75519A0062464C /* UntypedLambdaCalculusTerms.swift in Sources */,
 				B49B765A1D7412650062464C /* UntypedArithmeticParser.swift in Sources */,
@@ -444,6 +453,7 @@
 				B49B76771D7570EE0062464C /* UntypedLambdaCalculusParserTests.swift in Sources */,
 				B49B76641D7417670062464C /* Prelude.swift in Sources */,
 				B49B76631D7417670062464C /* ParseError.swift in Sources */,
+				B49B76821D7B93DC0062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B765E1D74171B0062464C /* UntypedArithmeticParser.swift in Sources */,
 				B49B76781D757A180062464C /* UntypedLambdaCalculusParser.swift in Sources */,
 				B49B765D1D7413420062464C /* UntypedArithmeticParserTests.swift in Sources */,

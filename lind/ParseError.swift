@@ -11,3 +11,9 @@ import Foundation
 public enum ParseError: ErrorType {
   case Message(String)
 }
+
+extension ParseError: Equatable {}
+
+public func == (lhs: ParseError, rhs: ParseError) -> Bool {
+  return true
+}
