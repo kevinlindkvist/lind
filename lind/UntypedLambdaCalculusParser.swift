@@ -55,7 +55,7 @@ private func lambda(context: NamingContext) -> TermParser {
         return shiftedContext[name] = index + 1
       }
       shiftedContext[boundName] = 0
-      return char(".") *> nonAppTerm(shiftedContext)
+      return char(".") *> term(shiftedContext)
       >>- { body in
         var unshiftedContext: NamingContext = [:]
         body.0.forEach { name, index in
