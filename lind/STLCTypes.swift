@@ -9,9 +9,9 @@
 typealias TypeContext = [Int:STLCType]
 
 indirect enum STLCType {
-  case T_T(STLCType, STLCType)
-  case Bool
-  case Nat
+  case t_T(STLCType, STLCType)
+  case bool
+  case nat
 }
 
 indirect enum STLCTerm {

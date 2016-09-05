@@ -8,7 +8,7 @@
 
 import Foundation
 
-public func union<Key, Value>(dictionary1: [Key:Value], _ dictionary2: [Key:Value]) -> [Key:Value] {
+public func union<Key, Value>(_ dictionary1: [Key:Value], _ dictionary2: [Key:Value]) -> [Key:Value] {
     var u: [Key:Value] = [:]
     dictionary1.forEach { (key, value) in
       u[key] = value

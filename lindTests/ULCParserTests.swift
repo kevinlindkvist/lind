@@ -10,16 +10,18 @@ import XCTest
 import Result
 
 private func ==(lhs: [String: Int], rhs: [String: Int] ) -> Bool {
-  return NSDictionary(dictionary: lhs).isEqualToDictionary(rhs)
+  return NSDictionary(dictionary: lhs).isEqual(to: rhs)
 }
+
+fileprivate typealias ParseResult = ([String:Int], ULCTerm)
 
 class UntypedLambdaCalculusParserTests: XCTestCase {
 
-  private func testParseResult(test: String, expected: ParseResult) {
-    let expectation: Result<ParseResult, ParseError> = Result.Success(expected)
+  fileprivate func testParseResult(_ test: String, expected: ParseResult) {
+    let expectation: Result<ParseResult, ParseError> = Result.success(expected)
     let result = parseUntypedLambdaCalculus(test)
     switch (result, expectation) {
-    case let (.Success(lhs), .Success(rhs)):
+    case let (.success(lhs), .success(rhs)):
       XCTAssertEqual(lhs.0, rhs.0)
       XCTAssertEqual(lhs.1, rhs.1)
       break

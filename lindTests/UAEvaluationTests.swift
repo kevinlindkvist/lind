@@ -11,12 +11,12 @@ import Result
 
 class UntypedArithmeticEvaluationTests: XCTestCase {
 
-  private func evaluateString(str: String, ts: UATerm, fails: Bool = false) {
+  fileprivate func evaluateString(_ str: String, ts: UATerm, fails: Bool = false) {
     switch parseUntypedArithmetic(str) {
-    case let .Success(result):
-      XCTAssertEqual(ts, evaluateUntypedArithmetic(result))
+    case let .success(result):
+      XCTAssertEqual(ts, evaluateUntypedArithmetic(result.1))
       break
-    case .Failure(_):
+    case .failure(_):
       XCTAssertTrue(fails)
       break
     }

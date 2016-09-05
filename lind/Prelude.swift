@@ -6,57 +6,72 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-func id<A>(a: A) -> A {
+func id<A>(_ a: A) -> A {
   return a
 }
 
-func const<A, B>(a: A) -> B -> A {
+func const<A, B>(_ a: A) -> (B) -> A {
   return { _ in a }
 }
 
-func cons<C: RangeReplaceableCollectionType>(x: C.Generator.Element) -> C -> C {
+func cons<C: RangeReplaceableCollection>(_ x: C.Iterator.Element) -> (C) -> C {
   return { xs in
     var xs = xs
-    xs.insert(x, atIndex: xs.startIndex)
+    xs.insert(x, at: xs.startIndex)
     return xs
   }
 }
 
-func uncons<C: CollectionType>(xs: C) -> (C.Generator.Element, C.SubSequence)? {
+func uncons<C: Collection>(_ xs: C) -> (C.Iterator.Element, C.SubSequence)? {
   if let head = xs.first {
-    return (head, xs.suffixFrom(xs.startIndex.successor()))
+    return (head, xs.suffix(from: xs.index(after: xs.startIndex)))
   } else {
     return nil
   }
 }
 
-func splitAt<C: CollectionType>(count: C.Index.Distance) -> C -> (C.SubSequence, C.SubSequence) {
-  precondition(count >= 0, "`splitAt(count)` must have `count >= 0`.")
-
+func splitAt<C: Collection>(_ count: C.IndexDistance) -> (C) -> (C.SubSequence, C.SubSequence) {
   return { xs in
-    let splitIndex = xs.startIndex.advancedBy(count)
+    let splitIndex = xs.index(xs.startIndex, offsetBy: count)
     if count <= xs.count {
-      return (xs.prefixUpTo(splitIndex), xs.suffixFrom(splitIndex))
+      return (xs.prefix(upTo: splitIndex), xs.suffix(from: splitIndex))
     } else {
-      return (xs.prefixUpTo(splitIndex), xs.suffix(0))
+      return (xs.prefix(upTo: splitIndex), xs.suffix(0))
     }
   }
 }
 
 /// Fixed-point combinator for recursive closures.
-func rec<T, U>(f: (T -> U) -> T -> U) -> T -> U {
-  return { f(rec(f))($0) }
+func unimplemented<T>() -> T
+{
+  fatalError()
 }
 
-infix operator >>-  { associativity left precedence 100 }
+func rec<T, U>(f: (@escaping (((T) -> U), T) -> U)) -> ((T) -> U)
+{
+  var g: ((T) -> U) = { _ in unimplemented() }
 
-infix operator <|>  { associativity right precedence 130 }
+  g = { f(g, $0) }
 
-infix operator <*>  { associativity left precedence 140 }
-infix operator <*   { associativity left precedence 140 }
-infix operator *>   { associativity left precedence 140 }
+  return g
+}
 
-infix operator <^>  { associativity left precedence 140 }
-infix operator <&>  { associativity left precedence 140 }
+precedencegroup ChainingPrecedence {
+  associativity: left
+  higherThan: LogicalConjunctionPrecedence
+  lowerThan: NilCoalescingPrecedence
+}
 
-infix operator <?>  { associativity left precedence 0 }
+precedencegroup ChoicePrecedence {
+  associativity: left
+  higherThan: LogicalConjunctionPrecedence
+}
+
+infix operator <*> : ChainingPrecedence
+infix operator <*  : ChainingPrecedence
+infix operator *> : ChainingPrecedence
+infix operator <^> : ChainingPrecedence
+infix operator <&> : ChainingPrecedence
+infix operator >>- : ChainingPrecedence
+
+infix operator <|> : ChoicePrecedence

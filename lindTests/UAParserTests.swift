@@ -11,7 +11,7 @@ import lind
 
 class UntypedArithmeticParserTests: XCTestCase {
 
-  func testParseResult(str: String, _ t: UATerm) {
+  func testParseResult(_ str: String, _ t: UATerm) {
     assertParseResult(str, t, parseUntypedArithmetic)
   }
 

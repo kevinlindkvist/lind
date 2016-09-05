@@ -30,17 +30,17 @@ func _UAFalse() -> UATermParser {
 
 let UASucc = _UASucc()
 func _UASucc() -> UATermParser {
-  return string((), "succ") *> UATermP >>- { t in pure(.succ(t.1)) }
+  return (string((), "succ") *> UATermP) >>- { t in pure(.succ(t.1)) }
 }
 
 let UAPred = _UAPred()
 func _UAPred() -> UATermParser {
-  return string((), "pred") *> UATermP >>- { t in pure(.pred(t.1)) }
+  return (string((), "pred") *> UATermP) >>- { t in pure(.pred(t.1)) }
 }
 
 let UAIsZero = _UAIsZero()
 func _UAIsZero() -> UATermParser {
-  return string((), "isZero") *> UATermP >>- { t in pure(.isZero(t.1)) }
+  return (string((), "isZero") *> UATermP) >>- { t in pure(.isZero(t.1)) }
 }
 
 // Parses an if-then-else statement.
@@ -49,9 +49,9 @@ func _UAIfElse() -> UATermParser {
   let ifString = string((), "if")
   let thenString = string((), "then")
   let elseString = string((), "else")
-  return ifString *> UATermP >>- { conditional in
-    return thenString *> UATermP >>- { trueBranch in
-      return elseString *> UATermP >>- { falseBranch in
+  return (ifString *> UATermP) >>- { conditional in
+    return (thenString *> UATermP) >>- { trueBranch in
+      return (elseString *> UATermP) >>- { falseBranch in
         let ifElse = IfElseUATerm(conditional: conditional.1,
                                 trueBranch: trueBranch.1,
                                 falseBranch: falseBranch.1)
@@ -74,7 +74,7 @@ func untypedArithmetic() -> UATermParser {
   return UATermP <* endOfInput()
 }
 
-func parseUntypedArithmetic(str: String) -> Result<((), UATerm), ParseError> {
+func parseUntypedArithmetic(_ str: String) -> Result<((), UATerm), ParseError> {
   return parseOnly(untypedArithmetic(), input: (str.unicodeScalars, ()))
 }
 

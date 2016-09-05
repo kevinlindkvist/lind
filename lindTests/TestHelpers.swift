@@ -9,20 +9,20 @@
 import Result
 import XCTest
 
-func assertParseResult<T: Equatable>(str: String, _ t: T, _ parser: String -> Result<T, ParseError>) {
+func assertParseResult<A, T: Equatable>(_ str: String, _ t: T, _ parser: (String) -> Result<(A,T), ParseError>) {
   switch parser(str) {
-  case let .Success(result):
-    XCTAssertEqual(t, result)
+  case let .success(result):
+    XCTAssertEqual(t, result.1)
     break
-  case .Failure(_):
+  case .failure(_):
     XCTAssertTrue(false)
     break
   }
 }
 
-func parseAndEvaluateLines(lines: [String], parser: String -> Result<UATerm, ParseError>, evaluator: UATerm -> UATerm) {
+func parseAndEvaluateLines(_ lines: [String], parser: (String) -> Result<((), UATerm), ParseError>, evaluator: (UATerm) -> UATerm) {
     let testCases = lines.flatMap { (line: String) -> (String, String)? in
-      let splitLine = line.componentsSeparatedByString(";")
+      let splitLine = line.components(separatedBy: ";")
       if splitLine.count == 2 {
         return (splitLine[0] , splitLine[1])
       }
@@ -30,8 +30,8 @@ func parseAndEvaluateLines(lines: [String], parser: String -> Result<UATerm, Par
     }
     testCases.forEach {
       switch (parser($0.0), parser($0.1)) {
-        case let (.Success(firstUATerms), .Success(secondUATerms)):
-          XCTAssertEqual(secondUATerms, evaluator(firstUATerms))
+        case let (.success(firstUATerms), .success(secondUATerms)):
+          XCTAssertEqual(secondUATerms.1, evaluator(firstUATerms.1))
         break
         default:
         XCTAssertTrue(false)

@@ -6,31 +6,35 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-public func many<In, Ctxt, Out, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> {
+public func many<In, Ctxt, Out, Outs: RangeReplaceableCollection>(_ p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> where Outs.Iterator.Element == Out {
   return many1(p) <|> pure(Outs())
 }
 
-public func many1<In, Ctxt, Out, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> {
-  return cons <^> p <*> many(p)
+public func many1<In, Ctxt, Out, Outs: RangeReplaceableCollection>(_ p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> where Outs.Iterator.Element == Out {
+  return (cons <^> p) <*> many(p)
 }
 
-public func skipMany<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
+public func skipMany<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
   return skipMany1(p) <|> pure(())
 }
 
-public func skipMany1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
+public func skipMany1<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
   return p *> skipMany(p)
 }
 
-public func chainl<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>, _ x: Out) -> Parser<In, Ctxt, Out> {
-  return chainl1(p, op) <|> pure(x)
+public func chainl<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>, _ x: Out) -> Parser<In, Ctxt, Out> {
+  return pure(x) //chainl1(p, op) <|> pure(x)
 }
 
-//public func chainl1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>) -> Parser<In, Ctxt, Out> {
-//  p >>- { (x: (Ctxt, Out)) in
-//    rec { recur in { (x: (Ctxt, Out)) in
-//      (op >>- { (f: (Ctxt, (Out, Out)->Out)) in p >>- { (y: Out) in recur(f.1(x.1, y.1)) } }) <|> pure(x.1)
-//    }}
-//  }
-//}
+public func chainl1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, op: Parser<In, Ctxt, (Out, Out) -> Out>) -> Parser<In, Ctxt, Out> {
+  func rest(_ left: Out) -> Parser<In, Ctxt, Out> {
+    let operParser = op >>- { (f: (Ctxt, (Out,Out)->Out)) in
+      p >>- { (right: (Ctxt, Out)) in rest(f.1(left, right.1)) }
+    }
+
+    return operParser <|> pure(left)
+  }
+
+  return p >>- { result in rest(result.1) }
+}
 

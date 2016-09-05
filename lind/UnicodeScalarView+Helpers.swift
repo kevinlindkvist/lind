@@ -6,7 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-extension String.UnicodeScalarView: StringLiteralConvertible {
+extension String.UnicodeScalarView: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     self = value.unicodeScalars
   }
@@ -20,10 +20,10 @@ extension String.UnicodeScalarView: StringLiteralConvertible {
   }
 }
 
-extension String.UnicodeScalarView: ArrayLiteralConvertible {
+extension String.UnicodeScalarView: ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: UnicodeScalar...) {
     self.init()
-    self.appendContentsOf(elements)
+    self.append(contentsOf: elements)
   }
 }
 

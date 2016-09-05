@@ -15,8 +15,8 @@ private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, U
 
 private let identifier = _identifier()
 private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
-  let alphas = NSCharacterSet.alphanumericCharacterSet()
-  return many1( satisfy([:]) { alphas.longCharacterIsMember($0.value) } )
+  let alphas = CharacterSet.alphanumerics
+  return many1( satisfy([:]) { alphas.contains(UnicodeScalar($0.value)!) } )
 }
 
 private let variable = _variable()
@@ -35,7 +35,7 @@ private func _variable() -> TermParser {
 
 private let lambda = _lambda()
 private func _lambda() -> TermParser {
-  return char([:], "\\") *> identifier
+  return (char([:], "\\") *> identifier)
     >>- { va in
       let boundName = String(va.1)
       var shiftedContext: NamingContext = [:]
@@ -43,7 +43,7 @@ private func _lambda() -> TermParser {
         return shiftedContext[name] = index + 1
       }
       shiftedContext[boundName] = 0
-      return char([:], ".") *> term
+      return (char([:], ".") *> term)
       >>- { body in
         var unshiftedContext: NamingContext = [:]
         body.0.forEach { name, index in
@@ -62,45 +62,30 @@ private func _nonAppTerm() -> TermParser {
 }
 
 private func >>-(parser: TermParser,
-         f: (NamingContext, ULCTerm) -> TermParser) -> TermParser {
+         f: @escaping (NamingContext, ULCTerm) -> TermParser) -> TermParser {
   return Parser { input in
     switch parse(parser, input: input) {
-    case let .Failure(input2, labels, message):
-      return .Failure(input2, labels, message)
-    case let .Done(input2, context, output):
+    case let .failure(input2, labels, message):
+      return .failure(input2, labels, message)
+    case let .done(input2, context, output):
       return parse(f(context, output), input: (input2, context))
     }
   }
 }
 
-//private func chainl1(p: TermParser, _ op: Parser<String.UnicodeScalarView, NamingContext, (ULCTerm, ULCTerm) -> ULCTerm>) -> TermParser {
-//  p >>- { x in
-//    rec { recur in { x in
-//      (op >>- { f in p >>- { y in recur(f.1(x.1, y.1)) } }) <|> pure(x.1)
-//    }}
-//  }
-//}
-
-private func chainl1(p: TermParser, _ op: Parser<String.UnicodeScalarView, NamingContext, (ULCTerm, ULCTerm) -> ULCTerm>) -> TermParser {
-  func recur(_: x) {
-    
-  }
-}
-
 private let term = _term()
 private func _term() -> TermParser {
-  return chainl1(nonAppTerm, char([:], " ")
-    *> pure( { t1, t2 in (t2.0, .app(t1.1, t2.1))})
-  )
+  return chainl1(p: nonAppTerm,
+                 op: char([:], " ") *> pure( { t1, t2 in .app(t1, t2)}))
 }
 
 private func untypedLambdaCalculus() -> TermParser {
   return term <* endOfInput()
 }
 
-func parseUntypedLambdaCalculus(str: String) -> Result<([String:Int], ULCTerm), ParseError> {
+func parseUntypedLambdaCalculus(_ str: String) -> Result<([String:Int], ULCTerm), ParseError> {
   switch parseOnly(untypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
-    case let .Success((g, term)): return .Success(g, term)
-    case let .Failure(error): return .Failure(error)
+    case let .success((g, term)): return .success(g, term)
+    case let .failure(error): return .failure(error)
   }
 }

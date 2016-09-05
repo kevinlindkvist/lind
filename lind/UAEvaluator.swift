@@ -6,7 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-func evaluateUntypedArithmetic(t: UATerm) -> UATerm {
+func evaluateUntypedArithmetic(_ t: UATerm) -> UATerm {
   switch t {
   case let .ifElse(ifElseTerm):
     switch evaluateUntypedArithmetic(ifElseTerm.conditional) {

@@ -11,9 +11,9 @@ import Result
 
 class UntypedLambdaCalculusEvaluationTests: XCTestCase {
 
-  func evaluateAndAssert(program: String, expectation: ULCTerm) {
+  func evaluateAndAssert(_ program: String, expectation: ULCTerm) {
     switch parseUntypedLambdaCalculus(program) {
-      case let .Success(_, term):
+      case let .success(_, term):
         XCTAssertEqual(evaluate(term), expectation)
       default: XCTAssertTrue(false)
     }

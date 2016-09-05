@@ -8,8 +8,8 @@
 
 import Foundation
 
-public enum ParseError: ErrorType {
-  case Message(String)
+public enum ParseError: Error {
+  case message(String)
 }
 
 extension ParseError: Equatable {}
