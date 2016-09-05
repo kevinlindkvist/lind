@@ -6,34 +6,31 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-public func many<Input, Output, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Output>(p: Parser<Input, Output>) -> Parser<Input, Outs> {
+public func many<In, Ctxt, Out, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> {
   return many1(p) <|> pure(Outs())
 }
 
-public func many1<Input, Output, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Output>(p: Parser<Input, Output>) -> Parser<Input, Outs> {
+public func many1<In, Ctxt, Out, Outs: RangeReplaceableCollectionType where Outs.Generator.Element == Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Outs> {
   return cons <^> p <*> many(p)
 }
 
-public func skipMany<Input, Output>(p: Parser<Input, Output>) -> Parser<Input, ()> {
+public func skipMany<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
   return skipMany1(p) <|> pure(())
 }
 
-public func skipMany1<Input, Output>(p: Parser<Input, Output>) -> Parser<Input, ()> {
+public func skipMany1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, ()> {
   return p *> skipMany(p)
 }
 
-public func chainl<In, Out>(p: Parser<In, Out>, _ op: Parser<In, (Out, Out) -> Out>, _ x: Out) -> Parser<In, Out> {
+public func chainl<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>, _ x: Out) -> Parser<In, Ctxt, Out> {
   return chainl1(p, op) <|> pure(x)
 }
 
-public func chainl1<In, Out>(p: Parser<In, Out>, _ op: Parser<In, (Out, Out) -> Out>) -> Parser<In, Out> {
-  return p >>- { x in
-    rec { recur in { x in
-      (op >>- { f in
-        p >>- { y in
-          recur(f(x, y))
-        }
-        }) <|> pure(x)
-      }}(x)
-  }
-}
+//public func chainl1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>) -> Parser<In, Ctxt, Out> {
+//  p >>- { (x: (Ctxt, Out)) in
+//    rec { recur in { (x: (Ctxt, Out)) in
+//      (op >>- { (f: (Ctxt, (Out, Out)->Out)) in p >>- { (y: Out) in recur(f.1(x.1, y.1)) } }) <|> pure(x.1)
+//    }}
+//  }
+//}
+

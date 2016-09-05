@@ -8,18 +8,18 @@
 
 import Result
 
-public enum Reply<Input, Output> {
-  case Failure(Input, [String], String)
-  case Done(Input, Output)
+public enum Reply<Input, Context, Output> {
+  case Failure((Input, Context), [String], String)
+  case Done(Input, Context, Output)
 }
 
 extension Reply {
-  var result: Result<Output, ParseError> {
+  var result: Result<(Context, Output), ParseError> {
       switch self {
       case let .Failure(_, o, m):
         return .Failure(.Message("Failed to read message \(o) \n\(m)"))
-      case let .Done(_, output):
-        return .Success(output)
+      case let .Done(_, context, output):
+        return .Success(context, output)
     }
   }
 }

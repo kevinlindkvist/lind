@@ -7,10 +7,10 @@
 //
 
 /// Matches characters satisfying `predicate`.
-func satisfy(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, UnicodeScalar> {
+func satisfy<Ctxt>(context: Ctxt, _ predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
   return Parser { input in
-    if let (head, tail) = uncons(input) where predicate(head) {
-      return .Done(tail, head)
+    if let (head, tail) = uncons(input.0) where predicate(head) {
+      return .Done(tail, input.1, head)
     } else {
       return .Failure(input, [], "satisfy")
     }
@@ -18,10 +18,10 @@ func satisfy(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarVie
 }
 
 /// Skips characters satisfying `predicate`.
-func skip(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, ()> {
+func skip<Ctxt>(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, ()> {
   return Parser { input in
-    if let (head, tail) = uncons(input) where predicate(head) {
-      return .Done(tail, ())
+    if let (head, tail) = uncons(input.0) where predicate(head) {
+      return .Done(tail, input.1, ())
     } else {
       return .Failure(input, [], "skip")
     }
@@ -29,26 +29,27 @@ func skip(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, 
 }
 
 /// Skips characters until `predicate` is not satisfied.
-func skipWhile(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, ()> {
+func skipWhile<Ctxt>(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, ()> {
   return Parser { input in
-    rec { skip in { input in
+    let ctxt = input.1
+    return rec { skip in { input in
       if let (head, tail) = uncons(input) where predicate(head) {
         return skip(tail)
       } else {
-        return .Done(input, ())
+        return .Done(input, ctxt, ())
       }
-    }} (input)
+    }} (input.0)
   }
 }
 
 /// Parses up to `count` UnicodeScalars.
 /// - Precondition: `count >= 0`
-func take(count: Int) -> Parser<String.UnicodeScalarView, String.UnicodeScalarView> {
+func take<Ctxt>(count: Int) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
   precondition(count > 0, "`take(count)` called with `count` < 0")
   return Parser { input in
-    if input.count >= count {
-      let (prefix, suffix) = splitAt(count)(input)
-      return .Done(suffix, prefix)
+    if input.0.count >= count {
+      let (prefix, suffix) = splitAt(count)(input.0)
+      return .Done(suffix, input.1, prefix)
     } else {
       return .Failure(input, [], "`take(\(count))")
     }
@@ -56,15 +57,16 @@ func take(count: Int) -> Parser<String.UnicodeScalarView, String.UnicodeScalarVi
 }
 
 /// Parses zero or more UnicodeScalars satifsying `predicate`.
-func takeWhile(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, String.UnicodeScalarView> {
+func takeWhile<Ctxt>(predicate: UnicodeScalar -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
   return Parser { input in
-    rec { take in { input, acc in
+    let ctxt = input.1
+    return rec { take in { input, acc in
       if let (head, tail) = uncons(input) where predicate(head) {
         return take(tail, acc + [head])
       } else {
-        return .Done(input, acc)
+        return .Done(input, ctxt, acc)
       }
-    }}(input, String.UnicodeScalarView())
+    }}(input.0, String.UnicodeScalarView())
   }
 }
 
@@ -73,45 +75,39 @@ func isSpace(c: UnicodeScalar) -> Bool {
   return spaces.contains(c)
 }
 
-let skipSpaces = _skipSpaces()
-func _skipSpaces() -> Parser<String.UnicodeScalarView, ()> {
-  return skipMany(satisfy(isSpace))
+func skipSpaces<Ctxt>(context: Ctxt) -> Parser<String.UnicodeScalarView, Ctxt, ()> {
+  return skipMany(satisfy(context, isSpace))
 }
 
-/// `Parser<String.UnicodeScalarView, UnicodeScalar>`
-typealias UVUSParser = Parser<String.UnicodeScalarView, UnicodeScalar>
-/// `Parser<String.UnicodeScalarView, String.UnicodeScalarView>`
-typealias UVUVParser = Parser<String.UnicodeScalarView, String.UnicodeScalarView>
-
 /// Parses any one unicode scalar.
-func any() -> UVUSParser {
-  return satisfy(const(true))
+func any<Ctxt>(context: Ctxt) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy(context, const(true))
 }
 
 /// Parses a character matching `c`.
-func char(c: UnicodeScalar) -> UVUSParser {
-  return satisfy { $0 == c }
+func char<Ctxt>(context: Ctxt, _ c: UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy(context) { $0 == c }
 }
 
 /// Parses a character not matching `c`.
-func not(c: UnicodeScalar) -> UVUSParser {
-  return satisfy { $0 != c }
+func not<Ctxt>(context: Ctxt, _ c: UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy(context) { $0 != c }
 }
 
 /// Parses a string `str`.
-func string(str: String.UnicodeScalarView) -> UVUVParser {
+func string<Ctxt>(context: Ctxt, _ str: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
   return string(str, f: id)
 }
 
 /// Parses a string `str` after mapping `f` over `str` and the input to the
 /// parser.
-func string(str: String.UnicodeScalarView, f: UnicodeScalar -> UnicodeScalar) -> UVUVParser {
+func string<Ctxt>(str: String.UnicodeScalarView, f: UnicodeScalar -> UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
   return Parser { input in
     let strLength = str.count
-    let prefix = input.prefix(strLength)
+    let prefix = input.0.prefix(strLength)
     if prefix.map(f) == str.map(f) {
-      let suffix = input.suffixFrom(input.startIndex.advancedBy(strLength))
-      return .Done(suffix, prefix)
+      let suffix = input.0.suffixFrom(input.0.startIndex.advancedBy(strLength))
+      return .Done(suffix, input.1, prefix)
     } else {
       return .Failure(input, [], "\(prefix) did not match \(str)")
     }
@@ -119,11 +115,11 @@ func string(str: String.UnicodeScalarView, f: UnicodeScalar -> UnicodeScalar) ->
 }
 
 /// Parses one UnicodeScalar that exists in `xs`.
-func oneOf(xs: String.UnicodeScalarView) -> UVUSParser {
-  return satisfy { xs.contains($0) }
+func oneOf<Ctxt>(context: Ctxt, xs: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy(context) { xs.contains($0) }
 }
 
 /// Parses one UnicodeScalar that does not exist in `xs`.
-func noneOf(xs: String.UnicodeScalarView) -> UVUSParser {
-  return satisfy { !xs.contains($0) }
+func noneOf<Ctxt>(context: Ctxt, xs: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy(context) { !xs.contains($0) }
 }

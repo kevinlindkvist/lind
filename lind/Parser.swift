@@ -8,35 +8,36 @@
 
 import Result
 
-public struct Parser<Input, Output> {
-  let parse: Input -> Reply<Input, Output>
+public struct Parser<In, Ctxt, Out> {
+  let parse: (In, Ctxt) -> Reply<In, Ctxt, Out>
 }
 
-public func parse<Input, Output>(parser: Parser<Input, Output>, input: Input) -> Reply<Input, Output> {
-  return parser.parse(input)
+public func parse<In, Ctxt, Out>(parser: Parser<In, Ctxt, Out>, input: (In, Ctxt)) -> Reply<In, Ctxt, Out> {
+  return parser.parse(input.0, input.1)
 }
 
-public func parseOnly<In, Out>(p: Parser<In, Out>, input: In) -> Result<Out, ParseError> {
+public func parseOnly<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, input: (In, Ctxt)) -> Result<(Ctxt, Out), ParseError> {
   return parse(p, input: input).result
 }
 
 // MARK: Monad functions.
 
 /// Returns a Parser with a .Failure Reply containing `message`.
-func fail<Input, Output>(message: String) -> Parser<Input, Output> {
+func fail<In, Ctxt, Out>(message: String) -> Parser<In, Ctxt, Out> {
   return Parser { .Failure($0, [], message) }
 }
 
 /// Equivalent to Swift's flatMap. First parses the input with `parser` and
 /// then passes the output to `f` and uses the result to parse the remaining 
 /// input.
-func >>-<Input, Output1, Output2>(parser: Parser<Input, Output1>, f: Output1 -> Parser<Input, Output2>) -> Parser<Input, Output2> {
+func >>-<In, Ctxt, Out1, Out2>(parser: Parser<In, Ctxt, Out1>,
+         f: (Ctxt, Out1) -> Parser<In, Ctxt, Out2>) -> Parser<In, Ctxt, Out2> {
   return Parser { input in
     switch parse(parser, input: input) {
     case let .Failure(input2, labels, message):
       return .Failure(input2, labels, message)
-    case let .Done(input2, output):
-      return parse(f(output), input: input2)
+    case let .Done(input2, context, output):
+      return parse(f(context, output), input: (input2, context))
     }
   }
 }
@@ -44,14 +45,14 @@ func >>-<Input, Output1, Output2>(parser: Parser<Input, Output1>, f: Output1 -> 
 // Mark: Alternative functions.
 
 /// The identity of `<|>`.
-func empty<Input, Output>() -> Parser<Input, Output> {
+func empty<In, Ctxt, Out>() -> Parser<In, Ctxt, Out> {
   return fail("empty")
 }
 
 /// Attempts parsing the input with `p`, and if that fails returns the result 
 /// of parsing the input with `q`.
-func <|><Input, Output>(p: Parser<Input, Output>,
-         @autoclosure(escaping) q: () -> Parser<Input, Output>) -> Parser<Input, Output> {
+func <|><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>,
+         @autoclosure(escaping) q: () -> Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Out> {
   return Parser { input in
     let reply = parse(p, input: input)
     switch reply {
@@ -65,30 +66,30 @@ func <|><Input, Output>(p: Parser<Input, Output>,
 
 // MARK: Applicative functions.
 
-/// Lifts `output` to `Parser<Input, Output>`.
-func pure<Input, Output>(output: Output) -> Parser<Input, Output> {
-  return Parser { .Done($0, output) }
+/// Lifts `output` to `Parser<In, Ctxt, Out>`.
+func pure<In, Ctxt, Out>(output: Out) -> Parser<In, Ctxt, Out> {
+  return Parser { .Done($0.0, $0.1, output) }
 }
 
 /// Rerturns a `Parser` that parses the input with `p`, and then parses the
 /// remaining input using the parser produced by `q`.
-func <*><Input, Output1, Output2>(p: Parser<Input, Output1 -> Output2>, @autoclosure(escaping) q: () -> Parser<Input, Output1>) -> Parser<Input, Output2> {
-  return p >>- { f in f <^> q() }
+func <*><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1 -> Out2>,
+         @autoclosure(escaping) q: () -> Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
+  return p >>- { f in f.1 <^> q() }
 }
 
 /// Sequences the provided actions, discarding the output of the right 
 /// argument.
-func <*<Input, Output1, Output2>(p: Parser<Input, Output1>,
-        @autoclosure(escaping) q: () -> Parser<Input, Output2>)
-  -> Parser<Input, Output1> {
+func <*<In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
+        @autoclosure(escaping) q: () -> Parser<In, Ctxt, Out2>) -> Parser<In, Ctxt, Out1> {
     return const <^> p <*> q
 }
 
 /// Sequences the provided actions, discarding the output of the left
 /// argument.
-func *><Input, Output1, Output2>(p: Parser<Input, Output1>,
-        @autoclosure(escaping) q: () -> Parser<Input, Output2>)
-  -> Parser<Input, Output2> {
+func *><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
+        @autoclosure(escaping) q: () -> Parser<In, Ctxt, Out2>)
+  -> Parser<In, Ctxt, Out2> {
     return const(id) <^> p <*> q
 }
 
@@ -96,17 +97,17 @@ func *><Input, Output1, Output2>(p: Parser<Input, Output1>,
 
 /// Swift's `map`. Parses the input using `p`, and then applies `f` to the
 /// resulting output before returning a parser with the converted output.
-func <^><Input, Output1, Output2>(f: Output1 -> Output2, p: Parser<Input, Output1>) -> Parser<Input, Output2> {
-  return p >>- { a in pure(f(a)) }
+func <^><In, Ctxt, Out1, Out2>(f: Out1 -> Out2, p: Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
+  return p >>- { a in pure(f(a.1)) }
 }
 
 /// Same as `<^>` with the arguments flipped.
-func <&><Input, Output1, Output2>(p: Parser<Input, Output1>, f: Output1 -> Output2) -> Parser<Input, Output2> {
+func <&><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>, f: Out1 -> Out2) -> Parser<In, Ctxt, Out2> {
   return f <^> p
 }
 
 /// Labels a parser with a name.
-func <?><Input, Output>(p: Parser<Input, Output>, @autoclosure(escaping) label: () -> String) -> Parser<Input, Output> {
+func <?><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, @autoclosure(escaping) label: () -> String) -> Parser<In, Ctxt, Out> {
   return Parser { input in
     let reply = parse(p, input: input)
     switch reply {
@@ -120,23 +121,12 @@ func <?><Input, Output>(p: Parser<Input, Output>, @autoclosure(escaping) label: 
 
 // MARK: Peek
 
-/// Matches the first element to perform lookahead.
-func peek<Input: CollectionType, Output where Input.Generator.Element == Output>() -> Parser<Input, Output> {
+func endOfInput<Ctxt, In: CollectionType>() -> Parser<In, Ctxt, ()> {
   return Parser { input in
-    if let head = input.first {
-      return .Done(input, head)
+    if input.0.isEmpty {
+      return .Done(input.0, input.1, ())
     } else {
-      return .Failure(input, [], "peek")
-    }
-  }
-}
-
-func endOfInput<Input: CollectionType>() -> Parser<Input, ()> {
-  return Parser { input in
-    if input.isEmpty {
-      return .Done(input, ())
-    } else {
-      return .Failure(input, [], "endOfInput: \(input)")
+      return .Failure(input, [], "endOfIn: \(input)")
     }
   }
 }
