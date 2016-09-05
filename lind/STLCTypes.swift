@@ -14,7 +14,15 @@ indirect enum STLCType {
   case Nat
 }
 
-enum STLCTerm {
-  case ULCTerm
-  case UATerm
+indirect enum STLCTerm {
+  case tmTrue
+  case tmFalse
+  case ifElse(STLCTerm, STLCTerm, STLCTerm)
+  case zero
+  case succ(STLCTerm)
+  case pred(STLCTerm)
+  case isZero(STLCTerm)
+  case va(String, Int)
+  case abs(String, STLCTerm)
+  case app(STLCTerm, STLCTerm)
 }
