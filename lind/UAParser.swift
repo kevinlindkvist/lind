@@ -30,17 +30,17 @@ func _UAFalse() -> UATermParser {
 
 let UASucc = _UASucc()
 func _UASucc() -> UATermParser {
-  return (string((), "succ") *> UATermP) >>- { (_: inout(),t: UATerm) in pure(.succ(t)) }
+  return (string((), "succ") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.succ(t)), ctxt) }
 }
 
 let UAPred = _UAPred()
 func _UAPred() -> UATermParser {
-  return (string((), "pred") *> UATermP) >>- { (_: inout(), t: UATerm) in pure(.pred(t)) }
+  return (string((), "pred") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.pred(t)), ctxt) }
 }
 
 let UAIsZero = _UAIsZero()
 func _UAIsZero() -> UATermParser {
-  return (string((), "isZero") *> UATermP) >>- { (_: inout(), t: UATerm) in pure(.isZero(t)) }
+  return (string((), "isZero") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.isZero(t)), ctxt) }
 }
 
 // Parses an if-then-else statement.
@@ -49,15 +49,15 @@ func _UAIfElse() -> UATermParser {
   let ifString = string((), "if")
   let thenString = string((), "then")
   let elseString = string((), "else")
-  return (ifString *> UATermP) >>- { (_: inout(), conditional: UATerm) in
-    return (thenString *> UATermP) >>- { (_: inout(), trueBranch: UATerm) in
-      return (elseString *> UATermP) >>- { (_: inout(), falseBranch: UATerm) in
+  return (ifString *> UATermP) >>- { (ctxt, conditional: UATerm) in
+    return ((thenString *> UATermP) >>- { (ctxt, trueBranch: UATerm) in
+      return ((elseString *> UATermP) >>- { (ctxt, falseBranch: UATerm) in
         let ifElse = IfElseUATerm(conditional: conditional,
                                 trueBranch: trueBranch,
                                 falseBranch: falseBranch)
-        return pure(.ifElse(ifElse))
-      }
-    }
+        return (pure(.ifElse(ifElse)), ())
+      }, ctxt)
+    }, ctxt)
   }
 }
 

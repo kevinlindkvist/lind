@@ -21,14 +21,13 @@ private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, St
 
 private let variable = _variable()
 private func _variable() -> TermParser {
-  return identifier >>- { (context: inout NamingContext, t: String.UnicodeScalarView) in
+  return identifier >>- { (context: NamingContext, t: String.UnicodeScalarView) in
     let id = String(t)
     if let index = context[id] {
-      return pure(.va(id, index))
+      return (pure(.va(id, index)), context)
     } else {
       let index = context.count
-      context[id] = index
-      return pure(.va(id, index))
+      return (pure(.va(id, index)), union(context, [id:index]))
     }
   }
 }
@@ -36,24 +35,24 @@ private func _variable() -> TermParser {
 private let lambda = _lambda()
 private func _lambda() -> TermParser {
   return (char("\\") *> identifier)
-    >>- { (context: inout NamingContext, identifier: String.UnicodeScalarView) in
+    >>- { (context: NamingContext, identifier: String.UnicodeScalarView) in
       let boundName = String(identifier)
       var shiftedContext: NamingContext = [:]
       context.forEach { name, index in
         return shiftedContext[name] = index + 1
       }
       shiftedContext[boundName] = 0
-      print("Parsing body with \(shiftedContext)")
-      return (char(".") *> term)
-        >>- { (context: inout NamingContext, t: ULCTerm) in
+      return ((char(".") *> term)
+        >>- { (context: NamingContext, t: ULCTerm) in
+          var context = context
           context.forEach { name, index in
             if (index != 0) {
               context[name] = index - 1
             }
           }
-          print("Parsed body with \(context)")
-          return pure(.abs(boundName, t))
-        }
+          context.removeValue(forKey: boundName)
+          return (pure(.abs(boundName, t)), context)
+        }, shiftedContext)
     }
 }
 
