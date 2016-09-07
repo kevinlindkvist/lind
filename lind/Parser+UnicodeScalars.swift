@@ -95,7 +95,7 @@ func not<Ctxt>(_ context: Ctxt, _ c: UnicodeScalar) -> Parser<String.UnicodeScal
 }
 
 /// Parses a string `str`.
-func string<Ctxt>(_ context: Ctxt, _ str: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
+func string<Ctxt>(_ str: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, String.UnicodeScalarView> {
   return string(str, f: id)
 }
 

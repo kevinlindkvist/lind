@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B47AB14A1D7FF67600586FDB /* STLCParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47AB1491D7FF67600586FDB /* STLCParserTests.swift */; };
+		B47AB1521D7FF6CA00586FDB /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B768C1D7CC15D0062464C /* STLCParser.swift */; };
+		B47AB1531D7FF6CE00586FDB /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76871D7CB7DD0062464C /* STLCTypes.swift */; };
 		B49B76151D740DFE0062464C /* lind.h in Headers */ = {isa = PBXBuildFile; fileRef = B49B76141D740DFE0062464C /* lind.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B49B761C1D740DFE0062464C /* lind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B49B76111D740DFE0062464C /* lind.framework */; };
 		B49B762C1D740E0E0062464C /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B762B1D740E0E0062464C /* Parser.swift */; };
@@ -122,6 +125,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B47AB1491D7FF67600586FDB /* STLCParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCParserTests.swift; sourceTree = "<group>"; };
 		B49B76111D740DFE0062464C /* lind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = lind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B49B76141D740DFE0062464C /* lind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lind.h; sourceTree = "<group>"; };
 		B49B76161D740DFE0062464C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -219,6 +223,7 @@
 				B49B76691D7423780062464C /* UAEvaluationTests.swift */,
 				B49B76761D7570EE0062464C /* ULCParserTests.swift */,
 				B49B76831D7C10210062464C /* ULCEvaluationTests.swift */,
+				B47AB1491D7FF67600586FDB /* STLCParserTests.swift */,
 				B49B766E1D75407D0062464C /* TestHelpers.swift */,
 				B49B766C1D7427AD0062464C /* UntypedArithmeticTests */,
 				B49B76221D740DFF0062464C /* Info.plist */,
@@ -473,12 +478,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				B49B76731D7552600062464C /* ULCTerms.swift in Sources */,
+				B47AB1531D7FF6CE00586FDB /* STLCTypes.swift in Sources */,
 				B49B76621D7417670062464C /* Reply.swift in Sources */,
 				B49B766A1D7423780062464C /* UAEvaluationTests.swift in Sources */,
 				B49B76661D7417670062464C /* UATerms.swift in Sources */,
 				B49B76771D7570EE0062464C /* ULCParserTests.swift in Sources */,
 				B49B76841D7C10210062464C /* ULCEvaluationTests.swift in Sources */,
+				B47AB1521D7FF6CA00586FDB /* STLCParser.swift in Sources */,
 				B49B76641D7417670062464C /* Prelude.swift in Sources */,
+				B47AB14A1D7FF67600586FDB /* STLCParserTests.swift in Sources */,
 				B49B76631D7417670062464C /* ParseError.swift in Sources */,
 				B49B76821D7B93DC0062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B765E1D74171B0062464C /* UAParser.swift in Sources */,

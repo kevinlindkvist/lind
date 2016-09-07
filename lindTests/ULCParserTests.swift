@@ -9,10 +9,6 @@
 import XCTest
 import Result
 
-private func ==(lhs: [String: Int], rhs: [String: Int] ) -> Bool {
-  return NSDictionary(dictionary: lhs).isEqual(to: rhs)
-}
-
 fileprivate typealias ParseResult = ([String:Int], ULCTerm)
 
 class UntypedLambdaCalculusParserTests: XCTestCase {

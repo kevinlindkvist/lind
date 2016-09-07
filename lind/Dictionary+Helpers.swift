@@ -18,3 +18,7 @@ public func union<Key, Value>(_ dictionary1: [Key:Value], _ dictionary2: [Key:Va
     }
     return u
 }
+
+func ==(lhs: [String: Int], rhs: [String: Int] ) -> Bool {
+  return NSDictionary(dictionary: lhs).isEqual(to: rhs)
+}

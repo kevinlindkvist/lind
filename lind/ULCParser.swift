@@ -37,11 +37,11 @@ private func _lambda() -> TermParser {
   return (char("\\") *> identifier)
     >>- { (context: NamingContext, identifier: String.UnicodeScalarView) in
       let boundName = String(identifier)
-      var shiftedContext: NamingContext = [:]
+      var context = context
       context.forEach { name, index in
-        return shiftedContext[name] = index + 1
+        return context[name] = index + 1
       }
-      shiftedContext[boundName] = 0
+      context[boundName] = 0
       return ((char(".") *> term)
         >>- { (context: NamingContext, t: ULCTerm) in
           var context = context
@@ -52,7 +52,7 @@ private func _lambda() -> TermParser {
           }
           context.removeValue(forKey: boundName)
           return (pure(.abs(boundName, t)), context)
-        }, shiftedContext)
+        }, context)
     }
 }
 
