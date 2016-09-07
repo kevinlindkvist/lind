@@ -7,7 +7,7 @@
 //
 
 /// Matches characters satisfying `predicate`.
-func satisfy<Ctxt>(_ context: Ctxt, _ predicate: @escaping (UnicodeScalar) -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+func satisfy<Ctxt>(_ predicate: @escaping (UnicodeScalar) -> Bool) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
   return Parser { input in
     if let (head, tail) = uncons(input.0) , predicate(head) {
       return .done(tail, input.1, head)
@@ -76,22 +76,22 @@ func isSpace(_ c: UnicodeScalar) -> Bool {
 }
 
 func skipSpaces<Ctxt>(_ context: Ctxt) -> Parser<String.UnicodeScalarView, Ctxt, ()> {
-  return skipMany(satisfy(context, isSpace))
+  return skipMany(satisfy(isSpace))
 }
 
 /// Parses any one unicode scalar.
 func any<Ctxt>(_ context: Ctxt) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
-  return satisfy(context, const(true))
+  return satisfy(const(true))
 }
 
 /// Parses a character matching `c`.
-func char<Ctxt>(_ context: Ctxt, _ c: UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
-  return satisfy(context) { $0 == c }
+func char<Ctxt>(_ c: UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
+  return satisfy { $0 == c }
 }
 
 /// Parses a character not matching `c`.
 func not<Ctxt>(_ context: Ctxt, _ c: UnicodeScalar) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
-  return satisfy(context) { $0 != c }
+  return satisfy { $0 != c }
 }
 
 /// Parses a string `str`.
@@ -116,10 +116,10 @@ func string<Ctxt>(_ str: String.UnicodeScalarView, f: @escaping (UnicodeScalar) 
 
 /// Parses one UnicodeScalar that exists in `xs`.
 func oneOf<Ctxt>(_ context: Ctxt, xs: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
-  return satisfy(context) { xs.contains($0) }
+  return satisfy { xs.contains($0) }
 }
 
 /// Parses one UnicodeScalar that does not exist in `xs`.
 func noneOf<Ctxt>(_ context: Ctxt, xs: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, Ctxt, UnicodeScalar> {
-  return satisfy(context) { !xs.contains($0) }
+  return satisfy { !xs.contains($0) }
 }

@@ -31,13 +31,14 @@ func fail<In, Ctxt, Out>(_ message: String) -> Parser<In, Ctxt, Out> {
 /// then passes the output to `f` and uses the result to parse the remaining 
 /// input.
 func >>-<In, Ctxt, Out1, Out2>(parser: Parser<In, Ctxt, Out1>,
-         f: @escaping (Ctxt, Out1) -> Parser<In, Ctxt, Out2>) -> Parser<In, Ctxt, Out2> {
+         f: @escaping (inout Ctxt, Out1) -> Parser<In, Ctxt, Out2>) -> Parser<In, Ctxt, Out2> {
   return Parser { input in
     switch parse(parser, input: input) {
     case let .failure(input2, labels, message):
       return .failure(input2, labels, message)
     case let .done(input2, context, output):
-      return parse(f(context, output), input: (input2, context))
+      var context = context
+      return parse(f(&context, output), input: (input2, context))
     }
   }
 }
@@ -71,11 +72,15 @@ func pure<In, Ctxt, Out>(_ output: Out) -> Parser<In, Ctxt, Out> {
   return Parser { .done($0.0, $0.1, output) }
 }
 
+func pure<In, Ctxt, Out>(_ context: Ctxt, _ output: Out) -> Parser<In, Ctxt, Out> {
+  return Parser { .done($0.0, context, output) }
+}
+
 /// Rerturns a `Parser` that parses the input with `p`, and then parses the
 /// remaining input using the parser produced by `q`.
 func <*><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, (Out1) -> Out2>,
          q: @autoclosure @escaping () -> Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
-  return p >>- { f in f.1 <^> q() }
+  return p >>- { (_, f) in f <^> q() }
 }
 
 /// Sequences the provided actions, discarding the output of the right 
@@ -98,7 +103,7 @@ func *><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
 /// Swift's `map`. Parses the input using `p`, and then applies `f` to the
 /// resulting output before returning a parser with the converted output.
 func <^><In, Ctxt, Out1, Out2>(f: @escaping (Out1) -> Out2, p: Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
-  return p >>- { a in pure(f(a.1)) }
+  return p >>- { (_: inout Ctxt, a: Out1) in pure(f(a)) }
 }
 
 /// Same as `<^>` with the arguments flipped.

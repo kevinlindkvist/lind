@@ -16,67 +16,56 @@ private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, U
 private let identifier = _identifier()
 private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
   let alphas = CharacterSet.alphanumerics
-  return many1( satisfy([:]) { alphas.contains(UnicodeScalar($0.value)!) } )
+  return many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
 }
 
 private let variable = _variable()
 private func _variable() -> TermParser {
-  return identifier >>- {
-    let context = ($0.0)
-    let id = String($0.1)
+  return identifier >>- { (context: inout NamingContext, t: String.UnicodeScalarView) in
+    let id = String(t)
     if let index = context[id] {
       return pure(.va(id, index))
     } else {
       let index = context.count
-      return (pure(.va(id, index)))
+      context[id] = index
+      return pure(.va(id, index))
     }
   }
 }
 
 private let lambda = _lambda()
 private func _lambda() -> TermParser {
-  return (char([:], "\\") *> identifier)
-    >>- { va in
-      let boundName = String(va.1)
+  return (char("\\") *> identifier)
+    >>- { (context: inout NamingContext, identifier: String.UnicodeScalarView) in
+      let boundName = String(identifier)
       var shiftedContext: NamingContext = [:]
-      va.0.forEach { name, index in
+      context.forEach { name, index in
         return shiftedContext[name] = index + 1
       }
       shiftedContext[boundName] = 0
-      return (char([:], ".") *> term)
-      >>- { body in
-        var unshiftedContext: NamingContext = [:]
-        body.0.forEach { name, index in
-          if (index != 0) {
-            unshiftedContext[name] = index - 1
+      print("Parsing body with \(shiftedContext)")
+      return (char(".") *> term)
+        >>- { (context: inout NamingContext, t: ULCTerm) in
+          context.forEach { name, index in
+            if (index != 0) {
+              context[name] = index - 1
+            }
           }
+          print("Parsed body with \(context)")
+          return pure(.abs(boundName, t))
         }
-        return pure(.abs(boundName, body.1))
-      }
     }
 }
 
 private let nonAppTerm = _nonAppTerm()
 private func _nonAppTerm() -> TermParser {
-  return (char([:], "(") *> term <* char([:], ")")) <|> lambda <|> variable
-}
-
-private func >>-(parser: TermParser,
-         f: @escaping (NamingContext, ULCTerm) -> TermParser) -> TermParser {
-  return Parser { input in
-    switch parse(parser, input: input) {
-    case let .failure(input2, labels, message):
-      return .failure(input2, labels, message)
-    case let .done(input2, context, output):
-      return parse(f(context, output), input: (input2, context))
-    }
-  }
+  return (char("(") *> term <* char(")")) <|> lambda <|> variable
 }
 
 private let term = _term()
 private func _term() -> TermParser {
   return chainl1(p: nonAppTerm,
-                 op: char([:], " ") *> pure( { t1, t2 in .app(t1, t2)}))
+                 op: char(" ") *> pure( { t1, t2 in .app(t1, t2)}))
 }
 
 private func untypedLambdaCalculus() -> TermParser {
