@@ -11,6 +11,17 @@ import Foundation
 
 private typealias NamingContext = [String:Int]
 private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
+private typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
+
+private let baseType = _baseType()
+private func _baseType() -> TypeParser {
+  return (string("bool") *> pure(.bool)) <|> (string("int") *> pure(.nat))
+}
+
+private let type = _type()
+private func _type() -> TypeParser {
+  return chainl1(p: baseType, op: string("->") *> pure({ t1, t2 in .t_t(t1, t2) }))
+}
 
 private let zero = _zero()
 private func _zero() -> TermParser {
@@ -81,15 +92,17 @@ private func _lambda() -> TermParser {
       return ctxt[name] = index + 1
     }
     ctxt[boundName] = 0
-    return ((char(".") *> term) >>- { ctxt, t in
-      var ctxt = ctxt
-      ctxt.forEach { name, index in
-        if (index != 0) {
-          ctxt[name] = index - 1
+    return ((char(":") *> type) >>- { ctxt, type in
+      return ((char(".") *> term) >>- { ctxt, t in
+        var ctxt = ctxt
+        ctxt.forEach { name, index in
+          if (index != 0) {
+            ctxt[name] = index - 1
+          }
         }
-      }
-      ctxt.removeValue(forKey: boundName)
-      return (pure(.abs(boundName, t)), ctxt)
+        ctxt.removeValue(forKey: boundName)
+        return (pure(.abs(boundName, type, t)), ctxt)
+      }, ctxt)
     }, ctxt)
   }
 }

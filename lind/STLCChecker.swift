@@ -5,3 +5,69 @@
 //  Created by Kevin Lindkvist on 9/4/16.
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
+
+func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
+  switch t {
+  case let .va(_, idx):
+    if let type = context[idx] {
+      return type
+    } else {
+      return nil
+    }
+  case let .abs(_, type, term):
+    var shiftedContext = context
+    context.forEach { k, v in
+      shiftedContext[k+1] = v
+    }
+    if let t2 = typeOf(t: term, context: union([0:type],shiftedContext)) {
+      return .t_t(type, t2)
+    } else {
+      return nil
+    }
+  case let .app(t1, t2):
+    if let tyT1 = typeOf(t: t1, context: context),
+      let tyT2 = typeOf(t: t2, context: context) {
+      switch tyT1 {
+        case let .t_t(tyT11, tyT22) where tyT11 == tyT2: return tyT22
+        default: return nil
+      }
+    } else {
+      return nil
+    }
+  case .tmTrue: return .bool
+  case .tmFalse: return .bool
+  case let .ifElse(conditional, trueBranch, falseBranch):
+    if typeOf(t: conditional, context: context) == .bool {
+      let tyTrue = typeOf(t: trueBranch, context: context)
+      if tyTrue == typeOf(t: falseBranch, context: context) {
+        return tyTrue
+      } else {
+        return nil
+      }
+    } else {
+      return nil
+    }
+  case let .zero: return .nat
+  case let .isZero(term):
+    let type = typeOf(t: term, context: context)
+    if type == .nat {
+      return .bool
+    } else {
+      return nil
+    }
+  case let .succ(term):
+    let type = typeOf(t: term, context: context)
+    if type == .nat {
+      return .nat
+    } else {
+      return nil
+    }
+  case let .pred(term):
+    let type = typeOf(t: term, context: context)
+    if type == .nat {
+      return .nat
+    } else {
+      return nil
+    }
+  }
+}

@@ -8,10 +8,22 @@
 
 typealias TypeContext = [Int:STLCType]
 
-indirect enum STLCType {
-  case t_T(STLCType, STLCType)
+public indirect enum STLCType {
+  case t_t(STLCType, STLCType)
   case bool
   case nat
+}
+
+extension STLCType: Equatable {
+}
+
+public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
+  switch (lhs, rhs) {
+    case (.bool, .bool): return true
+    case (.nat, .nat): return true
+    case let (.t_t(t1,t2), .t_t(t11, t22)): return t1 == t11 && t2 == t22
+    default: return false
+  }
 }
 
 public indirect enum STLCTerm {
@@ -23,7 +35,7 @@ public indirect enum STLCTerm {
   case pred(STLCTerm)
   case isZero(STLCTerm)
   case va(String, Int)
-  case abs(String, STLCTerm)
+  case abs(String, STLCType, STLCTerm)
   case app(STLCTerm, STLCTerm)
 }
 
@@ -38,7 +50,7 @@ extension STLCTerm: CustomStringConvertible {
     case let .pred(t): return "pred(\(t))"
     case let .isZero(t): return "isZero(\(t))"
     case let .va(x, idx): return "\(x):\(idx)"
-    case let .abs(x, t): return "\\\(x).\(t)"
+    case let .abs(x, type, t): return "\\\(x):\(type).\(t)"
     case let .app(lhs, rhs): return "(\(lhs) \(rhs))"
     }
   }
