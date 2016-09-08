@@ -75,7 +75,7 @@ func isSpace(_ c: UnicodeScalar) -> Bool {
   return spaces.contains(c)
 }
 
-func skipSpaces<Ctxt>(_ context: Ctxt) -> Parser<String.UnicodeScalarView, Ctxt, ()> {
+func skipSpaces<Ctxt>() -> Parser<String.UnicodeScalarView, Ctxt, ()> {
   return skipMany(satisfy(isSpace))
 }
 

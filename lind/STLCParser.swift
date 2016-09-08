@@ -29,17 +29,17 @@ private func _false() -> TermParser {
 
 private let succ = _succ()
 private func _succ() -> TermParser {
-  return (string("succ") *> term) >>- { ctxt, t in (pure(.succ(t)), ctxt) }
+  return (string("succ") *> skipSpaces() *> term) >>- { ctxt, t in (pure(.succ(t)), ctxt) }
 }
 
 private let pred = _pred()
 private func _pred() -> TermParser {
-  return (string("pred") *> term) >>- { ctxt, t in (pure(.pred(t)), ctxt) }
+  return (string("pred") *> skipSpaces() *> term) >>- { ctxt, t in (pure(.pred(t)), ctxt) }
 }
 
 private let isZero = _isZero()
 private func _isZero() -> TermParser {
-  return (string( "isZero") *> term) >>- { ctxt, t in (pure(.isZero(t)), ctxt) }
+  return (string( "isZero") *> skipSpaces() *> term) >>- { ctxt, t in (pure(.isZero(t)), ctxt) }
 }
 
 private let identifier = _identifier()
@@ -104,6 +104,7 @@ private func _nonAppTerm() -> TermParser {
     <|> isZero
     <|> tmTrue
     <|> tmFalse
+    <|> zero
     <|> variable
 }
 
