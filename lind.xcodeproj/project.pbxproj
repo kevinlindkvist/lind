@@ -49,6 +49,8 @@
 		B49B76881D7CB7DD0062464C /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76871D7CB7DD0062464C /* STLCTypes.swift */; };
 		B49B768A1D7CB82E0062464C /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
 		B49B768D1D7CC15D0062464C /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B768C1D7CC15D0062464C /* STLCParser.swift */; };
+		B4AD1D871D813BC50033FEB3 /* STLCTypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */; };
+		B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +157,7 @@
 		B49B76871D7CB7DD0062464C /* STLCTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypes.swift; sourceTree = "<group>"; };
 		B49B76891D7CB82E0062464C /* STLCChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCChecker.swift; sourceTree = "<group>"; };
 		B49B768C1D7CC15D0062464C /* STLCParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCParser.swift; sourceTree = "<group>"; };
+		B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypeCheckerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,6 +227,7 @@
 				B49B76761D7570EE0062464C /* ULCParserTests.swift */,
 				B49B76831D7C10210062464C /* ULCEvaluationTests.swift */,
 				B47AB1491D7FF67600586FDB /* STLCParserTests.swift */,
+				B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */,
 				B49B766E1D75407D0062464C /* TestHelpers.swift */,
 				B49B766C1D7427AD0062464C /* UntypedArithmeticTests */,
 				B49B76221D740DFF0062464C /* Info.plist */,
@@ -490,9 +494,11 @@
 				B49B76631D7417670062464C /* ParseError.swift in Sources */,
 				B49B76821D7B93DC0062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B765E1D74171B0062464C /* UAParser.swift in Sources */,
+				B4AD1D871D813BC50033FEB3 /* STLCTypeCheckerTests.swift in Sources */,
 				B49B76781D757A180062464C /* ULCParser.swift in Sources */,
 				B49B765D1D7413420062464C /* UAParserTests.swift in Sources */,
 				B49B76601D7417670062464C /* Parser+UnicodeScalars.swift in Sources */,
+				B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */,
 				B49B765F1D7417670062464C /* Parser.swift in Sources */,
 				B49B766B1D7423F90062464C /* UAEvaluator.swift in Sources */,
 				B49B76611D7417670062464C /* Parser+Combinators.swift in Sources */,

@@ -42,17 +42,20 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
       if tyTrue == typeOf(t: falseBranch, context: context) {
         return tyTrue
       } else {
+        print("type of if branches not equal")
         return nil
       }
     } else {
+      print("type of if conditional not bool: \(conditional)")
       return nil
     }
-  case let .zero: return .nat
+  case .zero: return .nat
   case let .isZero(term):
     let type = typeOf(t: term, context: context)
     if type == .nat {
       return .bool
     } else {
+      print("isZero called with non-nat argument")
       return nil
     }
   case let .succ(term):
@@ -60,6 +63,7 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
     if type == .nat {
       return .nat
     } else {
+      print("succ called with non-nat argument")
       return nil
     }
   case let .pred(term):
@@ -67,6 +71,7 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
     if type == .nat {
       return .nat
     } else {
+      print("pred called with non-nat argument")
       return nil
     }
   }
