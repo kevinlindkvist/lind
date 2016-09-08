@@ -30,6 +30,16 @@ class STLCParserTests: XCTestCase {
     let expected: STLCTerm = .abs("x", .bool, .va("x", 0))
     testParseResult("\\x:bool.x", expected: ([:], expected))
   }
+  
+  func testSucc() {
+    let expected: STLCTerm = .succ(.pred(.zero))
+    testParseResult("succ(pred 0)", expected: ([:], expected))
+  }
+  
+  func testPred() {
+    let expected: STLCTerm = .pred(.succ(.zero))
+    testParseResult("pred(succ 0)", expected: ([:], expected))
+  }
 
   func testAbsArrowType() {
     let expected: STLCTerm = .abs("x", .t_t(.nat,.bool), .va("x", 0))

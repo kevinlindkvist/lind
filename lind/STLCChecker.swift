@@ -12,6 +12,7 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
     if let type = context[idx] {
       return type
     } else {
+      print("Could not find \(idx) in \(context)")
       return nil
     }
   case let .abs(_, type, term):
@@ -29,7 +30,12 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
       let tyT2 = typeOf(t: t2, context: context) {
       switch tyT1 {
         case let .t_t(tyT11, tyT22) where tyT11 == tyT2: return tyT22
-        default: return nil
+        case let .t_t(tyT11, _):
+          print("App types inconsistent \(tyT11), \(tyT2)")
+          return nil
+        default:
+          print("incorrect type of app \(tyT1)")
+          return nil
       }
     } else {
       return nil
@@ -39,10 +45,11 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
   case let .ifElse(conditional, trueBranch, falseBranch):
     if typeOf(t: conditional, context: context) == .bool {
       let tyTrue = typeOf(t: trueBranch, context: context)
-      if tyTrue == typeOf(t: falseBranch, context: context) {
+      let tyFalse = typeOf(t: falseBranch, context: context)
+      if tyTrue == tyFalse {
         return tyTrue
       } else {
-        print("type of if branches not equal")
+        print("type of if branches not equal \(tyTrue) \(tyFalse)")
         return nil
       }
     } else {

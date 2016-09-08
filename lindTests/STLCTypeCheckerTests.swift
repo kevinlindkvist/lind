@@ -23,7 +23,7 @@ class STLCTypeCheckerTests: XCTestCase {
 
   func testIfElse() {
     let firstConditional = "((\\x:bool.x) true)"
-    let thenClause = "((\\y:bool->int.y false) \\z:bool.if (z) then (succ 0) else pred(succ(succ(0))))"
+    let thenClause = "((\\y:bool->int.y false) \\z:bool.if (isZero 0) then (succ 0) else pred(succ 0))"
     let ifElse =
       parseSimplyTypedLambdaCalculus("if \(firstConditional) then \(thenClause) else 0")
     switch ifElse {

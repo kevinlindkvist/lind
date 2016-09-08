@@ -26,6 +26,16 @@ public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
   }
 }
 
+extension STLCType: CustomStringConvertible {
+  public var description: String {
+    switch self {
+      case .bool: return "bool"
+      case .nat: return "int"
+      case let .t_t(t1, t2): return "\(t1.description)->\(t2.description)"
+    }
+  }
+}
+
 public indirect enum STLCTerm {
   case tmTrue
   case tmFalse
