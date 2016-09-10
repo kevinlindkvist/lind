@@ -117,16 +117,17 @@ private func _lambda() -> TermParser {
 
 private let nonAppTerm = _nonAppTerm()
 private func _nonAppTerm() -> TermParser {
-  return skipSpaces() *> ((char("(") *> term <* char(")"))
-    <|> lambda
-    <|> ifElse
-    <|> succ
-    <|> pred
-    <|> isZero
-    <|> tmTrue
-    <|> tmFalse
-    <|> zero
-    <|> variable)
+  return skipSpaces()
+    *> ((char("(") *> term <* char(")"))
+        <|> lambda
+        <|> ifElse
+        <|> succ
+        <|> pred
+        <|> isZero
+        <|> tmTrue
+        <|> tmFalse
+        <|> zero
+        <|> variable)
 }
 
 private let term = _term()
