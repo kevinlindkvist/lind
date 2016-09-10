@@ -12,6 +12,11 @@ import Foundation
 private typealias NamingContext = [String:Int]
 private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
 private typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
+private let keywords = ["if", "else", "then", "succ", "pred", "isZero", "0"]
+
+private func keyword(_ str: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
+  return skipSpaces() *> string(str);
+}
 
 private let baseType = _baseType()
 private func _baseType() -> TypeParser {
@@ -63,6 +68,9 @@ private let variable = _variable()
 private func _variable() -> TermParser {
   return identifier >>- { (context: NamingContext, t: String.UnicodeScalarView) in
     let id = String(t)
+    if keywords.contains(id) {
+      return (fail("variable was keyword"), context)
+    }
     if let index = context[id] {
       return (pure(.va(id, index)), context)
     } else {
@@ -74,9 +82,9 @@ private func _variable() -> TermParser {
 
 private let ifElse = _ifElse()
 private func _ifElse() -> TermParser {
-  return (string("if ") *> nonAppTerm) >>- { ctxt, conditional in
-    return ((string(" then ") *> nonAppTerm) >>- { ctxt, tBranch in
-      return ((string(" else ") *> nonAppTerm) >>- { ctxt, fBranch in
+  return (keyword("if") *> nonAppTerm) >>- { ctxt, conditional in
+    return ((keyword("then") *> nonAppTerm) >>- { ctxt, tBranch in
+      return ((keyword("else") *> nonAppTerm) >>- { ctxt, fBranch in
         return (pure(.ifElse(conditional, tBranch, fBranch)), ctxt)
       }, ctxt)
     }, ctxt)
@@ -109,7 +117,7 @@ private func _lambda() -> TermParser {
 
 private let nonAppTerm = _nonAppTerm()
 private func _nonAppTerm() -> TermParser {
-  return (char("(") *> term <* char(")"))
+  return skipSpaces() *> ((char("(") *> term <* char(")"))
     <|> lambda
     <|> ifElse
     <|> succ
@@ -118,7 +126,7 @@ private func _nonAppTerm() -> TermParser {
     <|> tmTrue
     <|> tmFalse
     <|> zero
-    <|> variable
+    <|> variable)
 }
 
 private let term = _term()

@@ -21,6 +21,18 @@ class STLCTypeCheckerTests: XCTestCase {
     XCTAssertEqual(typeOf(t: .abs("x", .bool, .app(.va("x", 0), .va("x", 0))), context: [:]), nil)
   }
 
+  func testIsZero() {
+    XCTAssertEqual(typeOf(t: .isZero(.succ(.zero)), context:[:]), .bool)
+  }
+  
+  func testSucc() {
+    XCTAssertEqual(typeOf(t: .pred(.succ(.zero)), context:[:]), .nat)
+  }
+  
+  func tesZero() {
+    XCTAssertEqual(typeOf(t: .zero, context:[:]), .nat)
+  }
+
   func testIfElse() {
     let firstConditional = "((\\x:bool.x) true)"
     let thenClause = "((\\y:bool->int.y false) \\z:bool.if (isZero 0) then (succ 0) else pred(succ 0))"

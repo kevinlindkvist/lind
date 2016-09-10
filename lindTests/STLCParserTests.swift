@@ -45,16 +45,22 @@ class STLCParserTests: XCTestCase {
     let expected: STLCTerm = .abs("x", .t_t(.nat,.bool), .va("x", 0))
     testParseResult("\\x:int->bool.x", expected: ([:], expected))
   }
+
+  func testIfElseNoParens() {
+    let expected: STLCTerm = .ifElse(.succ(.pred(.zero)), .tmFalse, .tmTrue)
+    testParseResult("if succ pred 0 then false else true", expected: ([:], expected))
+  }
   
   func testIfElse() {
     let expected: STLCTerm = .ifElse(.abs("x", .bool, .app(.va("x", 0), .va("x", 0))), .tmFalse, .tmTrue)
-    testParseResult("if (\\x:bool.x x) then false else true", expected: ([:], expected))
+    testParseResult("if \\x:bool.x x then false else true", expected: ([:], expected))
   }
 
   func testIfElseNested() {
     let inner: STLCTerm = .ifElse(.abs("x", .bool, .va("x", 0)), .tmFalse, .tmTrue)
     let expected: STLCTerm = .ifElse(.abs("x", .nat, .app(.va("x", 0), inner)), .abs("y", .t_t(.bool, .nat), .app(.va("y", 0), .va("x", 1))), .tmTrue)
-    testParseResult("if (\\x:int.x if (\\x:bool.x) then false else true) then (\\y:bool->int.y x) else true", expected: (["x":0], expected))
+    testParseResult("if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
+                    expected: (["x":0], expected))
   }
 
   func testAppInSucc() {
