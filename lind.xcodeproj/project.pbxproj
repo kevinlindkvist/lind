@@ -34,7 +34,6 @@
 		B49B76681D741FBC0062464C /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76671D741FBC0062464C /* UAEvaluator.swift */; };
 		B49B766A1D7423780062464C /* UAEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76691D7423780062464C /* UAEvaluationTests.swift */; };
 		B49B766B1D7423F90062464C /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76671D741FBC0062464C /* UAEvaluator.swift */; };
-		B49B766D1D7427AD0062464C /* UntypedArithmeticTests in Resources */ = {isa = PBXBuildFile; fileRef = B49B766C1D7427AD0062464C /* UntypedArithmeticTests */; };
 		B49B76721D75519A0062464C /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* ULCTerms.swift */; };
 		B49B76731D7552600062464C /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* ULCTerms.swift */; };
 		B49B76751D75526E0062464C /* ULCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* ULCParser.swift */; };
@@ -145,7 +144,6 @@
 		B49B765C1D7413420062464C /* UAParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAParserTests.swift; sourceTree = "<group>"; };
 		B49B76671D741FBC0062464C /* UAEvaluator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAEvaluator.swift; sourceTree = "<group>"; };
 		B49B76691D7423780062464C /* UAEvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAEvaluationTests.swift; sourceTree = "<group>"; };
-		B49B766C1D7427AD0062464C /* UntypedArithmeticTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UntypedArithmeticTests; sourceTree = "<group>"; };
 		B49B76711D75519A0062464C /* ULCTerms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCTerms.swift; sourceTree = "<group>"; };
 		B49B76741D75526E0062464C /* ULCParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCParser.swift; sourceTree = "<group>"; };
 		B49B76761D7570EE0062464C /* ULCParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCParserTests.swift; sourceTree = "<group>"; };
@@ -226,7 +224,6 @@
 				B49B76831D7C10210062464C /* ULCEvaluationTests.swift */,
 				B47AB1491D7FF67600586FDB /* STLCParserTests.swift */,
 				B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */,
-				B49B766C1D7427AD0062464C /* UntypedArithmeticTests */,
 				B49B76221D740DFF0062464C /* Info.plist */,
 			);
 			path = lindTests;
@@ -443,7 +440,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B49B766D1D7427AD0062464C /* UntypedArithmeticTests in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
