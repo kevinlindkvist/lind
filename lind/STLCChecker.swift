@@ -31,10 +31,10 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
       switch tyT1 {
         case let .t_t(tyT11, tyT22) where tyT11 == tyT2: return tyT22
         case let .t_t(tyT11, _):
-          print("App types inconsistent \(tyT11), \(tyT2)")
+          print("App types inconsistent expected:(\(tyT11)) got:(\(tyT2))")
           return nil
         default:
-          print("incorrect type of app \(tyT1)")
+          print("Incorrect type of App:(\(tyT1)) term: \(t)")
           return nil
       }
     } else {

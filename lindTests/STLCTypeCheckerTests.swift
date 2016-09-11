@@ -10,48 +10,49 @@ import XCTest
 
 class STLCTypeCheckerTests: XCTestCase {
 
-  func checkProgram(str: String, type: STLCType?) {
-    let t = parseSimplyTypedLambdaCalculus(str)
+  func check(program: String, type: STLCType?, context: [Int:STLCType] = [:]) {
+    let t = parseSimplyTypedLambdaCalculus(program)
     switch t {
     case let .success(_, t):
-      XCTAssertEqual(typeOf(t: t, context: [:]), type)
+      XCTAssertEqual(typeOf(t: t, context: context), type)
     default:
-      XCTFail()
+      XCTFail("Could not parse program: \(program)")
     }
   }
 
   func testVar() {
-    XCTAssertEqual(typeOf(t: .va("x", 0), context: [0:.nat]), .nat)
+    check(program: "x", type: nil)
+    check(program: "x", type: .nat, context:[0:.nat])
   }
 
   func testAbs() {
-    // \x:bool.x : bool -> bool
-    XCTAssertEqual(typeOf(t: .abs("x", .bool, .va("x", 0)), context: [:]), .t_t(.bool, .bool))
-    // \x:bool.x x : invalid
-    XCTAssertEqual(typeOf(t: .abs("x", .bool, .app(.va("x", 0), .va("x", 0))), context: [:]), nil)
+    check(program: "\\x:bool.x", type: .t_t(.bool, .bool))
+    check(program: "(\\x:bool.x) true", type: .bool)
+    check(program: "\\x:bool.x x", type: nil)
+    check(program: "(\\x:bool.x) 0", type: nil)
   }
 
   func testIsZero() {
-    XCTAssertEqual(typeOf(t: .isZero(.succ(.zero)), context:[:]), .bool)
-    XCTAssertEqual(typeOf(t: .isZero(.isZero(.zero)), context:[:]), nil)
+    check(program: "isZero succ 0", type: .bool)
+    check(program: "isZero isZero 0", type: nil)
   }
-  
+
   func testSucc() {
-    XCTAssertEqual(typeOf(t: .pred(.succ(.zero)), context:[:]), .nat)
-    XCTAssertEqual(typeOf(t: .pred(.isZero(.zero)), context:[:]), nil)
+    check(program: "pred succ 0", type: .nat)
+    check(program: "pred isZero 0", type: nil)
   }
-  
-  func tesZero() {
-    XCTAssertEqual(typeOf(t: .zero, context:[:]), .nat)
+
+  func testZero() {
+    check(program: "0", type: .nat)
   }
 
   func testIfElse() {
-    let firstConditional = "((\\x:bool.x) true)"
-    let thenClause = "((\\y:bool->int.y false) \\z:bool.if (isZero 0) then (succ 0) else pred(succ 0))"
+    let firstConditional = "(\\x:bool.x) true"
+    let thenClause = "(\\y:bool->int.y true) \\z:bool.if isZero 0 then succ 0 else pred succ 0"
     let correctIfElse = "if \(firstConditional) then \(thenClause) else 0"
     let incorrectIfElse = "if \(firstConditional) then \(thenClause) else true"
-    checkProgram(str: correctIfElse, type: .nat)
-    checkProgram(str: incorrectIfElse, type: nil)
+    check(program: correctIfElse, type: .nat)
+    check(program: incorrectIfElse, type: nil)
   }
   
 }

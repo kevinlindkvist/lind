@@ -11,47 +11,54 @@ import lind
 
 class UntypedArithmeticParserTests: XCTestCase {
 
-  func testParseResult(_ str: String, _ t: UATerm) {
-    assertParseResult(str, t, parseUntypedArithmetic)
+  func check(program: String, expected: UATerm) {
+    switch parseUntypedArithmetic(program) {
+    case let .success(result):
+      XCTAssertEqual(expected, result.1)
+      break
+    case .failure(_):
+      XCTAssertTrue(false)
+      break
+    }
   }
 
   func testTrue() {
-    testParseResult("true", .tmTrue)
+    check(program:"true", expected: .tmTrue)
   }
 
   func testFalse() {
-    testParseResult("false", .tmFalse)
+    check(program:"false", expected: .tmFalse)
   }
 
   func testZero() {
-    testParseResult("0", .zero)
+    check(program:"0", expected: .zero)
   }
 
   func testIfElse() {
-    testParseResult("if true then 0 else false", .ifElse(IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmFalse)))
+    check(program:"if true then 0 else false", expected: .ifElse(IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmFalse)))
   }
 
   func testNestedIfElse() {
     let innerIf = IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmTrue)
     let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .ifElse(innerIf), falseBranch: .tmFalse)
-    testParseResult("if false then if true then 0 else true else false", .ifElse(outerIf))
+    check(program:"if false then if true then 0 else true else false", expected: .ifElse(outerIf))
   }
 
   func testCondIfElse() {
     let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .pred(.zero), falseBranch: .tmFalse)
-    testParseResult("if false then pred 0 else false", .ifElse(outerIf))
+    check(program:"if false then pred 0 else false", expected: .ifElse(outerIf))
   }
 
   func testSucc() {
-    testParseResult("succ 0", .succ(.zero))
+    check(program:"succ 0", expected: .succ(.zero))
   }
 
   func testPred() {
-    testParseResult("pred true", .pred(.tmTrue))
+    check(program:"pred true", expected: .pred(.tmTrue))
   }
 
   func testIsZero() {
-    testParseResult("isZero false", .isZero(.tmFalse))
+    check(program:"isZero false", expected: .isZero(.tmFalse))
   }
 
 }

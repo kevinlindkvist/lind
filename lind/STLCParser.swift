@@ -82,9 +82,9 @@ private func _variable() -> TermParser {
 
 private let ifElse = _ifElse()
 private func _ifElse() -> TermParser {
-  return (keyword("if") *> nonAppTerm) >>- { ctxt, conditional in
-    return ((keyword("then") *> nonAppTerm) >>- { ctxt, tBranch in
-      return ((keyword("else") *> nonAppTerm) >>- { ctxt, fBranch in
+  return (keyword("if") *> term) >>- { ctxt, conditional in
+    return ((keyword("then") *> term) >>- { ctxt, tBranch in
+      return ((keyword("else") *> term) >>- { ctxt, fBranch in
         return (pure(.ifElse(conditional, tBranch, fBranch)), ctxt)
       }, ctxt)
     }, ctxt)

@@ -11,30 +11,51 @@ import Result
 
 class UntypedArithmeticEvaluationTests: XCTestCase {
 
-  fileprivate func evaluateString(_ str: String, ts: UATerm, fails: Bool = false) {
-    switch parseUntypedArithmetic(str) {
+  fileprivate func check(program: String, expected: UATerm?) {
+    switch parseUntypedArithmetic(program) {
     case let .success(result):
-      XCTAssertEqual(ts, evaluateUntypedArithmetic(result.1))
+      XCTAssertEqual(expected, evaluateUntypedArithmetic(result.1))
       break
     case .failure(_):
-      XCTAssertTrue(fails)
+      XCTAssertTrue(expected == nil)
       break
     }
   }
 
-  func testFile() {
-    let lines = [
-      "0; 0",
-      "isZero 0; true",
-      "isZero succ 0; false",
-      "isZero pred succ 0; true",
-      "isZero pred succ succ 0; false",
-      "if isZero 0 then false else true; false",
-      "if isZero succ 0 then false else true; true",
-      "if true then 0 else false; 0",
-      "if if true then false else true then 0 else false; false",
-      ]
-    parseAndEvaluateLines(lines, parser: parseUntypedArithmetic, evaluator: evaluateUntypedArithmetic)
+  func testZero() {
+    check(program: "0", expected: .zero)
+  }
+
+  func testIsZero() {
+    check(program: "isZero 0", expected: .tmTrue)
+  }
+
+  func testIsZeroPred() {
+    check(program: "isZero succ 0", expected: .tmFalse)
+  }
+
+  func testIsZeroNestedTrue() {
+    check(program: "isZero pred succ 0", expected: .tmTrue)
+  }
+  
+  func testIsZeroNestedFalse() {
+    check(program: "isZero pred succ succ 0", expected: .tmFalse)
+  }
+
+  func testIfIsZero() {
+    check(program: "if isZero 0 then 0 else true", expected: .zero)
+  }
+
+  func testIfIsZeroFalse() {
+    check(program: "if isZero succ 0 then 0 else true", expected: .tmTrue)
+  }
+  
+  func testIfTrue() {
+    check(program: "if true then 0 else true", expected: .zero)
+  }
+
+  func testNestedIf() {
+   check(program: "if if true then false else true then 0 else false", expected: .tmFalse)
   }
 
 }
