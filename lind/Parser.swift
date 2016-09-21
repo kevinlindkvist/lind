@@ -111,19 +111,6 @@ func <&><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>, f: @escaping (Out1) ->
   return f <^> p
 }
 
-/// Labels a parser with a name.
-/*func <?><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, label: @autoclosure @escaping () -> String) -> Parser<In, Ctxt, Out> {
-  return Parser { input in
-    let reply = parse(p, input: input)
-    switch reply {
-    case .done:
-      return reply
-    case let .failure(input2, labels, message2):
-      return .failure(input2, cons(label())(labels), message2)
-    }
-  }
-}*/
-
 // MARK: Peek
 
 func endOfInput<Ctxt, In: Collection>() -> Parser<In, Ctxt, ()> {

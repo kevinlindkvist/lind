@@ -9,10 +9,16 @@
 import Result
 import Foundation
 
-private typealias NamingContext = [String:Int]
-private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
-private typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
-private let keywords = ["if", "else", "then", "succ", "pred", "isZero", "0"]
+fileprivate typealias NamingContext = [String:Int]
+fileprivate typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
+fileprivate typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
+
+fileprivate let keywords = [
+  // Simply Typed Lambda Calculus
+  "if", "else", "then", "succ", "pred", "isZero", "0",
+  // Extensions
+  "unit", "_", "as",
+]
 
 private func keyword(_ str: String.UnicodeScalarView) -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
   return skipSpaces() *> string(str);
@@ -20,12 +26,21 @@ private func keyword(_ str: String.UnicodeScalarView) -> Parser<String.UnicodeSc
 
 private let baseType = _baseType()
 private func _baseType() -> TypeParser {
-  return (string("bool") *> pure(.bool)) <|> (string("int") *> pure(.nat))
+  return (string("bool") *> pure(.bool))
+    <|> (string("int") *> pure(.nat))
+    <|> (string("unit") *> pure(.unit))
+    <|> (identifier >>- { (context: NamingContext, identifier: String.UnicodeScalarView) in
+      (pure(.base(String(identifier))), context) })
 }
 
 private let type = _type()
 private func _type() -> TypeParser {
   return chainl1(p: baseType, op: string("->") *> pure({ t1, t2 in .t_t(t1, t2) }))
+}
+
+private let unit = _unit()
+private func _unit() -> TermParser {
+  return string("unit") *> pure(.unit)
 }
 
 private let zero = _zero()
@@ -61,6 +76,7 @@ private func _isZero() -> TermParser {
 private let identifier = _identifier()
 private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
   let alphas = CharacterSet.alphanumerics
+  print(alphas.contains(";"))
   return many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
 }
 
@@ -101,7 +117,7 @@ private func _lambda() -> TermParser {
     }
     ctxt[boundName] = 0
     return ((char(":") *> type) >>- { ctxt, type in
-      return ((char(".") *> term) >>- { ctxt, t in
+      return ((char(".") *> sequence) >>- { ctxt, t in
         var ctxt = ctxt
         ctxt.forEach { name, index in
           if (index != 0) {
@@ -115,29 +131,52 @@ private func _lambda() -> TermParser {
   }
 }
 
+private let atom = _atom()
+private func _atom() -> TermParser {
+  return skipSpaces()
+    *> ((char("(") *> sequence <* char(")"))
+      <|> lambda
+      <|> ifElse
+      <|> succ
+      <|> pred
+      <|> isZero
+      <|> tmTrue
+      <|> tmFalse
+      <|> zero
+      <|> unit
+      <|> variable)
+}
+
+private let ascription = _ascription()
+private func _ascription() -> TypeParser {
+  return skipSpaces() *> keyword("as") *> skipSpaces() *> type
+}
+
 private let nonAppTerm = _nonAppTerm()
 private func _nonAppTerm() -> TermParser {
-  return skipSpaces()
-    *> ((char("(") *> term <* char(")"))
-        <|> lambda
-        <|> ifElse
-        <|> succ
-        <|> pred
-        <|> isZero
-        <|> tmTrue
-        <|> tmFalse
-        <|> zero
-        <|> variable)
+  return atom >>- { ctxt, term in
+    let deriveAs: TermParser = ascription >>- { ctxt, type in
+      return (pure(.app(.abs("_", type, .va("_", 0)), term)), ctxt)
+    }
+    return (deriveAs <|> pure(term), ctxt)
+  }
+}
+
+private let sequence = _sequence()
+private func _sequence() -> TermParser {
+  return chainl1(p: term,
+                 op: (skipSpaces() *> char(";") <* skipSpaces())
+                  *> pure ({ t1, t2 in return .app(.abs("_", .unit, t2), t1) }))
 }
 
 private let term = _term()
 private func _term() -> TermParser {
   return chainl1(p: nonAppTerm,
-                 op: char(" ") *> pure( { t1, t2 in .app(t1, t2) }))
+                 op: char(" ") *> skipSpaces() *> pure( { t1, t2 in .app(t1, t2) }))
 }
 
 private func simplyTypedLambdaCalculus() -> TermParser {
-  return term <* endOfInput()
+  return sequence <* endOfInput()
 }
 
 func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], STLCTerm), ParseError> {

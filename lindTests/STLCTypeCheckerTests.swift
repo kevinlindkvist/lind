@@ -14,6 +14,7 @@ class STLCTypeCheckerTests: XCTestCase {
     let t = parseSimplyTypedLambdaCalculus(program)
     switch t {
     case let .success(_, t):
+      print(t)
       XCTAssertEqual(typeOf(t: t, context: context), type)
     default:
       XCTFail("Could not parse program: \(program)")
@@ -54,5 +55,33 @@ class STLCTypeCheckerTests: XCTestCase {
     check(program: correctIfElse, type: .nat)
     check(program: incorrectIfElse, type: nil)
   }
-  
+
+  func testNestedAbs() {
+    check(program: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", type: .unit)
+  }
+
+  // MARK - Extensions
+
+  func testBaseType() {
+    check(program: "\\x:A.x", type: .t_t(.base("A"), .base("A")))
+    check(program: "(\\x:A.x) nil", type: nil)
+  }
+
+  func testSequence() {
+    check(program: "unit;0", type: .nat)
+    check(program: "true;0", type: nil)
+  }
+
+  func testAbsUnit() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+  }
+
+  func testAbsSequence() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .bool)
+  }
+
+  func testAbsAbsSequence() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit;(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+  }
+
 }

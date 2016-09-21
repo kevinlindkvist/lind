@@ -45,10 +45,10 @@
 		B49B76841D7C10210062464C /* ULCEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76831D7C10210062464C /* ULCEvaluationTests.swift */; };
 		B49B76851D7C102A0062464C /* ULCEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76791D76C6BC0062464C /* ULCEvaluation.swift */; };
 		B49B76881D7CB7DD0062464C /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76871D7CB7DD0062464C /* STLCTypes.swift */; };
-		B49B768A1D7CB82E0062464C /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
+		B49B768A1D7CB82E0062464C /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */; };
 		B49B768D1D7CC15D0062464C /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B768C1D7CC15D0062464C /* STLCParser.swift */; };
 		B4AD1D871D813BC50033FEB3 /* STLCTypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */; };
-		B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
+		B4AD1D8F1D813BEB0033FEB3 /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -151,7 +151,7 @@
 		B49B76801D7B86190062464C /* Dictionary+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Helpers.swift"; sourceTree = "<group>"; };
 		B49B76831D7C10210062464C /* ULCEvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCEvaluationTests.swift; sourceTree = "<group>"; };
 		B49B76871D7CB7DD0062464C /* STLCTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypes.swift; sourceTree = "<group>"; };
-		B49B76891D7CB82E0062464C /* STLCChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCChecker.swift; sourceTree = "<group>"; };
+		B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypeChecker.swift; sourceTree = "<group>"; };
 		B49B768C1D7CC15D0062464C /* STLCParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCParser.swift; sourceTree = "<group>"; };
 		B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypeCheckerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -269,7 +269,7 @@
 			children = (
 				B49B76871D7CB7DD0062464C /* STLCTypes.swift */,
 				B49B768C1D7CC15D0062464C /* STLCParser.swift */,
-				B49B76891D7CB82E0062464C /* STLCChecker.swift */,
+				B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */,
 			);
 			name = "Simply Typed Lambda Calculus";
 			sourceTree = "<group>";
@@ -457,7 +457,7 @@
 				B49B76561D7410E40062464C /* Parser+Combinators.swift in Sources */,
 				B49B76681D741FBC0062464C /* UAEvaluator.swift in Sources */,
 				B49B76751D75526E0062464C /* ULCParser.swift in Sources */,
-				B49B768A1D7CB82E0062464C /* STLCChecker.swift in Sources */,
+				B49B768A1D7CB82E0062464C /* STLCTypeChecker.swift in Sources */,
 				B49B76811D7B86190062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B76501D740FFD0062464C /* Prelude.swift in Sources */,
 				B49B76721D75519A0062464C /* ULCTerms.swift in Sources */,
@@ -491,7 +491,7 @@
 				B49B76781D757A180062464C /* ULCParser.swift in Sources */,
 				B49B765D1D7413420062464C /* UAParserTests.swift in Sources */,
 				B49B76601D7417670062464C /* Parser+UnicodeScalars.swift in Sources */,
-				B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */,
+				B4AD1D8F1D813BEB0033FEB3 /* STLCTypeChecker.swift in Sources */,
 				B49B765F1D7417670062464C /* Parser.swift in Sources */,
 				B49B766B1D7423F90062464C /* UAEvaluator.swift in Sources */,
 				B49B76611D7417670062464C /* Parser+Combinators.swift in Sources */,
