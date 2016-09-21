@@ -17,7 +17,7 @@ extension Reply {
   var result: Result<(Context, Output), ParseError> {
       switch self {
       case let .failure(_, o, m):
-        return .failure(.message("Failed to read message \(o) \n\(m)"))
+        return .failure(.message("Failed to read message \(o) \\n \(m)"))
       case let .done(_, context, output):
         return .success(context, output)
     }

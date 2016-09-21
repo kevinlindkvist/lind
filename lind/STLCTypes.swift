@@ -11,7 +11,7 @@ typealias TypeContext = [Int:STLCType]
 public indirect enum STLCType {
   case t_t(STLCType, STLCType)
   case bool
-  case nat
+  case int
   case unit
   case base(String)
 }
@@ -22,7 +22,7 @@ extension STLCType: Equatable {
 public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
   switch (lhs, rhs) {
     case (.bool, .bool): return true
-    case (.nat, .nat): return true
+    case (.int, .int): return true
     case (.unit, .unit): return true
     case let (.base(t1), .base(t2)): return t1 == t2
     case let (.t_t(t1,t2), .t_t(t11, t22)): return t1 == t11 && t2 == t22
@@ -34,7 +34,7 @@ extension STLCType: CustomStringConvertible {
   public var description: String {
     switch self {
       case .bool: return "bool"
-      case .nat: return "int"
+      case .int: return "int"
       case .unit: return "unit"
       case let .base(t): return t
       case let .t_t(t1, t2): return "\(t1.description)->\(t2.description)"

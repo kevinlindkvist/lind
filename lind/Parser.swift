@@ -118,7 +118,7 @@ func endOfInput<Ctxt, In: Collection>() -> Parser<In, Ctxt, ()> {
     if input.0.isEmpty {
       return .done(input.0, input.1, ())
     } else {
-      return .failure(input, [], "endOfIn: \(input)")
+      return .failure(input, [], "endOfInput: \(input)")
     }
   }
 }

@@ -23,7 +23,7 @@ class STLCTypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(program: "x", type: nil)
-    check(program: "x", type: .nat, context:[0:.nat])
+    check(program: "x", type: .int, context:[0:.int])
   }
 
   func testAbs() {
@@ -39,12 +39,12 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testSucc() {
-    check(program: "pred succ 0", type: .nat)
+    check(program: "pred succ 0", type: .int)
     check(program: "pred isZero 0", type: nil)
   }
 
   func testZero() {
-    check(program: "0", type: .nat)
+    check(program: "0", type: .int)
   }
 
   func testIfElse() {
@@ -52,7 +52,7 @@ class STLCTypeCheckerTests: XCTestCase {
     let thenClause = "(\\y:bool->int.y true) \\z:bool.if isZero 0 then succ 0 else pred succ 0"
     let correctIfElse = "if \(firstConditional) then \(thenClause) else 0"
     let incorrectIfElse = "if \(firstConditional) then \(thenClause) else true"
-    check(program: correctIfElse, type: .nat)
+    check(program: correctIfElse, type: .int)
     check(program: incorrectIfElse, type: nil)
   }
 
@@ -68,7 +68,7 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testSequence() {
-    check(program: "unit;0", type: .nat)
+    check(program: "unit;0", type: .int)
     check(program: "true;0", type: nil)
   }
 

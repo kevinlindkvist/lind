@@ -59,7 +59,7 @@ class STLCParserTests: XCTestCase {
   }
 
   func testAbsArrowType() {
-    let expected: STLCTerm = .abs("x", .t_t(.nat,.bool), .va("x", 0))
+    let expected: STLCTerm = .abs("x", .t_t(.int,.bool), .va("x", 0))
     check(program: "\\x:int->bool.x", expected: expected)
   }
 
@@ -75,13 +75,13 @@ class STLCParserTests: XCTestCase {
 
   func testIfElseNested() {
     let inner: STLCTerm = .ifElse(.abs("x", .bool, .va("x", 0)), .tmFalse, .tmTrue)
-    let expected: STLCTerm = .ifElse(.abs("x", .nat, .app(.va("x", 0), inner)), .abs("y", .t_t(.bool, .nat), .app(.va("y", 0), .va("x", 1))), .tmTrue)
+    let expected: STLCTerm = .ifElse(.abs("x", .int, .app(.va("x", 0), inner)), .abs("y", .t_t(.bool, .int), .app(.va("y", 0), .va("x", 1))), .tmTrue)
     check(program: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
                     expectedResult: (["x":0], expected))
   }
 
   func testAppInSucc() {
-    let expected: STLCTerm = .succ(.succ(.abs("x", .t_t(.bool, .nat), .app(.va("x", 0), .zero))))
+    let expected: STLCTerm = .succ(.succ(.abs("x", .t_t(.bool, .int), .app(.va("x", 0), .zero))))
     check(program: "(succ (succ (\\x:bool->int.x 0)))", expected: expected)
   }
 
@@ -134,5 +134,11 @@ class STLCParserTests: XCTestCase {
 
   func testAs() {
     check(program: "x as bool", expectedResult: (["x":0], .app(.abs("_", .bool, .va("_", 0)), .va("x", 0))))
+  }
+
+  func testAsLambda() {
+    let body: STLCTerm = .abs("x", .bool, .unit)
+    let expected: STLCTerm = .app(.abs("_", .t_t(.bool, .unit), .va("_", 0)), body)
+    check(program: "(\\x:bool.unit) as bool->unit", expected:expected)
   }
 }

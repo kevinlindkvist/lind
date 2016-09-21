@@ -56,10 +56,10 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
       print("type of if conditional not bool: \(conditional)")
       return nil
     }
-  case .zero: return .nat
+  case .zero: return .int
   case let .isZero(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
+    if type == .int {
       return .bool
     } else {
       print("isZero called with non-nat argument")
@@ -67,16 +67,16 @@ func typeOf(t: STLCTerm, context: TypeContext) -> STLCType? {
     }
   case let .succ(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
-      return .nat
+    if type == .int {
+      return .int
     } else {
       print("succ called with non-nat argument")
       return nil
     }
   case let .pred(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
-      return .nat
+    if type == .int {
+      return .int
     } else {
       print("pred called with non-nat argument")
       return nil
