@@ -6,6 +6,8 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
+// MARK: - Types
+
 typealias TypeContext = [Int:STLCType]
 
 public indirect enum STLCType {
@@ -41,6 +43,8 @@ extension STLCType: CustomStringConvertible {
     }
   }
 }
+
+// MARK: - Terms
 
 public indirect enum STLCTerm {
   case tmTrue

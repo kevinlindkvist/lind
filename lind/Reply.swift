@@ -16,7 +16,7 @@ public enum Reply<Input, Context, Output> {
 extension Reply {
   var result: Result<(Context, Output), ParseError> {
       switch self {
-      case let .failure(_, o, m):
+      case let .failure(o, _, m):
         return .failure(.message("Failed to read message \(o) \\n \(m)"))
       case let .done(_, context, output):
         return .success(context, output)

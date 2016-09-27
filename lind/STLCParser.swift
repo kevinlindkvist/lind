@@ -20,23 +20,30 @@ fileprivate typealias TypeParser = Parser<String.UnicodeScalarView, NamingContex
 fileprivate typealias StringParser = Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView>
 
 fileprivate enum KeyWord: String.UnicodeScalarView {
+  // Built ins
   case IF = "if"
   case THEN = "then"
   case ELSE = "else"
   case SUCC = "succ"
   case PRED = "pred"
   case ISZERO = "isZero"
+  // Values
   case ZERO = "0"
   case UNIT = "unit"
-  case WILD = "_"
-  case AS = "as"
-  case BOOL = "bool"
-  case INT = "int"
   case FALSE = "false"
   case TRUE = "true"
+  // Base Types
+  case BOOL = "bool"
+  case INT = "int"
+  // Special characters
   case COLON = ":"
   case PERIOD = "."
   case BACKSLASH = "\\"
+  // Extensions
+  case AS = "as"
+  case WILD = "_"
+  case LET = "let"
+  case IN = "in"
 }
 
 private func keyword(_ word: KeyWord) -> StringParser {
@@ -119,7 +126,7 @@ fileprivate func zero() -> TermParser {
 private let identifier = _identifier()
 private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
   let alphas = CharacterSet.alphanumerics
-  return many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
+  return skipSpaces() *> many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
 }
 
 private let variable = _variable()
@@ -139,7 +146,7 @@ private func _variable() -> TermParser {
   }
 }
 
-// MARK: If Then Else
+// MARK: - If Statements
 
 private let IfElse = ifElse()
 private func ifElse() -> TermParser {
@@ -167,7 +174,7 @@ fileprivate func _else() -> StringParser {
   return keyword(.ELSE) <* skipSpaces()
 }
 
-// ΜARK: λ
+// ΜARK: - λ
 
 private let LAMBDA = _lambda()
 private func _lambda() -> TermParser {
@@ -201,6 +208,8 @@ fileprivate func backslash() -> StringParser {
   return keyword(.BACKSLASH)
 }
 
+// MARK: Context Modifications
+
 fileprivate func shiftContext(ctxt: NamingContext, identifier: String.UnicodeScalarView) -> NamingContext {
   var ctxt = ctxt
   ctxt.forEach { name, index in
@@ -221,21 +230,21 @@ fileprivate func unshiftContext(ctxt: NamingContext, identifier: String.UnicodeS
   return ctxt
 }
 
-// MARK: Built Ins
+// MARK: - Built Ins
 
 fileprivate let builtIn = _builtIn()
 fileprivate func _builtIn() -> TermParser {
-  return Succ <|> Pred <|> IsZero <|> IfElse
+  return Succ <|> Pred <|> IsZero <|> IfElse <|> Let
 }
 
-// MARK: Atoms
+// MARK: - Atoms
 
-fileprivate let Atom = atom()
-private func atom() -> TermParser {
+fileprivate let atom = _atom()
+private func _atom() -> TermParser {
   return (char("(") *> sequence <* char(")")) <|> builtIn <|> Value
 }
 
-// MARK: Ascription
+// MARK: - Ascription
 
 fileprivate let ascription = _ascription()
 fileprivate func _ascription() -> TypeParser {
@@ -247,7 +256,24 @@ fileprivate func _as() -> StringParser {
   return keyword(.AS)
 }
 
-// MARK: Program
+// MARK: - Assignment
+
+fileprivate let Let = _let()
+fileprivate func _let() -> TermParser {
+  return (keyword(.LET) *> identifier) >>- { (ctxt: NamingContext, identifier: String.UnicodeScalarView) in
+  return ((char("=") *> term) >>- { (ctxt: NamingContext, t1: STLCTerm) in
+  return ((keyword(.IN) *> skipSpaces() *> term) >>- { (ctxt: NamingContext, t2: STLCTerm) in
+    if let T1 = typeOf(t: t1, context: [:]) {
+      return (pure(.app(.abs(String(identifier), T1, t2), t1)), ctxt)
+    } else {
+      return (fail("Could not determine type of \(t1)"), ctxt)
+    }
+  }, ctxt)
+  }, ctxt)
+  }
+}
+
+// MARK: - Program
 
 private let sequence = _sequence()
 private func _sequence() -> TermParser {
@@ -264,11 +290,11 @@ private func _term() -> TermParser {
 
 private let nonAppTerm = _nonAppTerm()
 private func _nonAppTerm() -> TermParser {
-  return Atom >>- { ctxt, term in
-    let deriveAs: TermParser = ascription >>- { ctxt, type in
-      return (pure(.app(.abs("_", type, .va("_", 0)), term)), ctxt)
-    }
-    return (deriveAs <|> pure(term), ctxt)
+  return atom >>- { ctxt, term in
+    // After an atom is parsed, check if there is an ascription, otherwise purely return the atom.
+    return ((ascription >>- { ctxt, type in
+      return (pure(.app(.abs("_", type, .va("_", 0)), term)), ctxt)})
+      <|> pure(term), ctxt)
   }
 }
 

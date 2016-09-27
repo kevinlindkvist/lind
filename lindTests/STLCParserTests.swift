@@ -141,4 +141,18 @@ class STLCParserTests: XCTestCase {
     let expected: STLCTerm = .app(.abs("_", .t_t(.bool, .unit), .va("_", 0)), body)
     check(program: "(\\x:bool.unit) as bool->unit", expected:expected)
   }
+
+  func testLet() {
+    let t1: STLCTerm = .zero
+    let t2: STLCTerm = .abs("y", .int, .app(.va("y", 0), .va("x", 1)))
+    let expected: STLCTerm = .app(.abs("x", .int, t2), t1)
+    check(program: "let x=0 in \\y:int.y x", expectedResult: (["x":0], expected))
+  }
+
+  func testLetApp() {
+    let t1: STLCTerm = .abs("z", .t_t(.bool, .int), .app(.va("z", 0), .tmTrue))
+    let t2: STLCTerm = .app(.va("e", 0), .abs("y", .bool, .zero))
+    let expected: STLCTerm = .app(.abs("e", .t_t(.t_t(.bool, .int), .int), t2), t1)
+    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: (["e":0], expected))
+  }
 }

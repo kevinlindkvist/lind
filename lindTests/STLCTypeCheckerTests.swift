@@ -84,4 +84,21 @@ class STLCTypeCheckerTests: XCTestCase {
     check(program: "(\\x:bool->unit.x true) \\y:bool.unit;(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
   }
 
+  func testAs() {
+    check(program: "x as bool", type: .bool, context: [0: .bool])
+    check(program: "x as bool", type: nil, context: [0: .int])
+  }
+
+  func testAsLambda() {
+    check(program: "(\\x:bool.unit) as bool->unit", type: .t_t(.bool, .unit))
+  }
+
+  func testLet() {
+    check(program: "let x=0 in \\y:int.y x", type: nil)
+    check(program: "let x=0 in \\y:int.y", type: .t_t(.int, .int))
+  }
+
+  func testLetApp() {
+    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .int)
+  }
 }
