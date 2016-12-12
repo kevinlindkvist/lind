@@ -15,7 +15,7 @@ public typealias Evaluation = Result<(Term, NamingContext, TypeContext), Evaluat
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
     case let .success(term, _, _): return term.description
-    case let .failure(message): return message.localizedDescription
+    case let .failure(message): return message.description
   }
 }
 

@@ -17,3 +17,12 @@ extension ParseError: Equatable {}
 public func == (lhs: ParseError, rhs: ParseError) -> Bool {
   return true
 }
+
+extension ParseError: CustomStringConvertible {
+  public var description: String {
+    switch self {
+    case let .message(description):
+      return description
+    }
+  }
+}
