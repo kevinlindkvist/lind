@@ -1,8 +1,0 @@
-0; 0
-isZero 0; true
-isZero succ 0; false
-isZero pred succ 0; true
-isZero pred succ succ 0; false
-
-if isZero 0 then false else true; false
-if isZero succ 0 then false else true; true

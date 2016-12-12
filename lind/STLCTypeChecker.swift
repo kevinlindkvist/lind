@@ -20,7 +20,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
     context.forEach { k, v in
       shiftedContext[k+1] = v
     }
-    if let t2 = typeOf(t: term, context: union([0:type],shiftedContext)) {
+    if let t2 = typeOf(t: term, context: union(shiftedContext, [0:type])) {
       return .t_t(type, t2)
     } else {
       return nil
@@ -33,7 +33,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
         case let .t_t(tyT11, _):
           print("App types inconsistent expected:(\(tyT11)) got:(\(tyT2))")
           return nil
-        default:
+        default:  
           print("Incorrect type of App:(\(tyT1)) term: \(t)")
           return nil
       }
@@ -56,10 +56,10 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       print("type of if conditional not bool: \(conditional)")
       return nil
     }
-  case .zero: return .nat
+  case .zero: return .int
   case let .isZero(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
+    if type == .int {
       return .bool
     } else {
       print("isZero called with non-nat argument")
@@ -67,19 +67,22 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
     }
   case let .succ(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
-      return .nat
+    if type == .int {
+      return .int
     } else {
       print("succ called with non-nat argument")
       return nil
     }
   case let .pred(term):
     let type = typeOf(t: term, context: context)
-    if type == .nat {
-      return .nat
+    if type == .int {
+      return .int
     } else {
       print("pred called with non-nat argument")
       return nil
     }
+  // Extensions
+  case .unit: return .unit
+
   }
 }

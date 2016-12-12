@@ -19,6 +19,7 @@ public indirect enum Term {
   case variable(name: String, index: Int)
   case abstraction(parameter: String, parameterType: Type, body: Term)
   case application(left: Term, right: Term)
+  case unit
 }
 
 public typealias TermContext = [String:Int]
@@ -26,26 +27,28 @@ public typealias TermContext = [String:Int]
 extension Term: CustomStringConvertible {
   public var description: String {
     switch self {
-    case .tmTrue:
-      return "true"
-    case .tmFalse:
-      return "false"
-    case let .ifElse(t1, t2, t3):
-      return "if (\(t1))\n\tthen (\(t2))\n\telse (\(t3))"
-    case .zero:
-      return "0"
-    case let .succ(t):
-      return "succ(\(t))"
-    case let .pred(t):
-      return "pred(\(t))"
-    case let .isZero(t):
-      return "isZero(\(t))"
-    case let .variable(name, index):
-      return "\(name):\(index)"
-    case let .abstraction(parameter, type, body):
-      return "\\\(parameter):\(type).\(body)"
-    case let .application(lhs, rhs):
-      return "(\(lhs) \(rhs))"
+      case .tmTrue:
+        return "true"
+      case .tmFalse:
+        return "false"
+      case let .ifElse(t1, t2, t3):
+        return "if (\(t1))\n\tthen (\(t2))\n\telse (\(t3))"
+      case .zero:
+        return "0"
+      case let .succ(t):
+        return "succ(\(t))"
+      case let .pred(t):
+        return "pred(\(t))"
+      case let .isZero(t):
+        return "isZero(\(t))"
+      case let .variable(name, index):
+        return "\(name):\(index)"
+      case let .abstraction(parameter, type, body):
+        return "\\\(parameter):\(type).\(body)"
+      case let .application(lhs, rhs):
+        return "(\(lhs) \(rhs))"
+      case .unit:
+        return "unit"
     }
   }
 }
@@ -75,6 +78,8 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return leftValue == rightValue
   case let (.application(leftValue), .application(rightValue)):
     return leftValue == rightValue
+  case (.unit, .unit):
+    return true
   default:
     return false
   }

@@ -14,6 +14,7 @@ class STLCTypeCheckerTests: XCTestCase {
     let t = parseSimplyTypedLambdaCalculus(program)
     switch t {
     case let .success(_, t):
+      print(t)
       XCTAssertEqual(typeOf(t: t, context: context), type)
     default:
       XCTFail("Could not parse program: \(program)")
@@ -22,7 +23,7 @@ class STLCTypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(program: "x", type: nil)
-    check(program: "x", type: .nat, context:[0:.nat])
+    check(program: "x", type: .int, context:[0:.int])
   }
 
   func testAbs() {
@@ -38,12 +39,12 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testSucc() {
-    check(program: "pred succ 0", type: .nat)
+    check(program: "pred succ 0", type: .int)
     check(program: "pred isZero 0", type: nil)
   }
 
   func testZero() {
-    check(program: "0", type: .nat)
+    check(program: "0", type: .int)
   }
 
   func testIfElse() {
@@ -51,8 +52,53 @@ class STLCTypeCheckerTests: XCTestCase {
     let thenClause = "(\\y:bool->int.y true) \\z:bool.if isZero 0 then succ 0 else pred succ 0"
     let correctIfElse = "if \(firstConditional) then \(thenClause) else 0"
     let incorrectIfElse = "if \(firstConditional) then \(thenClause) else true"
-    check(program: correctIfElse, type: .nat)
+    check(program: correctIfElse, type: .int)
     check(program: incorrectIfElse, type: nil)
   }
-  
+
+  func testNestedAbs() {
+    check(program: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", type: .unit)
+  }
+
+  // MARK - Extensions
+
+  func testBaseType() {
+    check(program: "\\x:A.x", type: .t_t(.base("A"), .base("A")))
+    check(program: "(\\x:A.x) nil", type: nil)
+  }
+
+  func testSequence() {
+    check(program: "unit;0", type: .int)
+    check(program: "true;0", type: nil)
+  }
+
+  func testAbsUnit() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+  }
+
+  func testAbsSequence() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .bool)
+  }
+
+  func testAbsAbsSequence() {
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit;(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+  }
+
+  func testAs() {
+    check(program: "x as bool", type: .bool, context: [0: .bool])
+    check(program: "x as bool", type: nil, context: [0: .int])
+  }
+
+  func testAsLambda() {
+    check(program: "(\\x:bool.unit) as bool->unit", type: .t_t(.bool, .unit))
+  }
+
+  func testLet() {
+    check(program: "let x=0 in \\y:int.y x", type: nil)
+    check(program: "let x=0 in \\y:int.y", type: .t_t(.int, .int))
+  }
+
+  func testLetApp() {
+    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .int)
+  }
 }

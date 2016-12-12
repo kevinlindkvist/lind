@@ -30,6 +30,8 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
       return typeOf(predOrSucc: term, context: context)
     case let .pred(term):
       return typeOf(predOrSucc: term, context: context)
+    case .unit:
+      return .success(context, .unit)
   }
 }
 
@@ -62,7 +64,7 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
     case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)) where parameterType == argumentType:
       return .success(context, returnType)
     default:
-      return .failure(.message("Incorrect application, left was: \(leftType) and right was: \(rightType)."))
+      return .failure(.message("Incorrect application, left was: \(application.left) and right was: \(application.right)."))
   }
 }
 

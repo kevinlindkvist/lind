@@ -10,7 +10,7 @@
 		B439F77F1DE68A9B00921932 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F77E1DE68A9B00921932 /* main.swift */; };
 		B439F7841DE68AF600921932 /* console.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F7831DE68AF600921932 /* console.swift */; };
 		B439F7861DE68D4600921932 /* evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F7851DE68D4600921932 /* evaluation.swift */; };
-		B47AB14A1D7FF67600586FDB /* STLCParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47AB1491D7FF67600586FDB /* STLCParserTests.swift */; };
+		B47AB14A1D7FF67600586FDB /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47AB1491D7FF67600586FDB /* ParserTests.swift */; };
 		B47AB1521D7FF6CA00586FDB /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B768C1D7CC15D0062464C /* STLCParser.swift */; };
 		B47AB1531D7FF6CE00586FDB /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76871D7CB7DD0062464C /* STLCTypes.swift */; };
 		B4838DC11DFE211D00625B96 /* EvaluationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E54A021DFE1F3900157AA2 /* EvaluationError.swift */; };
@@ -18,10 +18,11 @@
 		B4838DC51DFE3B2A00625B96 /* Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DC31DFE3B2A00625B96 /* Type.swift */; };
 		B4838DC71DFE3BFE00625B96 /* Term.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DC61DFE3BFE00625B96 /* Term.swift */; };
 		B4838DC81DFE3BFE00625B96 /* Term.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DC61DFE3BFE00625B96 /* Term.swift */; };
-		B4838DCB1DFE3FF600625B96 /* LindParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCA1DFE3FF600625B96 /* LindParsing.swift */; };
-		B4838DCC1DFE3FF600625B96 /* LindParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCA1DFE3FF600625B96 /* LindParsing.swift */; };
-		B4838DCE1DFE4E4300625B96 /* LindTypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* LindTypeChecking.swift */; };
-		B4838DCF1DFE4E4300625B96 /* LindTypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* LindTypeChecking.swift */; };
+		B4838DCB1DFE3FF600625B96 /* Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCA1DFE3FF600625B96 /* Parsing.swift */; };
+		B4838DCC1DFE3FF600625B96 /* Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCA1DFE3FF600625B96 /* Parsing.swift */; };
+		B4838DCE1DFE4E4300625B96 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */; };
+		B4838DCF1DFE4E4300625B96 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */; };
+		B4838DD11DFE9C8900625B96 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E549FF1DFE0DB300157AA2 /* TypeError.swift */; };
 		B49B76151D740DFE0062464C /* lind.h in Headers */ = {isa = PBXBuildFile; fileRef = B49B76141D740DFE0062464C /* lind.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B49B761C1D740DFE0062464C /* lind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B49B76111D740DFE0062464C /* lind.framework */; };
 		B49B762C1D740E0E0062464C /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B762B1D740E0E0062464C /* Parser.swift */; };
@@ -46,7 +47,6 @@
 		B49B76681D741FBC0062464C /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76671D741FBC0062464C /* UAEvaluator.swift */; };
 		B49B766A1D7423780062464C /* UAEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76691D7423780062464C /* UAEvaluationTests.swift */; };
 		B49B766B1D7423F90062464C /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76671D741FBC0062464C /* UAEvaluator.swift */; };
-		B49B766D1D7427AD0062464C /* UntypedArithmeticTests in Resources */ = {isa = PBXBuildFile; fileRef = B49B766C1D7427AD0062464C /* UntypedArithmeticTests */; };
 		B49B76721D75519A0062464C /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* ULCTerms.swift */; };
 		B49B76731D7552600062464C /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76711D75519A0062464C /* ULCTerms.swift */; };
 		B49B76751D75526E0062464C /* ULCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76741D75526E0062464C /* ULCParser.swift */; };
@@ -58,13 +58,12 @@
 		B49B76841D7C10210062464C /* ULCEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76831D7C10210062464C /* ULCEvaluationTests.swift */; };
 		B49B76851D7C102A0062464C /* ULCEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76791D76C6BC0062464C /* ULCEvaluation.swift */; };
 		B49B76881D7CB7DD0062464C /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76871D7CB7DD0062464C /* STLCTypes.swift */; };
-		B49B768A1D7CB82E0062464C /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
+		B49B768A1D7CB82E0062464C /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */; };
 		B49B768D1D7CC15D0062464C /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B768C1D7CC15D0062464C /* STLCParser.swift */; };
 		B4AD1D871D813BC50033FEB3 /* STLCTypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */; };
-		B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCChecker.swift */; };
+		B4AD1D8F1D813BEB0033FEB3 /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */; };
 		B4E549FE1DEEADBF00157AA2 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = B4E549FD1DEEADBF00157AA2 /* Config.xcconfig */; };
 		B4E54A001DFE0DB300157AA2 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E549FF1DFE0DB300157AA2 /* TypeError.swift */; };
-		B4E54A011DFE0DB300157AA2 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E549FF1DFE0DB300157AA2 /* TypeError.swift */; };
 		B4E54A031DFE1F3900157AA2 /* EvaluationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E54A021DFE1F3900157AA2 /* EvaluationError.swift */; };
 /* End PBXBuildFile section */
 
@@ -165,11 +164,11 @@
 		B439F77E1DE68A9B00921932 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B439F7831DE68AF600921932 /* console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = console.swift; sourceTree = "<group>"; };
 		B439F7851DE68D4600921932 /* evaluation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = evaluation.swift; sourceTree = "<group>"; };
-		B47AB1491D7FF67600586FDB /* STLCParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCParserTests.swift; sourceTree = "<group>"; };
+		B47AB1491D7FF67600586FDB /* ParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		B4838DC31DFE3B2A00625B96 /* Type.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Type.swift; sourceTree = "<group>"; };
 		B4838DC61DFE3BFE00625B96 /* Term.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Term.swift; sourceTree = "<group>"; };
-		B4838DCA1DFE3FF600625B96 /* LindParsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LindParsing.swift; sourceTree = "<group>"; };
-		B4838DCD1DFE4E4300625B96 /* LindTypeChecking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LindTypeChecking.swift; sourceTree = "<group>"; };
+		B4838DCA1DFE3FF600625B96 /* Parsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parsing.swift; sourceTree = "<group>"; };
+		B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeChecking.swift; sourceTree = "<group>"; };
 		B49B76111D740DFE0062464C /* lind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = lind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B49B76141D740DFE0062464C /* lind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lind.h; sourceTree = "<group>"; };
 		B49B76161D740DFE0062464C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -188,7 +187,6 @@
 		B49B765C1D7413420062464C /* UAParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAParserTests.swift; sourceTree = "<group>"; };
 		B49B76671D741FBC0062464C /* UAEvaluator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAEvaluator.swift; sourceTree = "<group>"; };
 		B49B76691D7423780062464C /* UAEvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UAEvaluationTests.swift; sourceTree = "<group>"; };
-		B49B766C1D7427AD0062464C /* UntypedArithmeticTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UntypedArithmeticTests; sourceTree = "<group>"; };
 		B49B76711D75519A0062464C /* ULCTerms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCTerms.swift; sourceTree = "<group>"; };
 		B49B76741D75526E0062464C /* ULCParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCParser.swift; sourceTree = "<group>"; };
 		B49B76761D7570EE0062464C /* ULCParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCParserTests.swift; sourceTree = "<group>"; };
@@ -196,7 +194,7 @@
 		B49B76801D7B86190062464C /* Dictionary+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Helpers.swift"; sourceTree = "<group>"; };
 		B49B76831D7C10210062464C /* ULCEvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ULCEvaluationTests.swift; sourceTree = "<group>"; };
 		B49B76871D7CB7DD0062464C /* STLCTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypes.swift; sourceTree = "<group>"; };
-		B49B76891D7CB82E0062464C /* STLCChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCChecker.swift; sourceTree = "<group>"; };
+		B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypeChecker.swift; sourceTree = "<group>"; };
 		B49B768C1D7CC15D0062464C /* STLCParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCParser.swift; sourceTree = "<group>"; };
 		B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = STLCTypeCheckerTests.swift; sourceTree = "<group>"; };
 		B4E549FD1DEEADBF00157AA2 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Config.xcconfig; path = Config/Config.xcconfig; sourceTree = SOURCE_ROOT; };
@@ -256,8 +254,8 @@
 			children = (
 				B4838DC31DFE3B2A00625B96 /* Type.swift */,
 				B4838DC61DFE3BFE00625B96 /* Term.swift */,
-				B4838DCA1DFE3FF600625B96 /* LindParsing.swift */,
-				B4838DCD1DFE4E4300625B96 /* LindTypeChecking.swift */,
+				B4838DCA1DFE3FF600625B96 /* Parsing.swift */,
+				B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */,
 			);
 			name = lind;
 			sourceTree = "<group>";
@@ -312,9 +310,8 @@
 				B49B76691D7423780062464C /* UAEvaluationTests.swift */,
 				B49B76761D7570EE0062464C /* ULCParserTests.swift */,
 				B49B76831D7C10210062464C /* ULCEvaluationTests.swift */,
-				B47AB1491D7FF67600586FDB /* STLCParserTests.swift */,
+				B47AB1491D7FF67600586FDB /* ParserTests.swift */,
 				B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */,
-				B49B766C1D7427AD0062464C /* UntypedArithmeticTests */,
 				B49B76221D740DFF0062464C /* Info.plist */,
 			);
 			path = lindTests;
@@ -360,7 +357,7 @@
 			children = (
 				B49B76871D7CB7DD0062464C /* STLCTypes.swift */,
 				B49B768C1D7CC15D0062464C /* STLCParser.swift */,
-				B49B76891D7CB82E0062464C /* STLCChecker.swift */,
+				B49B76891D7CB82E0062464C /* STLCTypeChecker.swift */,
 			);
 			name = "Simply Typed Lambda Calculus";
 			sourceTree = "<group>";
@@ -555,7 +552,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B49B766D1D7427AD0062464C /* UntypedArithmeticTests in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,7 +564,6 @@
 			files = (
 				B439F77F1DE68A9B00921932 /* main.swift in Sources */,
 				B439F7841DE68AF600921932 /* console.swift in Sources */,
-				B4E54A011DFE0DB300157AA2 /* TypeError.swift in Sources */,
 				B439F7861DE68D4600921932 /* evaluation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -585,7 +580,7 @@
 				B49B76561D7410E40062464C /* Parser+Combinators.swift in Sources */,
 				B49B76681D741FBC0062464C /* UAEvaluator.swift in Sources */,
 				B49B76751D75526E0062464C /* ULCParser.swift in Sources */,
-				B49B768A1D7CB82E0062464C /* STLCChecker.swift in Sources */,
+				B49B768A1D7CB82E0062464C /* STLCTypeChecker.swift in Sources */,
 				B49B76811D7B86190062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B76501D740FFD0062464C /* Prelude.swift in Sources */,
 				B4838DC71DFE3BFE00625B96 /* Term.swift in Sources */,
@@ -595,11 +590,11 @@
 				B49B765A1D7412650062464C /* UAParser.swift in Sources */,
 				B4838DC41DFE3B2A00625B96 /* Type.swift in Sources */,
 				B49B76581D74117C0062464C /* UATerms.swift in Sources */,
-				B4838DCE1DFE4E4300625B96 /* LindTypeChecking.swift in Sources */,
+				B4838DCE1DFE4E4300625B96 /* TypeChecking.swift in Sources */,
 				B49B764C1D740F980062464C /* Reply.swift in Sources */,
 				B49B762C1D740E0E0062464C /* Parser.swift in Sources */,
 				B49B768D1D7CC15D0062464C /* STLCParser.swift in Sources */,
-				B4838DCB1DFE3FF600625B96 /* LindParsing.swift in Sources */,
+				B4838DCB1DFE3FF600625B96 /* Parsing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,14 +605,15 @@
 				B49B76731D7552600062464C /* ULCTerms.swift in Sources */,
 				B47AB1531D7FF6CE00586FDB /* STLCTypes.swift in Sources */,
 				B49B76621D7417670062464C /* Reply.swift in Sources */,
-				B4838DCC1DFE3FF600625B96 /* LindParsing.swift in Sources */,
+				B4838DCC1DFE3FF600625B96 /* Parsing.swift in Sources */,
 				B49B766A1D7423780062464C /* UAEvaluationTests.swift in Sources */,
 				B49B76661D7417670062464C /* UATerms.swift in Sources */,
+				B4838DD11DFE9C8900625B96 /* TypeError.swift in Sources */,
 				B49B76771D7570EE0062464C /* ULCParserTests.swift in Sources */,
 				B49B76841D7C10210062464C /* ULCEvaluationTests.swift in Sources */,
 				B47AB1521D7FF6CA00586FDB /* STLCParser.swift in Sources */,
 				B49B76641D7417670062464C /* Prelude.swift in Sources */,
-				B47AB14A1D7FF67600586FDB /* STLCParserTests.swift in Sources */,
+				B47AB14A1D7FF67600586FDB /* ParserTests.swift in Sources */,
 				B49B76631D7417670062464C /* ParseError.swift in Sources */,
 				B49B76821D7B93DC0062464C /* Dictionary+Helpers.swift in Sources */,
 				B49B765E1D74171B0062464C /* UAParser.swift in Sources */,
@@ -625,14 +621,14 @@
 				B49B76781D757A180062464C /* ULCParser.swift in Sources */,
 				B49B765D1D7413420062464C /* UAParserTests.swift in Sources */,
 				B49B76601D7417670062464C /* Parser+UnicodeScalars.swift in Sources */,
-				B4AD1D8F1D813BEB0033FEB3 /* STLCChecker.swift in Sources */,
+				B4AD1D8F1D813BEB0033FEB3 /* STLCTypeChecker.swift in Sources */,
 				B49B765F1D7417670062464C /* Parser.swift in Sources */,
 				B49B766B1D7423F90062464C /* UAEvaluator.swift in Sources */,
 				B49B76611D7417670062464C /* Parser+Combinators.swift in Sources */,
 				B4838DC11DFE211D00625B96 /* EvaluationError.swift in Sources */,
 				B4838DC81DFE3BFE00625B96 /* Term.swift in Sources */,
 				B49B76851D7C102A0062464C /* ULCEvaluation.swift in Sources */,
-				B4838DCF1DFE4E4300625B96 /* LindTypeChecking.swift in Sources */,
+				B4838DCF1DFE4E4300625B96 /* TypeChecking.swift in Sources */,
 				B4838DC51DFE3B2A00625B96 /* Type.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
