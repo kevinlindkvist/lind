@@ -9,7 +9,6 @@
 import Result
 import Foundation
 
-private typealias NamingContext = [String:Int]
 private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
 private typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
 private let keywords = ["if", "else", "then", "succ", "pred", "isZero", "0"]
@@ -140,9 +139,10 @@ private func simplyTypedLambdaCalculus() -> TermParser {
   return term <* endOfInput()
 }
 
-func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], STLCTerm), ParseError> {
-  switch parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
-  case let .success((g, term)): return .success(g, term)
-  case let .failure(error): return .failure(error)
+public func parseSimplyTypedLambdaCalculus(_ str: String, context: NamingContext = [:]) -> ParseResult {
+  switch parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, context)) {
+//    case let .success((g, term)): return .success(g, term)
+    case let .failure(error): return .failure(error)
+    default: return .failure(.message("unimplemented"))
   }
 }

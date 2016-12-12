@@ -6,7 +6,14 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-typealias TypeContext = [Int:STLCType]
+import Result
+
+public typealias NamingContext = [String:Int]
+
+public struct STLCContext {
+  let types: TypeContext = [:]
+  let namies: NamingContext = [:]
+}
 
 public indirect enum STLCType {
   case t_t(STLCType, STLCType)
