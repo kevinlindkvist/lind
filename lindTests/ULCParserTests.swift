@@ -9,12 +9,12 @@
 import XCTest
 import Result
 
-fileprivate typealias ParseResult = ([String:Int], ULCTerm)
+fileprivate typealias ULCParseResult = ([String:Int], ULCTerm)
 
 class UntypedLambdaCalculusParserTests: XCTestCase {
 
-  fileprivate func check(program: String, expected: ParseResult) {
-    let expectation: Result<ParseResult, ParseError> = Result.success(expected)
+  fileprivate func check(program: String, expected: ULCParseResult) {
+    let expectation: Result<ULCParseResult, ParseError> = Result.success(expected)
     let result = parseUntypedLambdaCalculus(program)
     switch (result, expectation) {
     case let (.success(lhs), .success(rhs)):
@@ -27,28 +27,28 @@ class UntypedLambdaCalculusParserTests: XCTestCase {
   }
 
   func testVariable() {
-    let expected: ParseResult = (["x": 0], ULCTerm.va("x", 0))
+    let expected:ULCParseResult = (["x": 0], ULCTerm.va("x", 0))
     check(program: "x", expected: expected)
   }
 
   func testAbs() {
-    let expected: ParseResult = (Dictionary<String, Int>(), .abs("x", .va("x", 0)))
+    let expected:ULCParseResult = (Dictionary<String, Int>(), .abs("x", .va("x", 0)))
     check(program: "\\x.x", expected: expected)
   }
 
   func testAbsAbs() {
     let innerApp: ULCTerm = .app(.va("x", 1), .va("y", 0))
-    let expected: ParseResult = ([:], .abs("x", .abs("y", .app(innerApp, innerApp))))
+    let expected:ULCParseResult = ([:], .abs("x", .abs("y", .app(innerApp, innerApp))))
     check(program: "\\x.\\y.(x y) (x y)", expected: expected)
   }
 
   func testAbsExtension() {
-    let expected: ParseResult = ([:], .abs("x", .abs("y", .app(.app(.va("x", 1), .va("y", 0)), .va("x", 1)))))
+    let expected:ULCParseResult = ([:], .abs("x", .abs("y", .app(.app(.va("x", 1), .va("y", 0)), .va("x", 1)))))
     check(program: "\\x.\\y.x y x", expected: expected)
   }
 
   func testApp() {
-    let expected: ParseResult = (["y": 0, "z": 1], (.abs("x", .app(.va("y", 1), .va("z", 2)))))
+    let expected:ULCParseResult = (["y": 0, "z": 1], (.abs("x", .app(.va("y", 1), .va("z", 2)))))
     check(program: "\\x.y z", expected: expected)
   }
 

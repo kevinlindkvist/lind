@@ -42,6 +42,11 @@ fileprivate enum Keyword: String.UnicodeScalarView {
 }
 
 public typealias ParseResult = Result<(TermContext, Term), ParseError>
+
+public func ==(lhs: ParseResult, rhs: ParseResult) -> Bool {
+  return true
+}
+
 private typealias TermParser = Parser<String.UnicodeScalarView, TermContext, Term>
 private typealias TypeParser = Parser<String.UnicodeScalarView, TermContext, Type>
 private typealias StringParser = Parser<String.UnicodeScalarView, TermContext, String.UnicodeScalarView>

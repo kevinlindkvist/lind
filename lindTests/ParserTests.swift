@@ -9,150 +9,200 @@
 import Result
 import XCTest
 
-fileprivate typealias ParseResult = ([String:Int], STLCTerm)
+class ParserTests: XCTestCase {
 
-class STLCParserTests: XCTestCase {
-
-  fileprivate func check(program: String, expected: STLCTerm?) {
-    if let expected = expected {
-      check(program: program, expectedResult: ([:],expected))
-    } else {
-      check(program: program, expectedResult: nil)
-    }
+  fileprivate func check(input: String, expectedTerm: Term) {
+    check(input: input, expectedResult: .success([:], expectedTerm))
   }
 
-  fileprivate func check(program: String, expectedResult: ParseResult?) {
-    let result = parseSimplyTypedLambdaCalculus(program)
-    switch (result, expectedResult) {
-      case let (.success(lhs), .some(expected)):
-        XCTAssertEqual(lhs.0, expected.0)
-        XCTAssertEqual(lhs.1, expected.1, "\nExpected \(expected.1)\nParsed:\(lhs.1)")
-        break
-      case let (.failure(failure), .some(_)): XCTFail("Parsing failed: \(failure)")
-      case (.success, .none): XCTFail("Parsing success when expecting failure")
-      default: return
-    }
+  fileprivate func check(input: String, expectedResult: ParseResult) {
+    let result = parse(input: input, terms: [:])
+    // Can't make Result<T, E> equatable for specific T, E, due to bug in Swift's implementation.
+    XCTAssertTrue(expectedResult == result)
   }
 
   func testAbsBaseType() {
-    let expected: STLCTerm = .abs("x", .bool, .va("x", 0))
-    check(program: "\\x:bool.x", expected: expected)
+    let expected: Term = .abstraction(parameter: "x",
+                                     parameterType: .boolean,
+                                     body: .variable(name: "x", index: 0))
+    check(input: "\\x:bool.x", expectedTerm: expected)
   }
 
   func testAppSpaces() {
-    let expected: STLCTerm = .app(.va("a", 0), .va("b", 1))
-    check(program: "a b", expectedResult: (["a":0, "b":1],expected))
-    check(program: "a  b", expectedResult: (["a":0, "b":1],expected))
-    check(program: "a     b", expectedResult: (["a":0, "b":1],expected))
-    check(program: "ab", expectedResult: (["ab":0], .va("ab", 0)))
+    let expected: Term = .application(left: .variable(name: "a", index: 0), right: .variable(name: "b", index: 1))
+    check(input: "a b", expectedResult: .success(["a": 0, "b": 1], expected))
+    check(input: "a  b", expectedResult: .success(["a":0, "b":1], expected))
+    check(input: "a     b", expectedResult: .success(["a":0, "b":1], expected))
+    check(input: "ab", expectedResult: .success(["ab":0], .variable(name: "ab", index: 0)))
   }
   
   func testSucc() {
-    let expected: STLCTerm = .succ(.pred(.zero))
-    check(program: "succ(pred 0)", expected: expected)
-    check(program: "succ pred 0", expected: expected)
+    let expected: Term = .succ(.pred(.zero))
+    check(input: "succ(pred 0)", expectedTerm: expected)
+    check(input: "succ pred 0", expectedTerm: expected)
   }
   
   func testPred() {
-    let expected: STLCTerm = .pred(.succ(.zero))
-    check(program: "pred(succ 0)", expected: expected)
+    let expected: Term = .pred(.succ(.zero))
+    check(input: "pred(succ 0)", expectedTerm: expected)
   }
 
   func testAbsArrowType() {
-    let expected: STLCTerm = .abs("x", .t_t(.int,.bool), .va("x", 0))
-    check(program: "\\x:int->bool.x", expected: expected)
+    let expected: Term = .abstraction(parameter: "x", parameterType: .function(argumentType: .integer, returnType: .boolean), body: .variable(name: "x", index: 0))
+    check(input: "\\x:int->bool.x", expectedTerm: expected)
   }
 
   func testIfElseNoParens() {
-    let expected: STLCTerm = .ifElse(.succ(.pred(.zero)), .tmFalse, .tmTrue)
-    check(program: "if succ pred 0 then false else true", expected: expected)
+    let expected: Term = .ifElse(condition: .succ(.pred(.zero)), trueBranch: .tmFalse, falseBranch: .tmTrue)
+    check(input: "if succ pred 0 then false else true", expectedTerm: expected)
   }
   
   func testIfElse() {
-    let expected: STLCTerm = .ifElse(.abs("x", .bool, .app(.va("x", 0), .va("x", 0))), .tmFalse, .tmTrue)
-    check(program: "if \\x:bool.x x then false else true", expected: expected)
+    let condition: Term = .application(left:
+      .abstraction(parameter: "x", parameterType: .boolean, body: .variable(name: "x", index: 0)),
+                                       right: .variable(name: "x", index: 0))
+    let expected: Term = .ifElse(condition: condition, trueBranch: .tmFalse, falseBranch: .tmTrue)
+    check(input: "if \\x:bool.x x then false else true", expectedTerm: expected)
   }
 
   func testIfElseNested() {
-    let inner: STLCTerm = .ifElse(.abs("x", .bool, .va("x", 0)), .tmFalse, .tmTrue)
-    let expected: STLCTerm = .ifElse(.abs("x", .int, .app(.va("x", 0), inner)), .abs("y", .t_t(.bool, .int), .app(.va("y", 0), .va("x", 1))), .tmTrue)
-    check(program: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
-                    expectedResult: (["x":0], expected))
+    let inner: Term = .ifElse(condition:
+      .abstraction(parameter: "x", parameterType: .boolean, body: .variable(name: "x", index: 0)),
+                              trueBranch: .tmFalse,
+                              falseBranch: .tmTrue)
+    let expected: Term = .ifElse(condition: .abstraction(parameter: "x",
+                                                         parameterType: .integer,
+                                                         body: .application(left: .variable(name: "x", index: 0), right: inner)),
+                                 trueBranch: .abstraction(parameter: "y",
+                                                          parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                                          body: .application(left: .variable(name: "y", index: 0),
+                                                                             right: .variable(name: "x", index: 1))),
+                                 falseBranch: .tmTrue)
+    check(input: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
+          expectedResult: .success(["x":0], expected))
   }
 
   func testAppInSucc() {
-    let expected: STLCTerm = .succ(.succ(.abs("x", .t_t(.bool, .int), .app(.va("x", 0), .zero))))
-    check(program: "(succ (succ (\\x:bool->int.x 0)))", expected: expected)
+    let expected: Term = .succ(.succ(.abstraction(parameter: "x",
+                                                  parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                                  body: .application(left: .variable(name: "x", index: 0),
+                                                                     right: .zero))))
+    check(input: "(succ (succ (\\x:bool->int.x 0)))", expectedTerm: expected)
   }
 
   func testIfIsZero() {
-    let expected: STLCTerm = .ifElse(.isZero(.zero), .tmFalse, .tmTrue)
-    check(program: "if (isZero 0) then false else true", expected: expected)
+    let expected: Term = .ifElse(condition: .isZero(.zero), trueBranch: .tmFalse, falseBranch: .tmTrue)
+    check(input: "if (isZero 0) then false else true", expectedTerm: expected)
   }
 
   func testAppTermInIfClause() {
-    let expected: STLCTerm = .ifElse(.tmTrue, .app(.abs("x", .bool, .va("x", 0)), .tmTrue), .succ(.zero))
-    check(program: "if true then (\\x:bool.x) true else succ 0", expected: expected)
+    let expected: Term = .ifElse(condition: .tmTrue,
+                                 trueBranch: .application(left: .abstraction(parameter: "x",
+                                                                             parameterType: .boolean,
+                                                                             body: .variable(name: "x", index: 0)),
+                                                          right: .tmTrue),
+                                 falseBranch: .succ(.zero))
+    check(input: "if true then (\\x:bool.x) true else succ 0", expectedTerm: expected)
   }
 
   func testNestedAbs() {
-    let inner: STLCTerm = .abs("y", .t_t(.bool, .unit), .app(.va("y", 0), .va("x", 1)))
-    let expected: STLCTerm = .app(.app(.abs("x", .bool, inner), .tmTrue), .abs("z", .bool, .unit))
-    check(program: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", expected: expected)
+    let inner: Term = .abstraction(parameter: "y",
+                                   parameterType: .function(argumentType: .boolean, returnType: .unit),
+                                   body: .application(left: .variable(name: "y", index: 0),
+                                                      right: .variable(name: "x", index: 1)))
+    let expected: Term = .application(left: .application(left: .abstraction(parameter: "x",
+                                                                            parameterType: .boolean,
+                                                                            body: inner),
+                                                         right: .tmTrue),
+                                      right: .abstraction(parameter: "z", parameterType: .boolean, body: .unit))
+    check(input: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", expectedTerm: expected)
   }
 
   // MARK - Extension Tests
 
   func testSequenceUnit() {
-    let t1: STLCTerm = .unit
-    let t2: STLCTerm = .unit
-    check(program:"unit;unit", expected: .app(.abs("_", .unit, t2), t1))
+    let t1: Term = .unit
+    let t2: Term = .unit
+    check(input:"unit;unit", expectedTerm: .application(left: .abstraction(parameter: "_",
+                                                                           parameterType: .unit,
+                                                                           body: t2),
+                                                        right: t1))
   }
 
   func testSequenceApp() {
-    let t1: STLCTerm = .app(.va("a", 0), .va("b", 1))
-    let t2: STLCTerm = .app(.va("c", 2), .va("d", 3))
-    let expected: STLCTerm = .app(.abs("_", .unit, t2), t1)
-    check(program: "a b; c d", expectedResult: (["a":0, "b":1, "c":2, "d":3],expected))
-    check(program: "a b ;c d", expectedResult: (["a":0, "b":1, "c":2, "d":3],expected))
-    check(program: "a b; c d", expectedResult: (["a":0, "b":1, "c":2, "d":3],expected))
-    check(program: "a b ; c d", expectedResult: (["a":0, "b":1, "c":2, "d":3],expected))
+    let t1: Term = .application(left: .variable(name: "a", index: 0),
+                                right: .variable(name: "b", index: 1))
+    let t2: Term = .application(left: .variable(name: "c", index: 2),
+                                right: .variable(name: "d", index: 3))
+    let expected: Term = .application(left: .abstraction(parameter: "_", parameterType: .unit, body: t2),
+                                      right: t1)
+    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b ;c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b ; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
   }
 
   func testBaseType() {
-    let expected: STLCTerm = .abs("x", .base("A"), .va("x", 0))
-    check(program: "\\x:A.x", expected: expected)
+    let expected: Term = .abstraction(parameter: "x",
+                                      parameterType: .base(typeName: "A"),
+                                      body: .variable(name: "x", index: 0))
+    check(input: "\\x:A.x", expectedTerm: expected)
   }
 
   func testAbsAbsSequence() {
-    let expected: STLCTerm = .app(.abs("x", .t_t(.bool, .unit),
-                                       .app(.va("x", 0),.tmTrue)),
-                                  .abs("y", .bool, .unit))
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit ; (\\x:bool->unit.x true) \\y:bool.unit",
-          expected: .app(.abs("_", .unit, expected), expected))
+    let expected: Term = .application(left: .abstraction(parameter: "x",
+                                                         parameterType: .function(argumentType: .boolean, returnType: .unit),
+                                                         body: .application(left: .variable(name: "x", index: 0),
+                                                                            right: .tmTrue)),
+                                      right: .abstraction(parameter: "y",
+                                                          parameterType: .boolean,
+                                                          body: .unit))
+    check(input: "(\\x:bool->unit.x true) \\y:bool.unit ; (\\x:bool->unit.x true) \\y:bool.unit",
+          expectedTerm: .application(left: .abstraction(parameter: "_", parameterType: .unit, body: expected),
+                                     right: expected))
   }
 
   func testAs() {
-    check(program: "x as bool", expectedResult: (["x":0], .app(.abs("_", .bool, .va("_", 0)), .va("x", 0))))
+    check(input: "x as bool",
+          expectedResult: .success(["x":0], .application(left: .abstraction(parameter: "_",
+                                                                            parameterType: .boolean,
+                                                                            body: .variable(name: "_", index: 0)),
+                                                         right: .variable(name: "x", index: 0))))
   }
 
   func testAsLambda() {
-    let body: STLCTerm = .abs("x", .bool, .unit)
-    let expected: STLCTerm = .app(.abs("_", .t_t(.bool, .unit), .va("_", 0)), body)
-    check(program: "(\\x:bool.unit) as bool->unit", expected:expected)
+    let body: Term = .abstraction(parameter: "x", parameterType: .boolean, body: .unit)
+    let expected: Term = .application(left: .abstraction(parameter: "_",
+                                                         parameterType: .function(argumentType: .boolean, returnType: .unit),
+                                                         body: .variable(name: "_", index: 0)),
+                                      right: body)
+    check(input: "(\\x:bool.unit) as bool->unit", expectedTerm: expected)
   }
 
   func testLet() {
-    let t1: STLCTerm = .zero
-    let t2: STLCTerm = .abs("y", .int, .app(.va("y", 0), .va("x", 1)))
-    let expected: STLCTerm = .app(.abs("x", .int, t2), t1)
-    check(program: "let x=0 in \\y:int.y x", expectedResult: (["x":0], expected))
+    let t1: Term = .zero
+    let t2: Term = .abstraction(parameter: "y",
+                                parameterType: .integer,
+                                body: .application(left: .variable(name: "y", index: 0),
+                                                   right: .variable(name: "x", index: 1)))
+    let expected: Term = .application(left: .abstraction(parameter: "x", parameterType: .integer, body: t2),
+                                      right: t1)
+    check(input: "let x=0 in \\y:int.y x", expectedResult: .success(["x":0], expected))
   }
 
   func testLetApp() {
-    let t1: STLCTerm = .abs("z", .t_t(.bool, .int), .app(.va("z", 0), .tmTrue))
-    let t2: STLCTerm = .app(.va("e", 0), .abs("y", .bool, .zero))
-    let expected: STLCTerm = .app(.abs("e", .t_t(.t_t(.bool, .int), .int), t2), t1)
-    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: (["e":0], expected))
+    let t1: Term = .abstraction(parameter: "z",
+                                parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                body: .application(left: .variable(name: "z", index: 0),
+                                                   right: .tmTrue))
+    let t2: Term = .application(left: .variable(name: "e", index: 0),
+                                right: .abstraction(parameter: "y", parameterType: .boolean, body: .zero))
+    let expected: Term = .application(left: .abstraction(parameter: "e",
+                                                         parameterType: .function(argumentType: .function(argumentType: .boolean,
+                                                                                                          returnType: .integer),
+                                                                                  returnType: .integer),
+                                                         body: t2),
+                                      right: t1)
+    check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .success(["e":0], expected))
   }
 }

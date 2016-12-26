@@ -301,6 +301,9 @@ private func simplyTypedLambdaCalculus() -> TermParser {
   return sequence <* endOfInput()
 }
 
-public func parseSimplyTypedLambdaCalculus(_ str: String, context: NamingContext = [:]) -> TermParser {
-  return parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, context))
+func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], STLCTerm), ParseError> {
+  switch parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
+  case let .success((g, term)): return .success(g, term)
+  case let .failure(error): return .failure(error)
+  }
 }
