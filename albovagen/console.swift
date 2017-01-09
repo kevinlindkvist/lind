@@ -25,10 +25,10 @@ fileprivate func write(message: String, to: OutputType, terminator: String = "\n
   switch to {
   case .standard:
     // Write messages in the default color.
-    print("\u{001B}[;m\(message)", terminator: terminator)
+    print("\(message)", terminator: terminator)
   case .error:
     // Write the error message in red.
-    fputs("\u{001B}[0;31m\(message)\n", stderr)
+    fputs("\(message)\n", stderr)
   }
 }
 

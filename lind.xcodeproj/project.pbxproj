@@ -23,6 +23,7 @@
 		B4838DCE1DFE4E4300625B96 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */; };
 		B4838DCF1DFE4E4300625B96 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */; };
 		B4838DD11DFE9C8900625B96 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E549FF1DFE0DB300157AA2 /* TypeError.swift */; };
+		B496D2D71E10B29200E2779C /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B496D2D61E10B29200E2779C /* Evaluation.swift */; };
 		B49B76151D740DFE0062464C /* lind.h in Headers */ = {isa = PBXBuildFile; fileRef = B49B76141D740DFE0062464C /* lind.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B49B761C1D740DFE0062464C /* lind.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B49B76111D740DFE0062464C /* lind.framework */; };
 		B49B762C1D740E0E0062464C /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B762B1D740E0E0062464C /* Parser.swift */; };
@@ -169,6 +170,7 @@
 		B4838DC61DFE3BFE00625B96 /* Term.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Term.swift; sourceTree = "<group>"; };
 		B4838DCA1DFE3FF600625B96 /* Parsing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parsing.swift; sourceTree = "<group>"; };
 		B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeChecking.swift; sourceTree = "<group>"; };
+		B496D2D61E10B29200E2779C /* Evaluation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Evaluation.swift; sourceTree = "<group>"; };
 		B49B76111D740DFE0062464C /* lind.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = lind.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B49B76141D740DFE0062464C /* lind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lind.h; sourceTree = "<group>"; };
 		B49B76161D740DFE0062464C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				B4838DC61DFE3BFE00625B96 /* Term.swift */,
 				B4838DCA1DFE3FF600625B96 /* Parsing.swift */,
 				B4838DCD1DFE4E4300625B96 /* TypeChecking.swift */,
+				B496D2D61E10B29200E2779C /* Evaluation.swift */,
 			);
 			name = lind;
 			sourceTree = "<group>";
@@ -575,6 +578,7 @@
 				B49B76541D74107F0062464C /* UnicodeScalarView+Helpers.swift in Sources */,
 				B49B767A1D76C6BC0062464C /* ULCEvaluation.swift in Sources */,
 				B4E54A001DFE0DB300157AA2 /* TypeError.swift in Sources */,
+				B496D2D71E10B29200E2779C /* Evaluation.swift in Sources */,
 				B49B764E1D740F9F0062464C /* ParseError.swift in Sources */,
 				B49B76521D74102C0062464C /* Parser+UnicodeScalars.swift in Sources */,
 				B49B76561D7410E40062464C /* Parser+Combinators.swift in Sources */,

@@ -9,17 +9,17 @@
 import Foundation
 
 public indirect enum Term {
+  case unit
+  case abstraction(parameter: String, parameterType: Type, body: Term)
+  case application(left: Term, right: Term)
   case tmTrue
   case tmFalse
   case ifElse(condition: Term, trueBranch: Term, falseBranch: Term)
   case zero
+  case isZero(Term)
   case succ(Term)
   case pred(Term)
-  case isZero(Term)
   case variable(name: String, index: Int)
-  case abstraction(parameter: String, parameterType: Type, body: Term)
-  case application(left: Term, right: Term)
-  case unit
 }
 
 public typealias TermContext = [String:Int]
@@ -41,12 +41,12 @@ extension Term: CustomStringConvertible {
         return "pred(\(t))"
       case let .isZero(t):
         return "isZero(\(t))"
-      case let .variable(name, index):
-        return "\(name):\(index)"
+      case let .variable(name, _):
+        return "\(name)"
       case let .abstraction(parameter, type, body):
-        return "\\\(parameter):\(type).\(body)"
+        return "\\\(parameter):\(type).(\(body))"
       case let .application(lhs, rhs):
-        return "(\(lhs) \(rhs))"
+        return "\(lhs) \(rhs)"
       case .unit:
         return "unit"
     }

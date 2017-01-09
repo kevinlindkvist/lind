@@ -19,7 +19,7 @@ func run(input: String, namingContext: NamingContext = [:], typeContext: TypeCon
 
   let result = evaluate(input: input)
 
-  write(line: " -> " + description(evaluation: result))
+  write(line: "  " + description(evaluation: result))
   write(string: "λ: ")
 
   run(input: read())

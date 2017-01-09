@@ -10,11 +10,11 @@ import lind
 import Foundation
 import Result
 
-public typealias Evaluation = Result<(Term, NamingContext, TypeContext), EvaluationError>
+public typealias Evaluation = Result<((Term, Type), NamingContext, TypeContext), EvaluationError>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
-    case let .success(term, _, _): return term.description
+    case let .success((term, type), _, _): return term.description + " :: " + type.description
     case let .failure(message): return message.description
   }
 }
@@ -25,8 +25,9 @@ func evaluate(input: String,
   switch parse(input: input, terms: terms) {
   case let .success(result):
     switch typeOf(term: result.1, context: types) {
-      case .success(_, _):
-        return .success((result.1, terms, types))
+      case let .success(_, type):
+        let evaluatedTerm = evaluate(term: result.1)
+        return .success(((evaluatedTerm, type), terms, types))
       case let .failure(error):
         return .failure(.typeError(error))
     }

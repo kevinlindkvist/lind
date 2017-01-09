@@ -49,7 +49,7 @@ extension Type: CustomStringConvertible {
       case .integer:
         return "int"
       case let .function(argumentType, returnType):
-        return "\(argumentType)->\(returnType)"
+        return "\(argumentType) => \(returnType)"
       case .unit:
         return "unit"
       case let .base(typeName):
