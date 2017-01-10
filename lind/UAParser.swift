@@ -13,34 +13,34 @@ typealias UATermParser = Parser<String.UnicodeScalarView, (), UATerm>
 /// Parses 0.
 let UAZero = _UAZero()
 private func _UAZero() -> UATermParser {
-  return char("0") *> pure(.zero)
+  return char("0") *> pure(.Zero)
 }
 
 /// Parses true.
 let UATrue = _UATrue()
 func _UATrue() -> UATermParser {
-  return string( "true") *> pure(.tmTrue)
+  return string( "true") *> pure(.True)
 }
 
 /// Parses false.
 let UAFalse = _UAFalse()
 func _UAFalse() -> UATermParser {
-  return string( "false") *> pure(.tmFalse)
+  return string( "false") *> pure(.False)
 }
 
 let UASucc = _UASucc()
 func _UASucc() -> UATermParser {
-  return (string( "succ") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.succ(t)), ctxt) }
+  return (string( "succ") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Succ(t)), ctxt) }
 }
 
 let UAPred = _UAPred()
 func _UAPred() -> UATermParser {
-  return (string( "pred") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.pred(t)), ctxt) }
+  return (string( "pred") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Pred(t)), ctxt) }
 }
 
 let UAIsZero = _UAIsZero()
 func _UAIsZero() -> UATermParser {
-  return (string( "isZero") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.isZero(t)), ctxt) }
+  return (string( "isZero") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.IsZero(t)), ctxt) }
 }
 
 // Parses an if-then-else statement.
@@ -52,7 +52,7 @@ func _UAIfElse() -> UATermParser {
         let ifElse = IfElseUATerm(conditional: conditional,
                                 trueBranch: trueBranch,
                                 falseBranch: falseBranch)
-        return (pure(.ifElse(ifElse)), ())
+        return (pure(.If(ifElse)), ())
       }, ctxt)
     }, ctxt)
   }

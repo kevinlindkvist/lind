@@ -41,7 +41,7 @@ public extension ResultProtocol {
 
 	/// Returns a new Result by mapping `Success`es’ values using `transform`, or re-wrapping `Failure`s’ errors.
 	public func map<U>(_ transform: (Value) -> U) -> Result<U, Error> {
-		return flatMap { .success(transform($0)) }
+		return flatMap { .Success(transform($0)) }
 	}
 
 	/// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
@@ -59,7 +59,7 @@ public extension ResultProtocol {
 	/// Returns the result of applying `transform` to `Failure`’s errors, or re-wrapping `Success`es’ values.
 	public func flatMapError<Error2>(_ transform: (Error) -> Result<Value, Error2>) -> Result<Value, Error2> {
 		return analysis(
-			ifSuccess: Result<Value, Error2>.success,
+			ifSuccess: Result<Value, Error2>.Success,
 			ifFailure: transform)
 	}
 }
@@ -92,7 +92,7 @@ public extension ResultProtocol where Error: ErrorProtocolConvertible {
 	public func tryMap<U>(_ transform: (Value) throws -> U) -> Result<U, Error> {
 		return flatMap { value in
 			do {
-				return .success(try transform(value))
+				return .Success(try transform(value))
 			}
 			catch {
 				let convertedError = Error.error(from: error)

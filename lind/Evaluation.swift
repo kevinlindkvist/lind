@@ -14,71 +14,71 @@ public func evaluate(term: Term) -> Term {
 
 private func evaluate(term: Term, context: NamingContext) -> Term {
   switch term {
-  case .unit: return .unit
+  case .Unit: return .Unit
   // Application and abstraction
-  case .abstraction(_,_,_):
+  case .Abstraction(_,_,_):
     return term
-  case let .application(.abstraction(_, _, body), v2) where isValue(term: v2):
+  case let .Application(.Abstraction(_, _, body), v2) where isValue(term: v2):
     let t2 = termSubstop(v2, body)
     return evaluate(term: t2, context: context)
-  case let .application(v1, t2) where isValue(term: v1):
+  case let .Application(v1, t2) where isValue(term: v1):
     let t2p = evaluate(term: t2, context: context)
-    return .application(left: v1, right: t2p)
-  case let .application(t1, t2):
+    return .Application(left: v1, right: t2p)
+  case let .Application(t1, t2):
     let t1p = evaluate(term: t1, context: context)
-    return .application(left: t1p, right: t2)
+    return .Application(left: t1p, right: t2)
   // Numbers
-  case .zero: return .zero
-  case .isZero(.zero):
-    return .tmTrue
-  case .isZero(.succ(_)):
-    return .tmFalse
-  case let .isZero(zeroTerm):
+  case .Zero: return .Zero
+  case .IsZero(.Zero):
+    return .True
+  case .IsZero(.Succ(_)):
+    return .False
+  case let .IsZero(zeroTerm):
     let evaluatedTerm = evaluate(term: zeroTerm, context: context)
-    return evaluate(term: .isZero(evaluatedTerm), context: context)
-  case .succ(.zero):
-    return .succ(.zero)
-  case let .succ(succTerm):
+    return evaluate(term: .IsZero(evaluatedTerm), context: context)
+  case .Succ(.Zero):
+    return .Succ(.Zero)
+  case let .Succ(succTerm):
     let evaluatedTerm = evaluate(term: succTerm, context: context)
-    return evaluate(term: .succ(evaluatedTerm), context: context)
-  case .pred(.zero):
-    return .zero
-  case let .pred(.succ(succTerm)):
+    return evaluate(term: .Succ(evaluatedTerm), context: context)
+  case .Pred(.Zero):
+    return .Zero
+  case let .Pred(.Succ(succTerm)):
     return succTerm
-  case let .pred(predTerm):
+  case let .Pred(predTerm):
     let evaluatedTerm = evaluate(term: predTerm, context: context)
-    return evaluate(term: .pred(evaluatedTerm), context: context)
+    return evaluate(term: .Pred(evaluatedTerm), context: context)
   // Booleans
-  case .tmTrue: return .tmTrue
-  case .tmFalse: return .tmFalse
-  case let .ifElse(conditional, trueBranch, falseBranch):
+  case .True: return .True
+  case .False: return .False
+  case let .If(conditional, trueBranch, falseBranch):
     switch evaluate(term: conditional, context: context) {
-      case .tmTrue:
+      case .True:
         return evaluate(term: trueBranch, context: context)
       default:
         return evaluate(term: falseBranch, context: context)
     }
   // Variables
-  case .variable(_, _):
+  case .Variable(_, _):
     return term
   }
 }
 
 private func isValue(term: Term) -> Bool {
   switch term {
-    case .abstraction: return true
-    case .unit: return true
-    case .tmTrue: return true
-    case .tmFalse: return true
+    case .Abstraction: return true
+    case .Unit: return true
+    case .True: return true
+    case .False: return true
     default: return isNumericValue(term: term)
   }
 }
 
 private func isNumericValue(term: Term) -> Bool {
   switch term {
-  case let .succ(t) where isNumericValue(term: t):
+  case let .Succ(t) where isNumericValue(term: t):
     return true
-  case .zero:
+  case .Zero:
     return true
   default:
     return false
@@ -87,24 +87,24 @@ private func isNumericValue(term: Term) -> Bool {
 
 private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
   switch t {
-    case let .variable(name, index) where index < c:
-      return .variable(name: name, index: index)
-    case let .variable(name, index):
-      return .variable(name: name, index: index+d)
-    case let .abstraction(name, type, body):
-      return .abstraction(parameter: name, parameterType: type, body: shift(d, c+1, body))
-    case let .application(lhs, rhs):
-      return .application(left: shift(d, c, lhs), right: shift(d, c, rhs))
-    case let .ifElse(conditional, trueBranch, falseBranch):
-      return .ifElse(condition: shift(d, c, conditional),
+    case let .Variable(name, index) where index < c:
+      return .Variable(name: name, index: index)
+    case let .Variable(name, index):
+      return .Variable(name: name, index: index+d)
+    case let .Abstraction(name, type, body):
+      return .Abstraction(parameter: name, parameterType: type, body: shift(d, c+1, body))
+    case let .Application(lhs, rhs):
+      return .Application(left: shift(d, c, lhs), right: shift(d, c, rhs))
+    case let .If(conditional, trueBranch, falseBranch):
+      return .If(condition: shift(d, c, conditional),
                      trueBranch: shift(d, c, trueBranch),
                      falseBranch: shift(d, c, falseBranch))
-    case let .succ(body):
-      return .succ(shift(d, c, body))
-    case let .pred(body):
-      return .pred(shift(d, c, body))
-    case let .isZero(body):
-      return .isZero(shift(d, c, body))
+    case let .Succ(body):
+      return .Succ(shift(d, c, body))
+    case let .Pred(body):
+      return .Pred(shift(d, c, body))
+    case let .IsZero(body):
+      return .IsZero(shift(d, c, body))
     default:
       return t
   }
@@ -112,24 +112,24 @@ private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
 
 private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
   switch t {
-    case let .variable(_, index) where index == j+c:
+    case let .Variable(_, index) where index == j+c:
       return shift(c, 0, s)
-    case let .variable(name, index):
-      return .variable(name: name, index: index)
-    case let .abstraction(name, type, body):
-      return .abstraction(parameter: name, parameterType: type, body: substitute(j, s, body, c+1))
-    case let .application(lhs, rhs):
-      return .application(left: substitute(j, s, lhs, c), right: substitute(j, s, rhs, c))
-    case let .ifElse(conditional, trueBranch, falseBranch):
-      return .ifElse(condition: substitute(j, s, conditional, c),
+    case let .Variable(name, index):
+      return .Variable(name: name, index: index)
+    case let .Abstraction(name, type, body):
+      return .Abstraction(parameter: name, parameterType: type, body: substitute(j, s, body, c+1))
+    case let .Application(lhs, rhs):
+      return .Application(left: substitute(j, s, lhs, c), right: substitute(j, s, rhs, c))
+    case let .If(conditional, trueBranch, falseBranch):
+      return .If(condition: substitute(j, s, conditional, c),
                      trueBranch: substitute(j, s, trueBranch, c),
                      falseBranch: substitute(j, s, falseBranch, c))
-    case let .succ(body):
-      return .succ(substitute(j, s, body, c))
-    case let .pred(body):
-      return .pred(substitute(j, s, body, c))
-    case let .isZero(body):
-      return .isZero(substitute(j, s, body, c))
+    case let .Succ(body):
+      return .Succ(substitute(j, s, body, c))
+    case let .Pred(body):
+      return .Pred(substitute(j, s, body, c))
+    case let .IsZero(body):
+      return .IsZero(substitute(j, s, body, c))
     default:
       return t
   }

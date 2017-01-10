@@ -40,9 +40,9 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
     } else {
       return nil
     }
-  case .tmTrue: return .bool
-  case .tmFalse: return .bool
-  case let .ifElse(conditional, trueBranch, falseBranch):
+  case .True: return .bool
+  case .False: return .bool
+  case let .If(conditional, trueBranch, falseBranch):
     if typeOf(t: conditional, context: context) == .bool {
       let tyTrue = typeOf(t: trueBranch, context: context)
       let tyFalse = typeOf(t: falseBranch, context: context)
@@ -56,8 +56,8 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       print("type of if conditional not bool: \(conditional)")
       return nil
     }
-  case .zero: return .int
-  case let .isZero(term):
+  case .Zero: return .int
+  case let .IsZero(term):
     let type = typeOf(t: term, context: context)
     if type == .int {
       return .bool
@@ -65,7 +65,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       print("isZero called with non-nat argument")
       return nil
     }
-  case let .succ(term):
+  case let .Succ(term):
     let type = typeOf(t: term, context: context)
     if type == .int {
       return .int
@@ -73,7 +73,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       print("succ called with non-nat argument")
       return nil
     }
-  case let .pred(term):
+  case let .Pred(term):
     let type = typeOf(t: term, context: context)
     if type == .int {
       return .int
@@ -82,7 +82,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       return nil
     }
   // Extensions
-  case .unit: return .unit
+  case .Unit: return .Unit
 
   }
 }

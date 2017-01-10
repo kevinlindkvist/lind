@@ -7,8 +7,8 @@
 //
 
 public indirect enum UATerm {
-  case tmTrue
-  case tmFalse
+  case True
+  case False
   case ifElse(IfElseUATerm)
   case zero
   case succ(UATerm)
@@ -21,19 +21,19 @@ extension UATerm: Equatable {
 
 public func ==(lhs: UATerm, rhs: UATerm) -> Bool {
   switch (lhs, rhs) {
-  case (.tmTrue, .tmTrue):
+  case (.True, .True):
     return true
-  case (.tmFalse, .tmFalse):
+  case (.False, .False):
     return true
-  case (let .ifElse(left), let .ifElse(right)):
+  case (let .If(left), let .If(right)):
     return left == right
-  case (.zero, .zero):
+  case (.Zero, .Zero):
     return true
-  case (let .succ(left), let .succ(right)):
+  case (let .Succ(left), let .Succ(right)):
     return left == right
-  case (let .pred(left), let .pred(right)):
+  case (let .Pred(left), let .Pred(right)):
     return left == right
-  case (let .isZero(left), let .isZero(right)):
+  case (let .IsZero(left), let .IsZero(right)):
     return left == right
   default:
     return false

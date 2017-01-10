@@ -64,10 +64,10 @@ private func _sequence() -> TermParser {
   return chainl1(p: term,
                  op: (skipSpaces() *> char(";") <* skipSpaces())
                   *> pure ({ t1, t2 in
-                    let abstraction: Term = .abstraction(parameter: "_",
-                                                         parameterType: .unit,
+                    let abstraction: Term = .Abstraction(parameter: "_",
+                                                         parameterType: .Unit,
                                                          body: t2)
-                    return .application(left: abstraction, right: t1)
+                    return .Application(left: abstraction, right: t1)
                   }))
 }
 
@@ -75,7 +75,7 @@ private let term = _term()
 private func _term() -> TermParser {
   return chainl1(p: nonApplicationTerm,
                  op: char(" ") *> skipSpaces() *> pure( { t1, t2 in
-                  .application(left: t1, right: t2)
+                  .Application(left: t1, right: t2)
                  }))
 }
 
@@ -85,9 +85,9 @@ private func _nonApplicationTerm() -> TermParser {
     // After an atom is parsed, check if there is an ascription, otherwise purely return the atom.
     return ((ascription
       >>- { context, type in
-        let body: Term = .variable(name: "_", index: 0)
-        let abstraction: Term = .abstraction(parameter: "_", parameterType: type, body: body)
-        return (pure(.application(left: abstraction, right: term)), context)
+        let body: Term = .Variable(name: "_", index: 0)
+        let abstraction: Term = .Abstraction(parameter: "_", parameterType: type, body: body)
+        return (pure(.Application(left: abstraction, right: term)), context)
       })
       <|> pure(term), context)
   }
@@ -126,11 +126,11 @@ fileprivate func _let() -> TermParser {
             >>- { (context: TermContext, t2: Term) in
                 let result = typeOf(term: t1, context: [:])
                 switch result {
-                case let .success(_, T1):
-                  let left: Term = .abstraction(parameter: String(identifier),
+                case let .Success(_, T1):
+                  let left: Term = .Abstraction(parameter: String(identifier),
                                                 parameterType: T1,
                                                 body: t2)
-                  return (pure(.application(left: left, right: t1)), context)
+                  return (pure(.Application(left: left, right: t1)), context)
                 case .failure(_):
                   return (fail("Could not determine type of \(t1)"), context)
                 }
@@ -148,17 +148,17 @@ fileprivate func _builtIn() -> TermParser {
 
 private let Succ = succ()
 private func succ() -> TermParser {
-  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { context, t in (pure(.succ(t)), context) }
+  return (keyword(.Succ) *> skipSpaces() *> term) >>- { context, t in (pure(.Succ(t)), context) }
 }
 
 private let Pred = pred()
 private func pred() -> TermParser {
-  return (keyword(.PRED) *> skipSpaces() *> term) >>- { context, t in (pure(.pred(t)), context) }
+  return (keyword(.Pred) *> skipSpaces() *> term) >>- { context, t in (pure(.Pred(t)), context) }
 }
 
 private let IsZero = isZero()
 private func isZero() -> TermParser {
-  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { context, t in (pure(.isZero(t)), context) }
+  return (keyword(.IsZero) *> skipSpaces() *> term) >>- { context, t in (pure(.IsZero(t)), context) }
 }
 
 
@@ -205,7 +205,7 @@ private func _lambda() -> TermParser {
       
   let context = unshiftContext(context: context, identifier: identifier)
     
-  return (pure(.abstraction(parameter: String(identifier), parameterType: type, body: t)), context)
+  return (pure(.Abstraction(parameter: String(identifier), parameterType: type, body: t)), context)
   }, context)
   }, context)
   }
@@ -233,7 +233,7 @@ private func ifElse() -> TermParser {
   return (If *> term) >>- { context, conditional in
   return ((Then *> term) >>- { context, tBranch in
   return ((Else *> term) >>- { context, fBranch in
-  return (pure(.ifElse(condition: conditional, trueBranch: tBranch, falseBranch: fBranch)), context)
+  return (pure(.If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch)), context)
   }, context)
   }, context)
   }
@@ -283,7 +283,7 @@ fileprivate func int() -> TypeParser {
 
 fileprivate let Unit = unit_ty()
 fileprivate func unit_ty() -> TypeParser {
-  return keyword(.UNIT) *> pure(.unit)
+  return keyword(.Unit) *> pure(.Unit)
 }
 
 // MARK: - Values
@@ -295,22 +295,22 @@ fileprivate func value() -> TermParser {
 
 private let UNIT = _unit()
 private func _unit() -> TermParser {
-  return keyword(.UNIT) *> pure(.unit)
+  return keyword(.Unit) *> pure(.Unit)
 }
 
 private let TRUE = _true()
 private func _true() -> TermParser {
-  return keyword(.TRUE) *> pure(.tmTrue)
+  return keyword(.TRUE) *> pure(.True)
 }
 
 private let FALSE = _false()
 private func _false() -> TermParser {
-  return keyword(.FALSE) *> pure(.tmFalse)
+  return keyword(.FALSE) *> pure(.False)
 }
 
 fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
-  return keyword(.ZERO) *> pure(.zero)
+  return keyword(.Zero) *> pure(.Zero)
 }
 
 
@@ -331,10 +331,10 @@ private func _variable() -> TermParser {
 
     let id = String(t)
     if let index = context[id] {
-      return (pure(.variable(name: id, index: index)), context)
+      return (pure(.Variable(name: id, index: index)), context)
     } else {
       let index = context.count
-      return (pure(.variable(name: id, index: index)), union(context, [id:index]))
+      return (pure(.Variable(name: id, index: index)), union(context, [id:index]))
     }
   }
 }

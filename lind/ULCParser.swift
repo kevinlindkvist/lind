@@ -71,7 +71,7 @@ private func untypedLambdaCalculus() -> TermParser {
 
 func parseUntypedLambdaCalculus(_ str: String) -> Result<([String:Int], ULCTerm), ParseError> {
   switch parseOnly(untypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
-    case let .success((g, term)): return .success(g, term)
+    case let .Success((g, term)): return .Success(g, term)
     case let .failure(error): return .failure(error)
   }
 }
