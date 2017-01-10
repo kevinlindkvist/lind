@@ -18,17 +18,21 @@ private func evaluate(term: Term, context: NamingContext) -> Term {
   // Application and abstraction
   case .abstraction(_,_,_):
     return term
+
   case let .application(.abstraction(_, _, body), v2) where isValue(term: v2):
     let t2 = termSubstop(v2, body)
     return evaluate(term: t2, context: context)
+
   case let .application(v1, t2) where isValue(term: v1):
     let t2p = evaluate(term: t2, context: context)
     return .application(left: v1, right: t2p)
+
   case let .application(t1, t2):
     let t1p = evaluate(term: t1, context: context)
     return .application(left: t1p, right: t2)
   // Numbers
   case .zero: return .zero
+    
   case .isZero(.zero):
     return .tmTrue
   case .isZero(.succ(_)):
@@ -36,11 +40,12 @@ private func evaluate(term: Term, context: NamingContext) -> Term {
   case let .isZero(zeroTerm):
     let evaluatedTerm = evaluate(term: zeroTerm, context: context)
     return evaluate(term: .isZero(evaluatedTerm), context: context)
+
   case .succ(.zero):
     return .succ(.zero)
   case let .succ(succTerm):
-    let evaluatedTerm = evaluate(term: succTerm, context: context)
-    return evaluate(term: .succ(evaluatedTerm), context: context)
+    return .succ(evaluate(term: succTerm, context: context))
+    
   case .pred(.zero):
     return .zero
   case let .pred(.succ(succTerm)):
@@ -48,9 +53,11 @@ private func evaluate(term: Term, context: NamingContext) -> Term {
   case let .pred(predTerm):
     let evaluatedTerm = evaluate(term: predTerm, context: context)
     return evaluate(term: .pred(evaluatedTerm), context: context)
+    
   // Booleans
   case .tmTrue: return .tmTrue
   case .tmFalse: return .tmFalse
+
   case let .ifElse(conditional, trueBranch, falseBranch):
     switch evaluate(term: conditional, context: context) {
       case .tmTrue:
