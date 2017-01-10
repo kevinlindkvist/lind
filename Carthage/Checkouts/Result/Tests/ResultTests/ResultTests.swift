@@ -95,7 +95,7 @@ final class ResultTests: XCTestCase {
 	// MARK: Recover
 
 	func testRecoverProducesLeftForLeftSuccess() {
-		let left = Result<String, NSError>.Success("left")
+		let left = Result<String, NSError>.success("left")
 		XCTAssertEqual(left.recover("right"), "left")
 	}
 
@@ -109,8 +109,8 @@ final class ResultTests: XCTestCase {
 	// MARK: Recover With
 
 	func testRecoverWithProducesLeftForLeftSuccess() {
-		let left = Result<String, NSError>.Success("left")
-		let right = Result<String, NSError>.Success("right")
+		let left = Result<String, NSError>.success("left")
+		let right = Result<String, NSError>.success("right")
 
 		XCTAssertEqual(left.recover(with: right).value, "left")
 	}
@@ -119,7 +119,7 @@ final class ResultTests: XCTestCase {
 		struct Error: Swift.Error {}
 
 		let left = Result<String, Error>.failure(Error())
-		let right = Result<String, Error>.Success("right")
+		let right = Result<String, Error>.success("right")
 
 		XCTAssertEqual(left.recover(with: right).value, "right")
 	}
@@ -173,7 +173,7 @@ final class ResultTests: XCTestCase {
 			/// FIXME: skipped on Linux because of crash with swift-3.0-PREVIEW-4.
 			print("Test Case `\(#function)` skipped on Linux because of crash with swift-3.0-PREVIEW-4.")
 		#else
-			let result = Result<String, NSError>.Success("fail").tryMap(tryIsSuccess)
+			let result = Result<String, NSError>.success("fail").tryMap(tryIsSuccess)
 			XCTAssert(result == failure)
 		#endif
 	}
@@ -202,7 +202,7 @@ final class ResultTests: XCTestCase {
 
 // MARK: - Fixtures
 
-let success = Result<String, NSError>.Success("success")
+let success = Result<String, NSError>.success("success")
 let error = NSError(domain: "com.antitypical.Result", code: 1, userInfo: nil)
 let error2 = NSError(domain: "com.antitypical.Result", code: 2, userInfo: nil)
 let failure = Result<String, NSError>.failure(error)

@@ -14,10 +14,10 @@ fileprivate typealias ULCParseResult = ([String:Int], ULCTerm)
 class UntypedLambdaCalculusParserTests: XCTestCase {
 
   fileprivate func check(program: String, expected: ULCParseResult) {
-    let expectation: Result<ULCParseResult, ParseError> = Result.Success(expected)
+    let expectation: Result<ULCParseResult, ParseError> = Result.success(expected)
     let result = parseUntypedLambdaCalculus(program)
     switch (result, expectation) {
-    case let (.Success(lhs), .Success(rhs)):
+    case let (.success(lhs), .success(rhs)):
       XCTAssertEqual(lhs.0, rhs.0)
       XCTAssertEqual(lhs.1, rhs.1)
       break

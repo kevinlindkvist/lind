@@ -19,7 +19,7 @@ extension Reply {
       case let .failure(o, _, m):
         return .failure(.message("Failed to read message \(o) \\n \(m)"))
       case let .done(_, context, output):
-        return .Success(context, output)
+        return .success(context, output)
     }
   }
 }

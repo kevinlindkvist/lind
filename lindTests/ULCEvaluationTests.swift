@@ -13,7 +13,7 @@ class UntypedLambdaCalculusEvaluationTests: XCTestCase {
 
   func check(program: String, expectation: ULCTerm) {
     switch parseUntypedLambdaCalculus(program) {
-      case let .Success(_, term):
+      case let .success(_, term):
         XCTAssertEqual(evaluate(term), expectation)
       default: XCTAssertTrue(false)
     }

@@ -9,7 +9,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 
 	/// Constructs a success wrapping a `value`.
 	public init(value: T) {
-		self = .Success(value)
+		self = .success(value)
 	}
 
 	/// Constructs a failure wrapping an `error`.
@@ -19,7 +19,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 
 	/// Constructs a result from an Optional, failing with `Error` if `nil`.
 	public init(_ value: T?, failWith: @autoclosure () -> Error) {
-		self = value.map(Result.Success) ?? .failure(failWith())
+		self = value.map(Result.success) ?? .failure(failWith())
 	}
 
 	/// Constructs a result from a function that uses `throw`, failing with `Error` if throws.
@@ -30,7 +30,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 	/// Constructs a result from a function that uses `throw`, failing with `Error` if throws.
 	public init(attempt f: () throws -> T) {
 		do {
-			self = .Success(try f())
+			self = .success(try f())
 		} catch {
 			self = .failure(error as! Error)
 		}
@@ -42,7 +42,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 	/// Returns the value from `Success` Results or `throw`s the error.
 	public func dematerialize() throws -> T {
 		switch self {
-		case let .Success(value):
+		case let .success(value):
 			return value
 		case let .failure(error):
 			throw error
@@ -55,7 +55,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 	/// Returns the value produced by applying `ifFailure` to `Failure` Results, or `ifSuccess` to `Success` Results.
 	public func analysis<Result>(ifSuccess: (T) -> Result, ifFailure: (Error) -> Result) -> Result {
 		switch self {
-		case let .Success(value):
+		case let .success(value):
 			return ifSuccess(value)
 		case let .failure(value):
 			return ifFailure(value)
@@ -96,7 +96,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 
 	public var description: String {
 		return analysis(
-			ifSuccess: { ".Success(\($0))" },
+			ifSuccess: { ".success(\($0))" },
 			ifFailure: { ".failure(\($0))" })
 	}
 
@@ -116,7 +116,7 @@ public func materialize<T>(_ f: () throws -> T) -> Result<T, NSError> {
 
 public func materialize<T>(_ f: @autoclosure () throws -> T) -> Result<T, NSError> {
 	do {
-		return .Success(try f())
+		return .success(try f())
 	} catch let error as NSError {
 		return .failure(error)
 	}
@@ -133,7 +133,7 @@ public func materialize<T>(_ f: @autoclosure () throws -> T) -> Result<T, NSErro
 ///     Result.try { NSData(contentsOfURL: URL, options: .DataReadingMapped, error: $0) }
 public func `try`<T>(_ function: String = #function, file: String = #file, line: Int = #line, `try`: (NSErrorPointer) -> T?) -> Result<T, NSError> {
 	var error: NSError?
-	return `try`(&error).map(Result.Success) ?? .failure(error ?? Result<T, NSError>.error(function: function, file: file, line: line))
+	return `try`(&error).map(Result.success) ?? .failure(error ?? Result<T, NSError>.error(function: function, file: file, line: line))
 }
 
 /// Constructs a Result with the result of calling `try` with an error pointer.
@@ -144,7 +144,7 @@ public func `try`<T>(_ function: String = #function, file: String = #file, line:
 public func `try`(_ function: String = #function, file: String = #file, line: Int = #line, `try`: (NSErrorPointer) -> Bool) -> Result<(), NSError> {
 	var error: NSError?
 	return `try`(&error) ?
-		.Success(())
+		.success(())
 	:	.failure(error ?? Result<(), NSError>.error(function: function, file: file, line: line))
 }
 

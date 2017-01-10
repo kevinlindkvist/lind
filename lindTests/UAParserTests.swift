@@ -13,7 +13,7 @@ class UntypedArithmeticParserTests: XCTestCase {
 
   func check(program: String, expected: UATerm) {
     switch parseUntypedArithmetic(program) {
-    case let .Success(result):
+    case let .success(result):
       XCTAssertEqual(expected, result.1)
       break
     case .failure(_):

@@ -126,7 +126,7 @@ fileprivate func _let() -> TermParser {
             >>- { (context: TermContext, t2: Term) in
                 let result = typeOf(term: t1, context: [:])
                 switch result {
-                case let .Success(_, T1):
+                case let .success(_, T1):
                   let left: Term = .Abstraction(parameter: String(identifier),
                                                 parameterType: T1,
                                                 body: t2)
@@ -148,17 +148,17 @@ fileprivate func _builtIn() -> TermParser {
 
 private let Succ = succ()
 private func succ() -> TermParser {
-  return (keyword(.Succ) *> skipSpaces() *> term) >>- { context, t in (pure(.Succ(t)), context) }
+  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { context, t in (pure(.Succ(t)), context) }
 }
 
 private let Pred = pred()
 private func pred() -> TermParser {
-  return (keyword(.Pred) *> skipSpaces() *> term) >>- { context, t in (pure(.Pred(t)), context) }
+  return (keyword(.PRED) *> skipSpaces() *> term) >>- { context, t in (pure(.Pred(t)), context) }
 }
 
 private let IsZero = isZero()
 private func isZero() -> TermParser {
-  return (keyword(.IsZero) *> skipSpaces() *> term) >>- { context, t in (pure(.IsZero(t)), context) }
+  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { context, t in (pure(.IsZero(t)), context) }
 }
 
 
@@ -283,7 +283,7 @@ fileprivate func int() -> TypeParser {
 
 fileprivate let Unit = unit_ty()
 fileprivate func unit_ty() -> TypeParser {
-  return keyword(.Unit) *> pure(.Unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 // MARK: - Values
@@ -295,7 +295,7 @@ fileprivate func value() -> TermParser {
 
 private let UNIT = _unit()
 private func _unit() -> TermParser {
-  return keyword(.Unit) *> pure(.Unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 private let TRUE = _true()
@@ -310,7 +310,7 @@ private func _false() -> TermParser {
 
 fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
-  return keyword(.Zero) *> pure(.Zero)
+  return keyword(.ZERO) *> pure(.Zero)
 }
 
 

@@ -12,7 +12,7 @@ import XCTest
 class ParserTests: XCTestCase {
 
   fileprivate func check(input: String, expectedTerm: Term) {
-    check(input: input, expectedResult: .Success([:], expectedTerm))
+    check(input: input, expectedResult: .success([:], expectedTerm))
   }
 
   fileprivate func check(input: String, expectedResult: ParseResult) {
@@ -30,10 +30,10 @@ class ParserTests: XCTestCase {
 
   func testAppSpaces() {
     let expected: Term = .Application(left: .Variable(name: "a", index: 0), right: .Variable(name: "b", index: 1))
-    check(input: "a b", expectedResult: .Success(["a": 0, "b": 1], expected))
-    check(input: "a  b", expectedResult: .Success(["a":0, "b":1], expected))
-    check(input: "a     b", expectedResult: .Success(["a":0, "b":1], expected))
-    check(input: "ab", expectedResult: .Success(["ab":0], .Variable(name: "ab", index: 0)))
+    check(input: "a b", expectedResult: .success(["a": 0, "b": 1], expected))
+    check(input: "a  b", expectedResult: .success(["a":0, "b":1], expected))
+    check(input: "a     b", expectedResult: .success(["a":0, "b":1], expected))
+    check(input: "ab", expectedResult: .success(["ab":0], .Variable(name: "ab", index: 0)))
   }
   
   func testSucc() {
@@ -79,7 +79,7 @@ class ParserTests: XCTestCase {
                                                                              right: .Variable(name: "x", index: 1))),
                                  falseBranch: .True)
     check(input: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
-          expectedResult: .Success(["x":0], expected))
+          expectedResult: .success(["x":0], expected))
   }
 
   func testAppInSucc() {
@@ -136,10 +136,10 @@ class ParserTests: XCTestCase {
                                 right: .Variable(name: "d", index: 3))
     let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: t2),
                                       right: t1)
-    check(input: "a b; c d", expectedResult: .Success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b ;c d", expectedResult: .Success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b; c d", expectedResult: .Success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b ; c d", expectedResult: .Success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b ;c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b ; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
   }
 
   func testBaseType() {
@@ -164,7 +164,7 @@ class ParserTests: XCTestCase {
 
   func testAs() {
     check(input: "x as bool",
-          expectedResult: .Success(["x":0], .Application(left: .Abstraction(parameter: "_",
+          expectedResult: .success(["x":0], .Application(left: .Abstraction(parameter: "_",
                                                                             parameterType: .boolean,
                                                                             body: .Variable(name: "_", index: 0)),
                                                          right: .Variable(name: "x", index: 0))))
@@ -187,7 +187,7 @@ class ParserTests: XCTestCase {
                                                    right: .Variable(name: "x", index: 1)))
     let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .integer, body: t2),
                                       right: t1)
-    check(input: "let x=0 in \\y:int.y x", expectedResult: .Success(["x":0], expected))
+    check(input: "let x=0 in \\y:int.y x", expectedResult: .success(["x":0], expected))
   }
 
   func testLetApp() {
@@ -203,6 +203,6 @@ class ParserTests: XCTestCase {
                                                                                   returnType: .integer),
                                                          body: t2),
                                       right: t1)
-    check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .Success(["e":0], expected))
+    check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .success(["e":0], expected))
   }
 }

@@ -9,11 +9,11 @@
 public indirect enum UATerm {
   case True
   case False
-  case ifElse(IfElseUATerm)
-  case zero
-  case succ(UATerm)
-  case pred(UATerm)
-  case isZero(UATerm)
+  case If(IfElseUATerm)
+  case Zero
+  case Succ(UATerm)
+  case Pred(UATerm)
+  case IsZero(UATerm)
 }
 
 extension UATerm: Equatable {

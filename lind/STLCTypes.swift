@@ -21,7 +21,7 @@ public indirect enum STLCType {
   case t_t(STLCType, STLCType)
   case bool
   case int
-  case unit
+  case Unit
   case base(String)
 }
 
@@ -56,12 +56,12 @@ extension STLCType: CustomStringConvertible {
 public indirect enum STLCTerm {
   case True
   case False
-  case zero
-  case unit
-  case ifElse(STLCTerm, STLCTerm, STLCTerm)
-  case succ(STLCTerm)
-  case pred(STLCTerm)
-  case isZero(STLCTerm)
+  case Zero
+  case Unit
+  case If(STLCTerm, STLCTerm, STLCTerm)
+  case Succ(STLCTerm)
+  case Pred(STLCTerm)
+  case IsZero(STLCTerm)
   case va(String, Int)
   case abs(String, STLCType, STLCTerm)
   case app(STLCTerm, STLCTerm)

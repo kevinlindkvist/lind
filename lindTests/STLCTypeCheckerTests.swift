@@ -13,7 +13,7 @@ class STLCTypeCheckerTests: XCTestCase {
   func check(program: String, type: STLCType?, context: [Int:STLCType] = [:]) {
     let t = parseSimplyTypedLambdaCalculus(program)
     switch t {
-    case let .Success(_, t):
+    case let .success(_, t):
       print(t)
       XCTAssertEqual(typeOf(t: t, context: context), type)
     default:

@@ -51,17 +51,17 @@ private func keyword(_ word: KeyWord) -> StringParser {
 
 private let Succ = succ()
 private func succ() -> TermParser {
-  return (keyword(.Succ) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Succ(t)), ctxt) }
+  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Succ(t)), ctxt) }
 }
 
 private let Pred = pred()
 private func pred() -> TermParser {
-  return (keyword(.Pred) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Pred(t)), ctxt) }
+  return (keyword(.PRED) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Pred(t)), ctxt) }
 }
 
 private let IsZero = isZero()
 private func isZero() -> TermParser {
-  return (keyword(.IsZero) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.IsZero(t)), ctxt) }
+  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.IsZero(t)), ctxt) }
 }
 
 // MARK: - Types
@@ -90,7 +90,7 @@ fileprivate func int() -> TypeParser {
 
 fileprivate let Unit = unit_ty()
 fileprivate func unit_ty() -> TypeParser {
-  return keyword(.Unit) *> pure(.Unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 // MARK: - Values
@@ -102,7 +102,7 @@ fileprivate func value() -> TermParser {
 
 private let UNIT = _unit()
 private func _unit() -> TermParser {
-  return keyword(.Unit) *> pure(.Unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 private let TRUE = _true()
@@ -117,7 +117,7 @@ private func _false() -> TermParser {
 
 fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
-  return keyword(.Zero) *> pure(.Zero)
+  return keyword(.ZERO) *> pure(.Zero)
 }
 
 // MARK: - Variables
@@ -303,7 +303,7 @@ private func simplyTypedLambdaCalculus() -> TermParser {
 
 func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], STLCTerm), ParseError> {
   switch parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
-  case let .Success((g, term)): return .Success(g, term)
+  case let .success((g, term)): return .success(g, term)
   case let .failure(error): return .failure(error)
   }
 }

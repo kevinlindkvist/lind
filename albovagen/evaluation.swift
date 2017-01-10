@@ -14,7 +14,7 @@ public typealias Evaluation = Result<((Term, Type), NamingContext, TypeContext),
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
-    case let .Success((term, type), _, _): return term.description + " :: " + type.description
+    case let .success((term, type), _, _): return term.description + " :: " + type.description
     case let .failure(message): return message.description
   }
 }
@@ -23,11 +23,11 @@ func evaluate(input: String,
               terms: TermContext = [:],
               types: TypeContext = [:]) -> Evaluation {
   switch parse(input: input, terms: terms) {
-  case let .Success(result):
+  case let .success(result):
     switch typeOf(term: result.1, context: types) {
-      case let .Success(_, type):
+      case let .success(_, type):
         let evaluatedTerm = evaluate(term: result.1)
-        return .Success(((evaluatedTerm, type), terms, types))
+        return .success(((evaluatedTerm, type), terms, types))
       case let .failure(error):
         return .failure(.typeError(error))
     }

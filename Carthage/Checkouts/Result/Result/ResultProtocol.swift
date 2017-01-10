@@ -41,7 +41,7 @@ public extension ResultProtocol {
 
 	/// Returns a new Result by mapping `Success`es’ values using `transform`, or re-wrapping `Failure`s’ errors.
 	public func map<U>(_ transform: (Value) -> U) -> Result<U, Error> {
-		return flatMap { .Success(transform($0)) }
+		return flatMap { .success(transform($0)) }
 	}
 
 	/// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
@@ -59,7 +59,7 @@ public extension ResultProtocol {
 	/// Returns the result of applying `transform` to `Failure`’s errors, or re-wrapping `Success`es’ values.
 	public func flatMapError<Error2>(_ transform: (Error) -> Result<Value, Error2>) -> Result<Value, Error2> {
 		return analysis(
-			ifSuccess: Result<Value, Error2>.Success,
+			ifSuccess: Result<Value, Error2>.success,
 			ifFailure: transform)
 	}
 }
@@ -68,12 +68,12 @@ public extension ResultProtocol {
 
 	// MARK: Higher-order functions
 
-	/// Returns `self.value` if this result is a .Success, or the given value otherwise. Equivalent with `??`
+	/// Returns `self.value` if this result is a .success, or the given value otherwise. Equivalent with `??`
 	public func recover(_ value: @autoclosure () -> Value) -> Value {
 		return self.value ?? value()
 	}
 
-	/// Returns this result if it is a .Success, or the given result otherwise. Equivalent with `??`
+	/// Returns this result if it is a .success, or the given result otherwise. Equivalent with `??`
 	public func recover(with result: @autoclosure () -> Self) -> Self {
 		return analysis(
 			ifSuccess: { _ in self },
@@ -92,7 +92,7 @@ public extension ResultProtocol where Error: ErrorProtocolConvertible {
 	public func tryMap<U>(_ transform: (Value) throws -> U) -> Result<U, Error> {
 		return flatMap { value in
 			do {
-				return .Success(try transform(value))
+				return .success(try transform(value))
 			}
 			catch {
 				let convertedError = Error.error(from: error)
