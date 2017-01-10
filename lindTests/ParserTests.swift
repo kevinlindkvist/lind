@@ -125,6 +125,17 @@ class ParserTests: XCTestCase {
     let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .function(argumentType: .integer, returnType: .integer), body: innerTerm)
     check(input: "\\f:int->int.\\x:int.f (f x)", expectedTerm: outerTerm)
   }
+
+  func testUnitSemicolon() {
+    check(input: "unit;", expectedTerm: .Unit)
+  }
+
+  func testLambdaSemicolon() {
+    check(input: "\\x:A.x;",
+          expectedTerm: .Abstraction(parameter: "x",
+                                     parameterType: .base(typeName: "A"),
+                                     body: .Variable(name: "x", index: 0)))
+  }
   
   // MARK - Extension Tests
 
