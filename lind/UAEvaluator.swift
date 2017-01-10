@@ -8,37 +8,37 @@
 
 func evaluateUntypedArithmetic(_ t: UATerm) -> UATerm {
   switch t {
-  case let .ifElse(ifElseTerm):
+  case let .If(ifElseTerm):
     switch evaluateUntypedArithmetic(ifElseTerm.conditional) {
-    case .tmTrue:
+    case .True:
       return evaluateUntypedArithmetic(ifElseTerm.trueBranch)
-    case .tmFalse:
+    case .False:
       return evaluateUntypedArithmetic(ifElseTerm.falseBranch)
     default:
       assert(false)
-      return .tmFalse
+      return .False
     }
-  case .succ(.zero):
-    return .succ(.zero)
-  case let .succ(succTerm):
+  case .Succ(.Zero):
+    return .Succ(.Zero)
+  case let .Succ(succTerm):
     let evaluatedTerm = evaluateUntypedArithmetic(succTerm)
-    return evaluateUntypedArithmetic(.succ(evaluatedTerm))
-  case .pred(.zero):
-    return .zero
-  case let .pred(.succ(succTerm)):
+    return evaluateUntypedArithmetic(.Succ(evaluatedTerm))
+  case .Pred(.Zero):
+    return .Zero
+  case let .Pred(.Succ(succTerm)):
     return succTerm
-  case let .pred(predTerm):
+  case let .Pred(predTerm):
     let evaluatedTerm = evaluateUntypedArithmetic(predTerm)
-    return evaluateUntypedArithmetic(.pred(evaluatedTerm))
-  case .isZero(.zero):
-    return .tmTrue
-  case .isZero(.succ(_)):
-    return .tmFalse
-  case let .isZero(zeroTerm):
+    return evaluateUntypedArithmetic(.Pred(evaluatedTerm))
+  case .IsZero(.Zero):
+    return .True
+  case .IsZero(.Succ(_)):
+    return .False
+  case let .IsZero(zeroTerm):
     let evaluatedTerm = evaluateUntypedArithmetic(zeroTerm)
-    return evaluateUntypedArithmetic(.isZero(evaluatedTerm))
-  case .tmTrue: return .tmTrue
-  case .tmFalse: return .tmFalse
-  case .zero: return .zero
+    return evaluateUntypedArithmetic(.IsZero(evaluatedTerm))
+  case .True: return .True
+  case .False: return .False
+  case .Zero: return .Zero
   }
 }

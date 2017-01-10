@@ -57,7 +57,7 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testNestedAbs() {
-    check(program: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", type: .unit)
+    check(program: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.Unit", type: .Unit)
   }
 
   // MARK - Extensions
@@ -73,15 +73,15 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testAbsUnit() {
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+    check(program: "(\\x:bool->unit.x true) \\y:bool.Unit", type: .Unit)
   }
 
   func testAbsSequence() {
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .bool)
+    check(program: "(\\x:bool->unit.x true) \\y:bool.Unit; false", type: .bool)
   }
 
   func testAbsAbsSequence() {
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit;(\\x:bool->unit.x true) \\y:bool.unit", type: .unit)
+    check(program: "(\\x:bool->unit.x true) \\y:bool.Unit;(\\x:bool->unit.x true) \\y:bool.Unit", type: .Unit)
   }
 
   func testAs() {
@@ -90,7 +90,7 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testAsLambda() {
-    check(program: "(\\x:bool.unit) as bool->unit", type: .t_t(.bool, .unit))
+    check(program: "(\\x:bool.Unit) as bool->unit", type: .t_t(.bool, .Unit))
   }
 
   func testLet() {

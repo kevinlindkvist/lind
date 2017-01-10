@@ -51,17 +51,17 @@ private func keyword(_ word: KeyWord) -> StringParser {
 
 private let Succ = succ()
 private func succ() -> TermParser {
-  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.succ(t)), ctxt) }
+  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Succ(t)), ctxt) }
 }
 
 private let Pred = pred()
 private func pred() -> TermParser {
-  return (keyword(.PRED) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.pred(t)), ctxt) }
+  return (keyword(.PRED) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.Pred(t)), ctxt) }
 }
 
 private let IsZero = isZero()
 private func isZero() -> TermParser {
-  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.isZero(t)), ctxt) }
+  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { ctxt, t in (pure(.IsZero(t)), ctxt) }
 }
 
 // MARK: - Types
@@ -90,7 +90,7 @@ fileprivate func int() -> TypeParser {
 
 fileprivate let Unit = unit_ty()
 fileprivate func unit_ty() -> TypeParser {
-  return keyword(.UNIT) *> pure(.unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 // MARK: - Values
@@ -102,22 +102,22 @@ fileprivate func value() -> TermParser {
 
 private let UNIT = _unit()
 private func _unit() -> TermParser {
-  return keyword(.UNIT) *> pure(.unit)
+  return keyword(.UNIT) *> pure(.Unit)
 }
 
 private let TRUE = _true()
 private func _true() -> TermParser {
-  return keyword(.TRUE) *> pure(.tmTrue)
+  return keyword(.TRUE) *> pure(.True)
 }
 
 private let FALSE = _false()
 private func _false() -> TermParser {
-  return keyword(.FALSE) *> pure(.tmFalse)
+  return keyword(.FALSE) *> pure(.False)
 }
 
 fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
-  return keyword(.ZERO) *> pure(.zero)
+  return keyword(.ZERO) *> pure(.Zero)
 }
 
 // MARK: - Variables
@@ -152,7 +152,7 @@ private func ifElse() -> TermParser {
   return (If *> term) >>- { ctxt, conditional in
   return ((Then *> term) >>- { ctxt, tBranch in
   return ((Else *> term) >>- { ctxt, fBranch in
-  return (pure(.ifElse(conditional, tBranch, fBranch)), ctxt)
+  return (pure(.If(conditional, tBranch, fBranch)), ctxt)
   }, ctxt)
   }, ctxt)
   }
@@ -278,7 +278,7 @@ private let sequence = _sequence()
 private func _sequence() -> TermParser {
   return chainl1(p: term,
                  op: (skipSpaces() *> char(";") <* skipSpaces())
-                  *> pure ({ t1, t2 in return .app(.abs("_", .unit, t2), t1) }))
+                  *> pure ({ t1, t2 in return .app(.abs("_", .Unit, t2), t1) }))
 }
 
 private let term = _term()

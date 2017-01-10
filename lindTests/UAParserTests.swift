@@ -23,42 +23,42 @@ class UntypedArithmeticParserTests: XCTestCase {
   }
 
   func testTrue() {
-    check(program:"true", expected: .tmTrue)
+    check(program:"true", expected: .True)
   }
 
   func testFalse() {
-    check(program:"false", expected: .tmFalse)
+    check(program:"false", expected: .False)
   }
 
   func testZero() {
-    check(program:"0", expected: .zero)
+    check(program:"0", expected: .Zero)
   }
 
   func testIfElse() {
-    check(program:"if true then 0 else false", expected: .ifElse(IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmFalse)))
+    check(program:"if true then 0 else false", expected: .If(IfElseUATerm(conditional: .True, trueBranch: .Zero, falseBranch: .False)))
   }
 
   func testNestedIfElse() {
-    let innerIf = IfElseUATerm(conditional: .tmTrue, trueBranch: .zero, falseBranch: .tmTrue)
-    let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .ifElse(innerIf), falseBranch: .tmFalse)
-    check(program:"if false then if true then 0 else true else false", expected: .ifElse(outerIf))
+    let innerIf = IfElseUATerm(conditional: .True, trueBranch: .Zero, falseBranch: .True)
+    let outerIf = IfElseUATerm(conditional: .False, trueBranch: .If(innerIf), falseBranch: .False)
+    check(program:"if false then if true then 0 else true else false", expected: .If(outerIf))
   }
 
   func testCondIfElse() {
-    let outerIf = IfElseUATerm(conditional: .tmFalse, trueBranch: .pred(.zero), falseBranch: .tmFalse)
-    check(program:"if false then pred 0 else false", expected: .ifElse(outerIf))
+    let outerIf = IfElseUATerm(conditional: .False, trueBranch: .Pred(.Zero), falseBranch: .False)
+    check(program:"if false then pred 0 else false", expected: .If(outerIf))
   }
 
   func testSucc() {
-    check(program:"succ 0", expected: .succ(.zero))
+    check(program:"succ 0", expected: .Succ(.Zero))
   }
 
   func testPred() {
-    check(program:"pred true", expected: .pred(.tmTrue))
+    check(program:"pred true", expected: .Pred(.True))
   }
 
   func testIsZero() {
-    check(program:"isZero false", expected: .isZero(.tmFalse))
+    check(program:"isZero false", expected: .IsZero(.False))
   }
 
 }

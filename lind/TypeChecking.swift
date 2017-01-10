@@ -10,28 +10,28 @@ import Foundation
 
 public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   switch term {
-    case let .variable(_, index: idx):
+    case let .Variable(_, index: idx):
       return typeOf(variable: idx, context: context)
-    case let .abstraction(_, type, term):
+    case let .Abstraction(_, type, term):
       return typeOf(abstraction: term, type: type, context: context)
-    case let .application(left, right):
+    case let .Application(left, right):
       return typeOf(application: (left, right), context: context)
-    case .tmTrue:
+    case .True:
       return .success(context, .boolean)
-    case .tmFalse:
+    case .False:
       return .success(context, .boolean)
-    case let .ifElse(conditional, trueBranch, falseBranch):
+    case let .If(conditional, trueBranch, falseBranch):
       return typeOf(ifElse: (conditional, trueBranch, falseBranch), context: context)
-    case .zero:
+    case .Zero:
       return .success(context, .integer)
-    case let .isZero(term):
+    case let .IsZero(term):
       return typeOf(isZero: term, context: context)
-    case let .succ(term):
+    case let .Succ(term):
       return typeOf(predOrSucc: term, context: context)
-    case let .pred(term):
+    case let .Pred(term):
       return typeOf(predOrSucc: term, context: context)
-    case .unit:
-      return .success(context, .unit)
+    case .Unit:
+      return .success(context, .Unit)
   }
 }
 
@@ -63,8 +63,10 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
   switch (leftType, rightType) {
     case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)) where parameterType == argumentType:
       return .success(context, returnType)
+    case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)):
+      return .failure(.message("Incorrect application types, function: \(parameterType, returnType), argument: \(argumentType)"))
     default:
-      return .failure(.message("Incorrect application, left was: \(application.left) and right was: \(application.right)."))
+      return .failure(.message("Incorrect application, left was: \(leftType) and right was: \(rightType)."))
   }
 }
 

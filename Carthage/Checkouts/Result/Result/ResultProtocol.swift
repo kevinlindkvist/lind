@@ -68,12 +68,12 @@ public extension ResultProtocol {
 
 	// MARK: Higher-order functions
 
-	/// Returns `self.value` if this result is a .Success, or the given value otherwise. Equivalent with `??`
+	/// Returns `self.value` if this result is a .success, or the given value otherwise. Equivalent with `??`
 	public func recover(_ value: @autoclosure () -> Value) -> Value {
 		return self.value ?? value()
 	}
 
-	/// Returns this result if it is a .Success, or the given result otherwise. Equivalent with `??`
+	/// Returns this result if it is a .success, or the given result otherwise. Equivalent with `??`
 	public func recover(with result: @autoclosure () -> Self) -> Self {
 		return analysis(
 			ifSuccess: { _ in self },

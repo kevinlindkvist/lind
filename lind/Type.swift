@@ -15,7 +15,7 @@ public indirect enum Type {
   case function(argumentType: Type, returnType: Type)
   case boolean
   case integer
-  case unit
+  case Unit
   case base(typeName: String)
 }
 
@@ -32,7 +32,7 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
       return true
     case let (.function(t1,t2), .function(t11, t22)):
       return t1 == t11 && t2 == t22
-    case (.unit, .unit):
+    case (.Unit, .Unit):
       return true
     case let (.base(firstType), .base(secondType)):
       return firstType == secondType
@@ -50,7 +50,7 @@ extension Type: CustomStringConvertible {
         return "int"
       case let .function(argumentType, returnType):
         return "\(argumentType) => \(returnType)"
-      case .unit:
+      case .Unit:
         return "unit"
       case let .base(typeName):
         return typeName
