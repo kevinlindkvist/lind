@@ -118,6 +118,14 @@ class ParserTests: XCTestCase {
     check(input: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.Unit", expectedTerm: expected)
   }
 
+
+  func testNestedFunctionApplication() {
+    let body: Term = .Application(left: .Variable(name: "f", index: 1), right: .Application(left: .Variable(name: "f", index: 1), right: .Variable(name: "x", index: 0)))
+    let innerTerm: Term = .Abstraction(parameter: "x", parameterType: .integer, body: body)
+    let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .function(argumentType: .integer, returnType: .integer), body: innerTerm)
+    check(input: "\\f:int->int.\\x:int.f (f x)", expectedTerm: outerTerm)
+  }
+  
   // MARK - Extension Tests
 
   func testSequenceUnit() {
