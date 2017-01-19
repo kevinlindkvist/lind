@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B40D107E1E30A90E00AC9204 /* EvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D107D1E30A90E00AC9204 /* EvaluationTests.swift */; };
+		B40D10861E30AD4E00AC9204 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B496D2D61E10B29200E2779C /* Evaluation.swift */; };
 		B439F77F1DE68A9B00921932 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F77E1DE68A9B00921932 /* main.swift */; };
 		B439F7841DE68AF600921932 /* console.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F7831DE68AF600921932 /* console.swift */; };
 		B439F7861DE68D4600921932 /* evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F7851DE68D4600921932 /* evaluation.swift */; };
@@ -161,6 +163,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B40D107D1E30A90E00AC9204 /* EvaluationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EvaluationTests.swift; sourceTree = "<group>"; };
 		B439F77C1DE68A9B00921932 /* albovagen */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = albovagen; sourceTree = BUILT_PRODUCTS_DIR; };
 		B439F77E1DE68A9B00921932 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B439F7831DE68AF600921932 /* console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = console.swift; sourceTree = "<group>"; };
@@ -314,6 +317,7 @@
 				B49B76761D7570EE0062464C /* ULCParserTests.swift */,
 				B49B76831D7C10210062464C /* ULCEvaluationTests.swift */,
 				B47AB1491D7FF67600586FDB /* ParserTests.swift */,
+				B40D107D1E30A90E00AC9204 /* EvaluationTests.swift */,
 				B4AD1D861D813BC50033FEB3 /* STLCTypeCheckerTests.swift */,
 				B49B76221D740DFF0062464C /* Info.plist */,
 			);
@@ -614,6 +618,8 @@
 				B49B76661D7417670062464C /* UATerms.swift in Sources */,
 				B4838DD11DFE9C8900625B96 /* TypeError.swift in Sources */,
 				B49B76771D7570EE0062464C /* ULCParserTests.swift in Sources */,
+				B40D107E1E30A90E00AC9204 /* EvaluationTests.swift in Sources */,
+				B40D10861E30AD4E00AC9204 /* Evaluation.swift in Sources */,
 				B49B76841D7C10210062464C /* ULCEvaluationTests.swift in Sources */,
 				B47AB1521D7FF6CA00586FDB /* STLCParser.swift in Sources */,
 				B49B76641D7417670062464C /* Prelude.swift in Sources */,

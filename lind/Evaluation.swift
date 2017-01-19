@@ -12,7 +12,7 @@ public func evaluate(term: Term) -> Term {
   return evaluate(term: term, context: [:])
 }
 
-private func evaluate(term: Term, context: NamingContext) -> Term {
+private func evaluate(term: Term, context: TermContext) -> Term {
   switch term {
   case .Unit: return .Unit
   // Application and Abstraction

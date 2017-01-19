@@ -10,9 +10,9 @@ import Foundation
 
 private typealias NameLookup = [Int:ULCTerm]
 
-func evaluate(_ term: ULCTerm) -> ULCTerm {
+func evaluateULCTerm(_ term: ULCTerm) -> ULCTerm {
   switch evaluate(term, [:]) {
-    case let .some(t): return evaluate(t)
+    case let .some(t): return evaluateULCTerm(t)
     case .none: return term
   }
 }
