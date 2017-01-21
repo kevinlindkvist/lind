@@ -267,7 +267,7 @@ private let type = _type()
 private func _type() -> TypeParser {
   return chainl1(p: baseType, op: string("->")
     *> pure({ t1, t2 in
-      return .function(argumentType: t1, returnType: t2)
+      return .function(parameterType: t1, returnType: t2)
     }))
 }
 

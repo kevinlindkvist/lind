@@ -48,10 +48,10 @@ private func typeOf(abstraction: Term, type: Type, context: TypeContext) -> Type
     context.forEach { k, v in
       shiftedContext[k+1] = v
     }
-    let bodyType = typeOf(term: abstraction, context: union([0:type],shiftedContext))
+    let bodyType = typeOf(term: abstraction, context: union(shiftedContext, [0:type]))
     switch bodyType {
       case let .success(_, returnType):
-        return .success(context, .function(argumentType: type, returnType: returnType))
+        return .success(context, .function(parameterType: type, returnType: returnType))
       case let .failure(error):
         return .failure(error)
     }
@@ -65,8 +65,16 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
       return .success(context, returnType)
     case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)):
       return .failure(.message("Incorrect application types, function: \(parameterType, returnType), argument: \(argumentType)"))
+    case let (.success(c1, t1), .success(c2, t2)):
+      return .failure(.message("Incorrect application\n\(application.left) :: \(t1) - \(c1) \n\(application.right) :: \(t2) - \(c2)"))
+    case let (.success, .failure(error)):
+      return .failure(.message("Could not parse type of \(application.right)\n\(error)"))
+    case let (.failure(error), .success):
+      return .failure(.message("Could not parse type of \(application.left)\n\(error)"))
+    case (.failure, .failure):
+      return .failure(.message("Could not parse type of \(application.left) or \(application.right)"))
     default:
-      return .failure(.message("Incorrect application, left was: \(leftType) and right was: \(rightType)."))
+      return .failure(.message("Unknown error: \(application)"))
   }
 }
 

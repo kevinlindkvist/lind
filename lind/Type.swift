@@ -12,7 +12,7 @@ import Result
 public typealias TypeResult = Result<(TypeContext, Type), TypeError>
 
 public indirect enum Type {
-  case function(argumentType: Type, returnType: Type)
+  case function(parameterType: Type, returnType: Type)
   case boolean
   case integer
   case Unit
@@ -48,8 +48,8 @@ extension Type: CustomStringConvertible {
         return "bool"
       case .integer:
         return "int"
-      case let .function(argumentType, returnType):
-        return "\(argumentType) => \(returnType)"
+      case let .function(parameterType, returnType):
+        return "\(parameterType) => \(returnType)"
       case .Unit:
         return "unit"
       case let .base(typeName):

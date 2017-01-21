@@ -48,7 +48,7 @@ class ParserTests: XCTestCase {
   }
 
   func testAbsArrowType() {
-    let expected: Term = .Abstraction(parameter: "x", parameterType: .function(argumentType: .integer, returnType: .boolean), body: .Variable(name: "x", index: 0))
+    let expected: Term = .Abstraction(parameter: "x", parameterType: .function(parameterType: .integer, returnType: .boolean), body: .Variable(name: "x", index: 0))
     check(input: "\\x:int->bool.x", expectedTerm: expected)
   }
 
@@ -74,7 +74,7 @@ class ParserTests: XCTestCase {
                                                          parameterType: .integer,
                                                          body: .Application(left: .Variable(name: "x", index: 0), right: inner)),
                                  trueBranch: .Abstraction(parameter: "y",
-                                                          parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                                          parameterType: .function(parameterType: .boolean, returnType: .integer),
                                                           body: .Application(left: .Variable(name: "y", index: 0),
                                                                              right: .Variable(name: "x", index: 1))),
                                  falseBranch: .True)
@@ -84,7 +84,7 @@ class ParserTests: XCTestCase {
 
   func testAppInSucc() {
     let expected: Term = .Succ(.Succ(.Abstraction(parameter: "x",
-                                                  parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                                  parameterType: .function(parameterType: .boolean, returnType: .integer),
                                                   body: .Application(left: .Variable(name: "x", index: 0),
                                                                      right: .Zero))))
     check(input: "(succ (succ (\\x:bool->int.x 0)))", expectedTerm: expected)
@@ -107,7 +107,7 @@ class ParserTests: XCTestCase {
 
   func testNestedAbs() {
     let inner: Term = .Abstraction(parameter: "y",
-                                   parameterType: .function(argumentType: .boolean, returnType: .Unit),
+                                   parameterType: .function(parameterType: .boolean, returnType: .Unit),
                                    body: .Application(left: .Variable(name: "y", index: 0),
                                                       right: .Variable(name: "x", index: 1)))
     let expected: Term = .Application(left: .Application(left: .Abstraction(parameter: "x",
@@ -122,7 +122,7 @@ class ParserTests: XCTestCase {
   func testNestedFunctionApplication() {
     let body: Term = .Application(left: .Variable(name: "f", index: 1), right: .Application(left: .Variable(name: "f", index: 1), right: .Variable(name: "x", index: 0)))
     let innerTerm: Term = .Abstraction(parameter: "x", parameterType: .integer, body: body)
-    let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .function(argumentType: .integer, returnType: .integer), body: innerTerm)
+    let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .function(parameterType: .integer, returnType: .integer), body: innerTerm)
     check(input: "\\f:int->int.\\x:int.f (f x)", expectedTerm: outerTerm)
   }
 
@@ -170,7 +170,7 @@ class ParserTests: XCTestCase {
 
   func testAbsAbsSequence() {
     let expected: Term = .Application(left: .Abstraction(parameter: "x",
-                                                         parameterType: .function(argumentType: .boolean, returnType: .Unit),
+                                                         parameterType: .function(parameterType: .boolean, returnType: .Unit),
                                                          body: .Application(left: .Variable(name: "x", index: 0),
                                                                             right: .True)),
                                       right: .Abstraction(parameter: "y",
@@ -192,7 +192,7 @@ class ParserTests: XCTestCase {
   func testAsLambda() {
     let body: Term = .Abstraction(parameter: "x", parameterType: .boolean, body: .Unit)
     let expected: Term = .Application(left: .Abstraction(parameter: "_",
-                                                         parameterType: .function(argumentType: .boolean, returnType: .Unit),
+                                                         parameterType: .function(parameterType: .boolean, returnType: .Unit),
                                                          body: .Variable(name: "_", index: 0)),
                                       right: body)
     check(input: "(\\x:bool.Unit) as bool->unit", expectedTerm: expected)
@@ -211,13 +211,13 @@ class ParserTests: XCTestCase {
 
   func testLetApp() {
     let t1: Term = .Abstraction(parameter: "z",
-                                parameterType: .function(argumentType: .boolean, returnType: .integer),
+                                parameterType: .function(parameterType: .boolean, returnType: .integer),
                                 body: .Application(left: .Variable(name: "z", index: 0),
                                                    right: .True))
     let t2: Term = .Application(left: .Variable(name: "e", index: 0),
                                 right: .Abstraction(parameter: "y", parameterType: .boolean, body: .Zero))
     let expected: Term = .Application(left: .Abstraction(parameter: "e",
-                                                         parameterType: .function(argumentType: .function(argumentType: .boolean,
+                                                         parameterType: .function(parameterType: .function(parameterType: .boolean,
                                                                                                           returnType: .integer),
                                                                                   returnType: .integer),
                                                          body: t2),
