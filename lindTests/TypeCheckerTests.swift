@@ -122,9 +122,14 @@ class TypeCheckerTests: XCTestCase {
   func testWildcard() {
     check(program: "(\\_:bool.unit) true", type: .Unit)
   }
-  
+
   func testAscription() {
     check(program: "0 as int", type: .integer)
+  }
+
+  func testAscriptionArgument() {
+    check(program: "(\\x:int.x) (0 as int)", type: .integer)
+    check(malformedProgram:"(\\x:int.x) (0 as bool)")
   }
 
 }
