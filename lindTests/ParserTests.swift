@@ -186,17 +186,17 @@ class ParserTests: XCTestCase {
 
   func testAs() {
     check(input: "x as bool",
-          expectedResult: .success(["x":0], .Application(left: .Abstraction(parameter: "_",
+          expectedResult: .success(["x":0], .Application(left: .Abstraction(parameter: "x",
                                                                             parameterType: .boolean,
-                                                                            body: .Variable(name: "_", index: 0)),
+                                                                            body: .Variable(name: "x", index: 0)),
                                                          right: .Variable(name: "x", index: 0))))
   }
 
   func testAsLambda() {
     let body: Term = .Abstraction(parameter: "x", parameterType: .boolean, body: .Unit)
-    let expected: Term = .Application(left: .Abstraction(parameter: "_",
+    let expected: Term = .Application(left: .Abstraction(parameter: "x",
                                                          parameterType: .function(parameterType: .boolean, returnType: .Unit),
-                                                         body: .Variable(name: "_", index: 0)),
+                                                         body: .Variable(name: "x", index: 0)),
                                       right: body)
     check(input: "(\\x:bool.unit) as bool->unit", expectedTerm: expected)
   }
@@ -231,5 +231,9 @@ class ParserTests: XCTestCase {
   func testWildcard() {
     let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .boolean, body: .Unit), right: .True)
     check(input: "(\\_:bool.unit) true", expectedTerm: expected)
+  }
+
+  func testAscription() {
+    check(input: "0 as int", expectedTerm: .Application(left: .Abstraction(parameter: "x", parameterType: .integer, body: .Variable(name: "x", index: 0)), right: .Zero))
   }
 }

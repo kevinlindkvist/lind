@@ -120,7 +120,11 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testWildcard() {
-    check(program: "\\_:bool.(unit) true", type: .Unit)
+    check(program: "(\\_:bool.unit) true", type: .Unit)
+  }
+  
+  func testAscription() {
+    check(program: "0 as int", type: .integer)
   }
 
 }

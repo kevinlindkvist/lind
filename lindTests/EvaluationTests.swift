@@ -52,4 +52,7 @@ class EvaluationTests: XCTestCase {
     check(program: program, expectation: expectation)
   }
   
+  func testAscription() {
+    check(program: "0 as int", expectation: .Zero)
+  }
 }

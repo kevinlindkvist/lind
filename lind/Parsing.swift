@@ -85,8 +85,8 @@ private func _nonApplicationTerm() -> TermParser {
     // After an atom is parsed, check if there is an ascription, otherwise purely return the atom.
     return ((ascription
       >>- { context, type in
-        let body: Term = .Variable(name: "_", index: 0)
-        let abstraction: Term = .Abstraction(parameter: "_", parameterType: type, body: body)
+        let body: Term = .Variable(name: "x", index: 0)
+        let abstraction: Term = .Abstraction(parameter: "x", parameterType: type, body: body)
         return (pure(.Application(left: abstraction, right: term)), context)
       })
       <|> pure(term), context)
