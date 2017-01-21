@@ -23,7 +23,7 @@ public func skipMany1<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>) -> Parser<In, C
 }
 
 public func chainl<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>, _ op: Parser<In, Ctxt, (Out, Out) -> Out>, _ x: Out) -> Parser<In, Ctxt, Out> {
-  return chainl1(p: p,op: op) <|> pure(x)
+  return chainl1(p: p, op: op) <|> pure(x)
 }
 
 public func chainl1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, op: Parser<In, Ctxt, (Out, Out) -> Out>) -> Parser<In, Ctxt, Out> {

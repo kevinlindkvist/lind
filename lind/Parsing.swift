@@ -10,7 +10,7 @@ import Foundation
 import Result
 
 // # Note on capitalization.
-//
+// 
 // Keyword enum members are capitalized. Parsers for values and specific characters are capitalized.
 // Convenience parsers for keywords and built-ins use CamelCase. All other parsers use camelCase.
 
@@ -116,7 +116,7 @@ fileprivate func _as() -> StringParser {
 
 fileprivate let Let = _let()
 fileprivate func _let() -> TermParser {
-  // Let is a slightly different derived form in that it actually runs
+  // Let is a slightly different derived form in that it actually runs 
   // the typechecker to verify the statement.
   return (keyword(.LET) *> identifier)
     >>- { (context: TermContext, identifier: String.UnicodeScalarView) in
@@ -124,19 +124,19 @@ fileprivate func _let() -> TermParser {
         >>- { (context: TermContext, t1: Term) in
           return ((keyword(.IN) *> skipSpaces() *> term)
             >>- { (context: TermContext, t2: Term) in
-              let result = typeOf(term: t1, context: [:])
-              switch result {
-              case let .success(_, T1):
-                let left: Term = .Abstraction(parameter: String(identifier),
-                                              parameterType: T1,
-                                              body: t2)
-                return (pure(.Application(left: left, right: t1)), context)
-              case .failure(_):
-                return (fail("Could not determine type of \(t1)"), context)
-              }
-            }, context)
+                let result = typeOf(term: t1, context: [:])
+                switch result {
+                case let .success(_, T1):
+                  let left: Term = .Abstraction(parameter: String(identifier),
+                                                parameterType: T1,
+                                                body: t2)
+                  return (pure(.Application(left: left, right: t1)), context)
+                case .failure(_):
+                  return (fail("Could not determine type of \(t1)"), context)
+                }
+            }, context) 
         }, context)
-  }
+    }
 }
 
 // MARK: - Built Ins
@@ -196,18 +196,18 @@ private func keyword(_ word: Keyword) -> StringParser {
 
 private let LAMBDA = _lambda()
 private func _lambda() -> TermParser {
-  return (BACKSLASH *> identifier) >>- { context, identifier in
+  return (BACKSLASH *> (identifier <|> keyword(.WILD))) >>- { context, identifier in
 
-    let context = shiftContext(context: context, identifier: identifier)
+  let context = shiftContext(context: context, identifier: identifier)
 
-    return ((COLON *> type) >>- { context, type in
-      return ((PERIOD *> term) >>- { context, t in
-
-        let context = unshiftContext(context: context, identifier: identifier)
-
-        return (pure(.Abstraction(parameter: String(identifier), parameterType: type, body: t)), context)
-        }, context)
-      }, context)
+  return ((COLON *> type) >>- { context, type in
+  return ((PERIOD *> term) >>- { context, t in
+      
+  let context = unshiftContext(context: context, identifier: identifier)
+    
+  return (pure(.Abstraction(parameter: String(identifier), parameterType: type, body: t)), context)
+  }, context)
+  }, context)
   }
 }
 
@@ -231,11 +231,11 @@ fileprivate func backslash() -> StringParser {
 private let IfElse = ifElse()
 private func ifElse() -> TermParser {
   return (If *> term) >>- { context, conditional in
-    return ((Then *> term) >>- { context, tBranch in
-      return ((Else *> term) >>- { context, fBranch in
-        return (pure(.If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch)), context)
-        }, context)
-      }, context)
+  return ((Then *> term) >>- { context, tBranch in
+  return ((Else *> term) >>- { context, fBranch in
+  return (pure(.If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch)), context)
+  }, context)
+  }, context)
   }
 }
 
@@ -260,7 +260,7 @@ private let baseType = _baseType()
 private func _baseType() -> TypeParser {
   return Bool <|> Int <|> Unit <|> (identifier >>- { context, identifier in
     (pure(.base(typeName: String(identifier))), context)
-    })
+  })
 }
 
 private let type = _type()

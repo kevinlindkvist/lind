@@ -19,8 +19,8 @@ class TypeCheckerTests: XCTestCase {
       case let .failure(error):
         XCTFail("Type check failed: \(error)")
       }
-    default:
-      XCTFail("Could not parse program: \(program)")
+    case let .failure(error):
+      XCTFail("Could not parse program: \(error)")
     }
   }
 
@@ -117,6 +117,10 @@ class TypeCheckerTests: XCTestCase {
 
   func testLetApp() {
     check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .integer)
+  }
+
+  func testWildcard() {
+    check(program: "\\_:bool.(unit) true", type: .Unit)
   }
 
 }

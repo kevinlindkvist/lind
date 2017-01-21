@@ -19,7 +19,10 @@ private func evaluate(term: Term, context: TermContext) -> Term {
   case .Abstraction(_,_,_):
     return term
 
-  case let .Application(.Abstraction(_, _, body), v2) where isValue(term: v2):
+  case let .Application(.Abstraction(parameter, _, body), v2) where isValue(term: v2):
+    if parameter == "_" {
+      return evaluate(term: body, context: context)
+    }
     let t2 = termSubstop(v2, body)
     return evaluate(term: t2, context: context)
 

@@ -17,8 +17,15 @@ class ParserTests: XCTestCase {
 
   fileprivate func check(input: String, expectedResult: ParseResult) {
     let result = parse(input: input, terms: [:])
-    // Can't make Result<T, E> equatable for specific T, E, due to bug in Swift's implementation.
-    XCTAssertTrue(expectedResult == result)
+    switch (result, expectedResult) {
+    case let (.success(t1), .success(t2)):
+      XCTAssertEqual(t1.0, t2.0)
+      XCTAssertEqual(t1.1, t2.1)
+    case (.failure, .failure):
+      break
+    default:
+      XCTFail()
+    }
   }
 
   func testAbsBaseType() {
@@ -60,9 +67,9 @@ class ParserTests: XCTestCase {
   func testIfElse() {
     let condition: Term = .Application(left:
       .Abstraction(parameter: "x", parameterType: .boolean, body: .Variable(name: "x", index: 0)),
-                                       right: .Variable(name: "x", index: 0))
+                                       right: .True)
     let expected: Term = .If(condition: condition, trueBranch: .False, falseBranch: .True)
-    check(input: "if \\x:bool.x x then false else true", expectedTerm: expected)
+    check(input: "if (\\x:bool.x) true then false else true", expectedTerm: expected)
   }
 
   func testIfElseNested() {
@@ -115,7 +122,7 @@ class ParserTests: XCTestCase {
                                                                             body: inner),
                                                          right: .True),
                                       right: .Abstraction(parameter: "z", parameterType: .boolean, body: .Unit))
-    check(input: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.Unit", expectedTerm: expected)
+    check(input: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", expectedTerm: expected)
   }
 
 
@@ -126,12 +133,8 @@ class ParserTests: XCTestCase {
     check(input: "\\f:int->int.\\x:int.f (f x)", expectedTerm: outerTerm)
   }
 
-  func testUnitSemicolon() {
-    check(input: "unit;", expectedTerm: .Unit)
-  }
-
-  func testLambdaSemicolon() {
-    check(input: "\\x:A.x;",
+  func testLambdaBaseType() {
+    check(input: "\\x:A.x",
           expectedTerm: .Abstraction(parameter: "x",
                                      parameterType: .base(typeName: "A"),
                                      body: .Variable(name: "x", index: 0)))
@@ -176,7 +179,7 @@ class ParserTests: XCTestCase {
                                       right: .Abstraction(parameter: "y",
                                                           parameterType: .boolean,
                                                           body: .Unit))
-    check(input: "(\\x:bool->unit.x true) \\y:bool.Unit ; (\\x:bool->unit.x true) \\y:bool.Unit",
+    check(input: "(\\x:bool->unit.x true) \\y:bool.unit ; (\\x:bool->unit.x true) \\y:bool.unit",
           expectedTerm: .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: expected),
                                      right: expected))
   }
@@ -195,7 +198,7 @@ class ParserTests: XCTestCase {
                                                          parameterType: .function(parameterType: .boolean, returnType: .Unit),
                                                          body: .Variable(name: "_", index: 0)),
                                       right: body)
-    check(input: "(\\x:bool.Unit) as bool->unit", expectedTerm: expected)
+    check(input: "(\\x:bool.unit) as bool->unit", expectedTerm: expected)
   }
 
   func testLet() {
@@ -223,5 +226,10 @@ class ParserTests: XCTestCase {
                                                          body: t2),
                                       right: t1)
     check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .success(["e":0], expected))
+  }
+
+  func testWildcard() {
+    let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .boolean, body: .Unit), right: .True)
+    check(input: "(\\_:bool.unit) true", expectedTerm: expected)
   }
 }

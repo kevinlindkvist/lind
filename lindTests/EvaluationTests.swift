@@ -45,5 +45,11 @@ class EvaluationTests: XCTestCase {
     let program = "(\\z:unit->unit->unit.z \\y:unit.y) \\x:unit->unit.x"
     check(program: program, expectation: expectation)
   }
+
+  func testEvaluateWildCard() {
+    let expectation: Term = .Unit
+    let program = "(\\_:bool.unit) true"
+    check(program: program, expectation: expectation)
+  }
   
 }
