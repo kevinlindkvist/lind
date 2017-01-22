@@ -32,7 +32,7 @@ final class ResultTests: XCTestCase {
 
 	func testErrorsIncludeTheCallingFunction() {
 		let function = #function
-		XCTAssert(Result<(), NSError>.error().function == function)
+		XCTAssert(Result<(), NSError>.error().Function == function)
 	}
 
 	// MARK: Try - Catch
@@ -234,7 +234,7 @@ func tryIsSuccess(_ text: String?) throws -> String {
 
 extension NSError {
 	var function: String? {
-		return userInfo[Result<(), NSError>.functionKey] as? String
+		return userInfo[Result<(), NSError>.FunctionKey] as? String
 	}
 	
 	var file: String? {

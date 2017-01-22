@@ -17,13 +17,13 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     case let .Application(left, right):
       return typeOf(application: (left, right), context: context)
     case .True:
-      return .success(context, .boolean)
+      return .success(context, .Boolean)
     case .False:
-      return .success(context, .boolean)
+      return .success(context, .Boolean)
     case let .If(conditional, trueBranch, falseBranch):
       return typeOf(ifElse: (conditional, trueBranch, falseBranch), context: context)
     case .Zero:
-      return .success(context, .integer)
+      return .success(context, .Integer)
     case let .IsZero(term):
       return typeOf(isZero: term, context: context)
     case let .Succ(term):
@@ -32,6 +32,9 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
       return typeOf(predOrSucc: term, context: context)
     case .Unit:
       return .success(context, .Unit)
+    case .Tuple:
+      // TODO: Implement.
+      return .failure(.message("Tuple type checking not implemented."))
   }
 }
 
@@ -51,7 +54,7 @@ private func typeOf(abstraction: Term, type: Type, context: TypeContext) -> Type
     let bodyType = typeOf(term: abstraction, context: union(shiftedContext, [0:type]))
     switch bodyType {
       case let .success(_, returnType):
-        return .success(context, .function(parameterType: type, returnType: returnType))
+        return .success(context, .Function(parameterType: type, returnType: returnType))
       case let .failure(error):
         return .failure(error)
     }
@@ -61,9 +64,9 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
   let leftType = typeOf(term: application.left, context: context)
   let rightType = typeOf(term: application.right, context: context)
   switch (leftType, rightType) {
-    case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)) where parameterType == argumentType:
+    case let (.success(_, .Function(parameterType, returnType)), .success(_, argumentType)) where parameterType == argumentType:
       return .success(context, returnType)
-    case let (.success(_, .function(parameterType, returnType)), .success(_, argumentType)):
+    case let (.success(_, .Function(parameterType, returnType)), .success(_, argumentType)):
       return .failure(.message("Incorrect application types, function: \(parameterType, returnType), argument: \(argumentType)"))
     case let (.success(c1, t1), .success(c2, t2)):
       return .failure(.message("Incorrect application\n\(application.left) :: \(t1) - \(c1) \n\(application.right) :: \(t2) - \(c2)"))
@@ -81,8 +84,8 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
 private func typeOf(isZero: Term, context: TypeContext) -> TypeResult {
   let result = typeOf(term: isZero, context: context)
   switch result {
-    case let .success(_, type) where type == .integer:
-      return .success(context, .boolean)
+    case let .success(_, type) where type == .Integer:
+      return .success(context, .Boolean)
     default:
       return .failure(.message("isZero called on non-integer argument \(result)"))
   }
@@ -91,8 +94,8 @@ private func typeOf(isZero: Term, context: TypeContext) -> TypeResult {
 private func typeOf(predOrSucc: Term, context: TypeContext) -> TypeResult {
   let result = typeOf(term: predOrSucc, context: context)
   switch result {
-    case let .success(_, type) where type == .integer:
-      return .success(context, .integer)
+    case let .success(_, type) where type == .Integer:
+      return .success(context, .Integer)
     default:
       return .failure(.message("pred/succ called on non-integer term: \(result)"))
   }
@@ -103,7 +106,7 @@ private func typeOf(ifElse: (conditional: Term, trueBranch: Term, falseBranch: T
   let trueBranch = typeOf(term: ifElse.trueBranch, context: context)
   let falseBranch = typeOf(term: ifElse.falseBranch, context: context)
   switch conditionalResult {
-    case let .success(_, type) where type == .boolean:
+    case let .success(_, type) where type == .Boolean:
       switch (trueBranch, falseBranch) {
         case let (.success(_, t1), .success(_, t2)) where t1 == t2:
           return .success(context, t1)

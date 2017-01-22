@@ -40,28 +40,28 @@ class TypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(malformedProgram: "x")
-    check(program: "x", type: .integer, context:[0:.integer])
+    check(program: "x", type: .Integer, context:[0:.Integer])
   }
 
   func testAbs() {
-    check(program: "\\x:bool.x", type: .function(parameterType: .boolean, returnType: .boolean))
-    check(program: "(\\x:bool.x) true", type: .boolean)
+    check(program: "\\x:bool.x", type: .Function(parameterType: .Boolean, returnType: .Boolean))
+    check(program: "(\\x:bool.x) true", type: .Boolean)
     check(malformedProgram: "\\x:bool.x x")
     check(malformedProgram: "(\\x:bool.x) 0")
   }
 
   func testIsZero() {
-    check(program: "isZero succ 0", type: .boolean)
+    check(program: "isZero succ 0", type: .Boolean)
     check(malformedProgram: "isZero isZero 0")
   }
 
   func testSucc() {
-    check(program: "pred succ 0", type: .integer)
+    check(program: "pred succ 0", type: .Integer)
     check(malformedProgram: "pred isZero 0")
   }
 
   func testZero() {
-    check(program: "0", type: .integer)
+    check(program: "0", type: .Integer)
   }
 
   func testIfElse() {
@@ -69,7 +69,7 @@ class TypeCheckerTests: XCTestCase {
     let thenClause = "(\\y:bool->int.y true) \\z:bool.if isZero 0 then succ 0 else pred succ 0"
     let correctIfElse = "if \(firstConditional) then \(thenClause) else 0"
     let incorrectIfElse = "if \(firstConditional) then \(thenClause) else true"
-    check(program: correctIfElse, type: .integer)
+    check(program: correctIfElse, type: .Integer)
     check(malformedProgram: incorrectIfElse)
   }
 
@@ -80,12 +80,12 @@ class TypeCheckerTests: XCTestCase {
   // MARK - Extensions
 
   func testBaseType() {
-    check(program: "\\x:A.x", type: .function(parameterType: .base(typeName: "A"), returnType: .base(typeName: "A")))
+    check(program: "\\x:A.x", type: .Function(parameterType: .Base(typeName: "A"), returnType: .Base(typeName: "A")))
     check(malformedProgram: "(\\x:A.x) nil")
   }
 
   func testSequence() {
-    check(program: "unit;0", type: .integer)
+    check(program: "unit;0", type: .Integer)
     check(malformedProgram: "true;0")
   }
 
@@ -94,7 +94,7 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testAbsSequence() {
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .boolean)
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .Boolean)
   }
 
   func testAbsAbsSequence() {
@@ -102,21 +102,21 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testAs() {
-    check(program: "x as bool", type: .boolean, context: [0: .boolean])
-    check(malformedProgram: "x as bool", context: [0: .integer])
+    check(program: "x as bool", type: .Boolean, context: [0: .Boolean])
+    check(malformedProgram: "x as bool", context: [0: .Integer])
   }
 
   func testAsLambda() {
-    check(program: "(\\x:bool.unit) as bool->unit", type: .function(parameterType: .boolean, returnType: .Unit))
+    check(program: "(\\x:bool.unit) as bool->unit", type: .Function(parameterType: .Boolean, returnType: .Unit))
   }
 
   func testLet() {
     check(malformedProgram: "let x=0 in \\y:int.y x")
-    check(program: "let x=0 in \\y:int.y", type: .function(parameterType: .integer, returnType: .integer))
+    check(program: "let x=0 in \\y:int.y", type: .Function(parameterType: .Integer, returnType: .Integer))
   }
 
   func testLetApp() {
-    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .integer)
+    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .Integer)
   }
 
   func testWildcard() {
@@ -124,11 +124,11 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testAscription() {
-    check(program: "0 as int", type: .integer)
+    check(program: "0 as int", type: .Integer)
   }
 
   func testAscriptionArgument() {
-    check(program: "(\\x:int.x) (0 as int)", type: .integer)
+    check(program: "(\\x:int.x) (0 as int)", type: .Integer)
     check(malformedProgram:"(\\x:int.x) (0 as bool)")
   }
 

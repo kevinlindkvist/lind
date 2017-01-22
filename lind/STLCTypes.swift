@@ -18,11 +18,11 @@ public struct STLCContext {
 // MARK: - Types
 
 public indirect enum STLCType {
-  case t_t(STLCType, STLCType)
-  case bool
-  case int
+  case Function(STLCType, STLCType)
+  case Bool
+  case Integer
   case Unit
-  case base(String)
+  case Base(String)
 }
 
 extension STLCType: Equatable {
@@ -30,11 +30,11 @@ extension STLCType: Equatable {
 
 public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
   switch (lhs, rhs) {
-    case (.bool, .bool): return true
-    case (.int, .int): return true
+    case (.Bool, .Bool): return true
+    case (.Integer, .Integer): return true
     case (.Unit, .Unit): return true
-    case let (.base(t1), .base(t2)): return t1 == t2
-    case let (.t_t(t1,t2), .t_t(t11, t22)): return t1 == t11 && t2 == t22
+    case let (.Base(t1), .Base(t2)): return t1 == t2
+    case let (.Function(t1,t2), .Function(t11, t22)): return t1 == t11 && t2 == t22
     default: return false
   }
 }
@@ -42,11 +42,11 @@ public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
 extension STLCType: CustomStringConvertible {
   public var description: String {
     switch self {
-      case .bool: return "bool"
-      case .int: return "int"
+      case .Bool: return "bool"
+      case .Integer: return "int"
       case .Unit: return "unit"
-      case let .base(t): return t
-      case let .t_t(t1, t2): return "\(t1.description)->\(t2.description)"
+      case let .Base(t): return t
+      case let .Function(t1, t2): return "\(t1.description)->\(t2.description)"
     }
   }
 }

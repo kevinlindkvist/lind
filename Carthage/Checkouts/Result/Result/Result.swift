@@ -68,7 +68,7 @@ public enum Result<T, Error: Swift.Error>: ResultProtocol, CustomStringConvertib
 	public static var errorDomain: String { return "com.antitypical.Result" }
 
 	/// The userInfo key for source functions in errors constructed by Result.
-	public static var functionKey: String { return "\(errorDomain).function" }
+	public static var functionKey: String { return "\(errorDomain).Function" }
 
 	/// The userInfo key for source file paths in errors constructed by Result.
 	public static var fileKey: String { return "\(errorDomain).file" }

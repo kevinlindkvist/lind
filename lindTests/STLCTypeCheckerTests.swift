@@ -22,28 +22,28 @@ class STLCTypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(program: "x", type: nil)
-    check(program: "x", type: .int, context:[0:.int])
+    check(program: "x", type: .Integer, context:[0:.Integer])
   }
 
   func testAbs() {
-    check(program: "\\x:bool.x", type: .t_t(.bool, .bool))
-    check(program: "(\\x:bool.x) true", type: .bool)
+    check(program: "\\x:bool.x", type: .Function(.Bool, .Bool))
+    check(program: "(\\x:bool.x) true", type: .Bool)
     check(program: "\\x:bool.x x", type: nil)
     check(program: "(\\x:bool.x) 0", type: nil)
   }
 
   func testIsZero() {
-    check(program: "isZero succ 0", type: .bool)
+    check(program: "isZero succ 0", type: .Bool)
     check(program: "isZero isZero 0", type: nil)
   }
 
   func testSucc() {
-    check(program: "pred succ 0", type: .int)
+    check(program: "pred succ 0", type: .Integer)
     check(program: "pred isZero 0", type: nil)
   }
 
   func testZero() {
-    check(program: "0", type: .int)
+    check(program: "0", type: .Integer)
   }
 
   func testIfElse() {
@@ -51,7 +51,7 @@ class STLCTypeCheckerTests: XCTestCase {
     let thenClause = "(\\y:bool->int.y true) \\z:bool.if isZero 0 then succ 0 else pred succ 0"
     let correctIfElse = "if \(firstConditional) then \(thenClause) else 0"
     let incorrectIfElse = "if \(firstConditional) then \(thenClause) else true"
-    check(program: correctIfElse, type: .int)
+    check(program: correctIfElse, type: .Integer)
     check(program: incorrectIfElse, type: nil)
   }
 
@@ -62,12 +62,12 @@ class STLCTypeCheckerTests: XCTestCase {
   // MARK - Extensions
 
   func testBaseType() {
-    check(program: "\\x:A.x", type: .t_t(.base("A"), .base("A")))
+    check(program: "\\x:A.x", type: .Function(.Base("A"), .Base("A")))
     check(program: "(\\x:A.x) nil", type: nil)
   }
 
   func testSequence() {
-    check(program: "unit;0", type: .int)
+    check(program: "unit;0", type: .Integer)
     check(program: "true;0", type: nil)
   }
 
@@ -76,7 +76,7 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testAbsSequence() {
-    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .bool)
+    check(program: "(\\x:bool->unit.x true) \\y:bool.unit; false", type: .Bool)
   }
 
   func testAbsAbsSequence() {
@@ -84,20 +84,20 @@ class STLCTypeCheckerTests: XCTestCase {
   }
 
   func testAs() {
-    check(program: "x as bool", type: .bool, context: [0: .bool])
-    check(program: "x as bool", type: nil, context: [0: .int])
+    check(program: "x as bool", type: .Bool, context: [0: .Bool])
+    check(program: "x as bool", type: nil, context: [0: .Integer])
   }
 
   func testAsLambda() {
-    check(program: "(\\x:bool.unit) as bool->unit", type: .t_t(.bool, .Unit))
+    check(program: "(\\x:bool.unit) as bool->unit", type: .Function(.Bool, .Unit))
   }
 
   func testLet() {
     check(program: "let x=0 in \\y:int.y x", type: nil)
-    check(program: "let x=0 in \\y:int.y", type: .t_t(.int, .int))
+    check(program: "let x=0 in \\y:int.y", type: .Function(.Integer, .Integer))
   }
 
   func testLetApp() {
-    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .int)
+    check(program: "let e=\\z:bool->int.(z true) in e \\y:bool.0", type: .Integer)
   }
 }

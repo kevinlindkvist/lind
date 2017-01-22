@@ -30,8 +30,8 @@ class ParserTests: XCTestCase {
 
   func testAbsBaseType() {
     let expected: Term = .Abstraction(parameter: "x",
-                                     parameterType: .boolean,
-                                     body: .Variable(name: "x", index: 0))
+                                      parameterType: .Boolean,
+                                      body: .Variable(name: "x", index: 0))
     check(input: "\\x:bool.x", expectedTerm: expected)
   }
 
@@ -42,20 +42,20 @@ class ParserTests: XCTestCase {
     check(input: "a     b", expectedResult: .success(["a":0, "b":1], expected))
     check(input: "ab", expectedResult: .success(["ab":0], .Variable(name: "ab", index: 0)))
   }
-  
+
   func testSucc() {
     let expected: Term = .Succ(.Pred(.Zero))
     check(input: "succ(pred 0)", expectedTerm: expected)
     check(input: "succ pred 0", expectedTerm: expected)
   }
-  
+
   func testPred() {
     let expected: Term = .Pred(.Succ(.Zero))
     check(input: "pred(succ 0)", expectedTerm: expected)
   }
 
   func testAbsArrowType() {
-    let expected: Term = .Abstraction(parameter: "x", parameterType: .function(parameterType: .integer, returnType: .boolean), body: .Variable(name: "x", index: 0))
+    let expected: Term = .Abstraction(parameter: "x", parameterType: .Function(parameterType: .Integer, returnType: .Boolean), body: .Variable(name: "x", index: 0))
     check(input: "\\x:int->bool.x", expectedTerm: expected)
   }
 
@@ -63,10 +63,10 @@ class ParserTests: XCTestCase {
     let expected: Term = .If(condition: .Succ(.Pred(.Zero)), trueBranch: .False, falseBranch: .True)
     check(input: "if succ pred 0 then false else true", expectedTerm: expected)
   }
-  
+
   func testIfElse() {
     let condition: Term = .Application(left:
-      .Abstraction(parameter: "x", parameterType: .boolean, body: .Variable(name: "x", index: 0)),
+      .Abstraction(parameter: "x", parameterType: .Boolean, body: .Variable(name: "x", index: 0)),
                                        right: .True)
     let expected: Term = .If(condition: condition, trueBranch: .False, falseBranch: .True)
     check(input: "if (\\x:bool.x) true then false else true", expectedTerm: expected)
@@ -74,24 +74,24 @@ class ParserTests: XCTestCase {
 
   func testIfElseNested() {
     let inner: Term = .If(condition:
-      .Abstraction(parameter: "x", parameterType: .boolean, body: .Variable(name: "x", index: 0)),
-                              trueBranch: .False,
-                              falseBranch: .True)
+      .Abstraction(parameter: "x", parameterType: .Boolean, body: .Variable(name: "x", index: 0)),
+                          trueBranch: .False,
+                          falseBranch: .True)
     let expected: Term = .If(condition: .Abstraction(parameter: "x",
-                                                         parameterType: .integer,
-                                                         body: .Application(left: .Variable(name: "x", index: 0), right: inner)),
-                                 trueBranch: .Abstraction(parameter: "y",
-                                                          parameterType: .function(parameterType: .boolean, returnType: .integer),
-                                                          body: .Application(left: .Variable(name: "y", index: 0),
-                                                                             right: .Variable(name: "x", index: 1))),
-                                 falseBranch: .True)
+                                                     parameterType: .Integer,
+                                                     body: .Application(left: .Variable(name: "x", index: 0), right: inner)),
+                             trueBranch: .Abstraction(parameter: "y",
+                                                      parameterType: .Function(parameterType: .Boolean, returnType: .Integer),
+                                                      body: .Application(left: .Variable(name: "y", index: 0),
+                                                                         right: .Variable(name: "x", index: 1))),
+                             falseBranch: .True)
     check(input: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
           expectedResult: .success(["x":0], expected))
   }
 
   func testAppInSucc() {
     let expected: Term = .Succ(.Succ(.Abstraction(parameter: "x",
-                                                  parameterType: .function(parameterType: .boolean, returnType: .integer),
+                                                  parameterType: .Function(parameterType: .Boolean, returnType: .Integer),
                                                   body: .Application(left: .Variable(name: "x", index: 0),
                                                                      right: .Zero))))
     check(input: "(succ (succ (\\x:bool->int.x 0)))", expectedTerm: expected)
@@ -104,42 +104,42 @@ class ParserTests: XCTestCase {
 
   func testAppTermInIfClause() {
     let expected: Term = .If(condition: .True,
-                                 trueBranch: .Application(left: .Abstraction(parameter: "x",
-                                                                             parameterType: .boolean,
-                                                                             body: .Variable(name: "x", index: 0)),
-                                                          right: .True),
-                                 falseBranch: .Succ(.Zero))
+                             trueBranch: .Application(left: .Abstraction(parameter: "x",
+                                                                         parameterType: .Boolean,
+                                                                         body: .Variable(name: "x", index: 0)),
+                                                      right: .True),
+                             falseBranch: .Succ(.Zero))
     check(input: "if true then (\\x:bool.x) true else succ 0", expectedTerm: expected)
   }
 
   func testNestedAbs() {
     let inner: Term = .Abstraction(parameter: "y",
-                                   parameterType: .function(parameterType: .boolean, returnType: .Unit),
+                                   parameterType: .Function(parameterType: .Boolean, returnType: .Unit),
                                    body: .Application(left: .Variable(name: "y", index: 0),
                                                       right: .Variable(name: "x", index: 1)))
     let expected: Term = .Application(left: .Application(left: .Abstraction(parameter: "x",
-                                                                            parameterType: .boolean,
+                                                                            parameterType: .Boolean,
                                                                             body: inner),
                                                          right: .True),
-                                      right: .Abstraction(parameter: "z", parameterType: .boolean, body: .Unit))
+                                      right: .Abstraction(parameter: "z", parameterType: .Boolean, body: .Unit))
     check(input: "(\\x:bool.(\\y:bool->unit.y x)) true \\z:bool.unit", expectedTerm: expected)
   }
 
 
   func testNestedFunctionApplication() {
     let body: Term = .Application(left: .Variable(name: "f", index: 1), right: .Application(left: .Variable(name: "f", index: 1), right: .Variable(name: "x", index: 0)))
-    let innerTerm: Term = .Abstraction(parameter: "x", parameterType: .integer, body: body)
-    let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .function(parameterType: .integer, returnType: .integer), body: innerTerm)
+    let innerTerm: Term = .Abstraction(parameter: "x", parameterType: .Integer, body: body)
+    let outerTerm: Term = .Abstraction(parameter: "f", parameterType: .Function(parameterType: .Integer, returnType: .Integer), body: innerTerm)
     check(input: "\\f:int->int.\\x:int.f (f x)", expectedTerm: outerTerm)
   }
 
   func testLambdaBaseType() {
     check(input: "\\x:A.x",
           expectedTerm: .Abstraction(parameter: "x",
-                                     parameterType: .base(typeName: "A"),
+                                     parameterType: .Base(typeName: "A"),
                                      body: .Variable(name: "x", index: 0)))
   }
-  
+
   // MARK - Extension Tests
 
   func testSequenceUnit() {
@@ -166,18 +166,18 @@ class ParserTests: XCTestCase {
 
   func testBaseType() {
     let expected: Term = .Abstraction(parameter: "x",
-                                      parameterType: .base(typeName: "A"),
+                                      parameterType: .Base(typeName: "A"),
                                       body: .Variable(name: "x", index: 0))
     check(input: "\\x:A.x", expectedTerm: expected)
   }
 
   func testAbsAbsSequence() {
     let expected: Term = .Application(left: .Abstraction(parameter: "x",
-                                                         parameterType: .function(parameterType: .boolean, returnType: .Unit),
+                                                         parameterType: .Function(parameterType: .Boolean, returnType: .Unit),
                                                          body: .Application(left: .Variable(name: "x", index: 0),
                                                                             right: .True)),
                                       right: .Abstraction(parameter: "y",
-                                                          parameterType: .boolean,
+                                                          parameterType: .Boolean,
                                                           body: .Unit))
     check(input: "(\\x:bool->unit.x true) \\y:bool.unit ; (\\x:bool->unit.x true) \\y:bool.unit",
           expectedTerm: .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: expected),
@@ -187,15 +187,15 @@ class ParserTests: XCTestCase {
   func testAs() {
     check(input: "x as bool",
           expectedResult: .success(["x":0], .Application(left: .Abstraction(parameter: "x",
-                                                                            parameterType: .boolean,
+                                                                            parameterType: .Boolean,
                                                                             body: .Variable(name: "x", index: 0)),
                                                          right: .Variable(name: "x", index: 0))))
   }
 
   func testAsLambda() {
-    let body: Term = .Abstraction(parameter: "x", parameterType: .boolean, body: .Unit)
+    let body: Term = .Abstraction(parameter: "x", parameterType: .Boolean, body: .Unit)
     let expected: Term = .Application(left: .Abstraction(parameter: "x",
-                                                         parameterType: .function(parameterType: .boolean, returnType: .Unit),
+                                                         parameterType: .Function(parameterType: .Boolean, returnType: .Unit),
                                                          body: .Variable(name: "x", index: 0)),
                                       right: body)
     check(input: "(\\x:bool.unit) as bool->unit", expectedTerm: expected)
@@ -204,36 +204,39 @@ class ParserTests: XCTestCase {
   func testLet() {
     let t1: Term = .Zero
     let t2: Term = .Abstraction(parameter: "y",
-                                parameterType: .integer,
+                                parameterType: .Integer,
                                 body: .Application(left: .Variable(name: "y", index: 0),
                                                    right: .Variable(name: "x", index: 1)))
-    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .integer, body: t2),
+    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: t2),
                                       right: t1)
     check(input: "let x=0 in \\y:int.y x", expectedResult: .success(["x":0], expected))
   }
 
   func testLetApp() {
     let t1: Term = .Abstraction(parameter: "z",
-                                parameterType: .function(parameterType: .boolean, returnType: .integer),
+                                parameterType: .Function(parameterType: .Boolean, returnType: .Integer),
                                 body: .Application(left: .Variable(name: "z", index: 0),
                                                    right: .True))
     let t2: Term = .Application(left: .Variable(name: "e", index: 0),
-                                right: .Abstraction(parameter: "y", parameterType: .boolean, body: .Zero))
+                                right: .Abstraction(parameter: "y", parameterType: .Boolean, body: .Zero))
     let expected: Term = .Application(left: .Abstraction(parameter: "e",
-                                                         parameterType: .function(parameterType: .function(parameterType: .boolean,
-                                                                                                          returnType: .integer),
-                                                                                  returnType: .integer),
+                                                         parameterType: .Function(parameterType: .Function(parameterType: .Boolean,
+                                                                                                           returnType: .Integer),
+                                                                                  returnType: .Integer),
                                                          body: t2),
                                       right: t1)
     check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .success(["e":0], expected))
   }
 
   func testWildcard() {
-    let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .boolean, body: .Unit), right: .True)
+    let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Boolean, body: .Unit), right: .True)
     check(input: "(\\_:bool.unit) true", expectedTerm: expected)
   }
 
   func testAscription() {
-    check(input: "0 as int", expectedTerm: .Application(left: .Abstraction(parameter: "x", parameterType: .integer, body: .Variable(name: "x", index: 0)), right: .Zero))
+    check(input: "0 as int", expectedTerm: .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: .Variable(name: "x", index: 0)), right: .Zero))
+  }
+
+  func testPair() {
   }
 }

@@ -69,23 +69,23 @@ private func isZero() -> TermParser {
 private let baseType = _baseType()
 private func _baseType() -> TypeParser {
   return Bool <|> Int <|> Unit <|> (identifier >>- { context, identifier in
-    (pure(.base(String(identifier))), context)
+    (pure(.Base(String(identifier))), context)
   })
 }
 
 private let type = _type()
 private func _type() -> TypeParser {
-  return chainl1(p: baseType, op: string("->") *> pure({ t1, t2 in .t_t(t1, t2) }))
+  return chainl1(p: baseType, op: string("->") *> pure({ t1, t2 in .Function(t1, t2) }))
 }
 
 fileprivate let Bool = bool()
 fileprivate func bool() -> TypeParser {
-  return keyword(.BOOL) *> pure(.bool)
+  return keyword(.BOOL) *> pure(.Bool)
 }
 
 fileprivate let Int = int()
 fileprivate func int() -> TypeParser {
-  return keyword(.INT) *> pure(.int)
+  return keyword(.INT) *> pure(.Integer)
 }
 
 fileprivate let Unit = unit_ty()

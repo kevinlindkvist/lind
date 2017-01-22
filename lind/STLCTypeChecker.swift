@@ -21,7 +21,7 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       shiftedContext[k+1] = v
     }
     if let t2 = typeOf(t: term, context: union(shiftedContext, [0:type])) {
-      return .t_t(type, t2)
+      return .Function(type, t2)
     } else {
       return nil
     }
@@ -29,8 +29,8 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
     if let tyT1 = typeOf(t: t1, context: context),
       let tyT2 = typeOf(t: t2, context: context) {
       switch tyT1 {
-        case let .t_t(tyT11, tyT22) where tyT11 == tyT2: return tyT22
-        case let .t_t(tyT11, _):
+        case let .Function(tyT11, tyT22) where tyT11 == tyT2: return tyT22
+        case let .Function(tyT11, _):
           print("App types inconsistent expected:(\(tyT11)) got:(\(tyT2))")
           return nil
         default:  
@@ -40,10 +40,10 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
     } else {
       return nil
     }
-  case .True: return .bool
-  case .False: return .bool
+  case .True: return .Bool
+  case .False: return .Bool
   case let .If(conditional, trueBranch, falseBranch):
-    if typeOf(t: conditional, context: context) == .bool {
+    if typeOf(t: conditional, context: context) == .Bool {
       let tyTrue = typeOf(t: trueBranch, context: context)
       let tyFalse = typeOf(t: falseBranch, context: context)
       if tyTrue == tyFalse {
@@ -56,27 +56,27 @@ func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
       print("type of if conditional not bool: \(conditional)")
       return nil
     }
-  case .Zero: return .int
+  case .Zero: return .Integer
   case let .IsZero(term):
     let type = typeOf(t: term, context: context)
-    if type == .int {
-      return .bool
+    if type == .Integer {
+      return .Bool
     } else {
       print("isZero called with non-nat argument")
       return nil
     }
   case let .Succ(term):
     let type = typeOf(t: term, context: context)
-    if type == .int {
-      return .int
+    if type == .Integer {
+      return .Integer
     } else {
       print("succ called with non-nat argument")
       return nil
     }
   case let .Pred(term):
     let type = typeOf(t: term, context: context)
-    if type == .int {
-      return .int
+    if type == .Integer {
+      return .Integer
     } else {
       print("pred called with non-nat argument")
       return nil

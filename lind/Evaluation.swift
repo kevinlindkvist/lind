@@ -71,6 +71,10 @@ private func evaluate(term: Term, context: TermContext) -> Term {
   // Variables
   case .Variable(_, _):
     return term
+  // Tuples
+  case .Tuple:
+    // TODO: Implement.
+    return term
   }
 }
 

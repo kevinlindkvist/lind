@@ -20,6 +20,7 @@ public indirect enum Term {
   case Succ(Term)
   case Pred(Term)
   case Variable(name: String, index: Int)
+  case Tuple([String:Term])
 }
 
 public typealias TermContext = [String:Int]
@@ -49,6 +50,8 @@ extension Term: CustomStringConvertible {
         return "\(lhs) \(rhs)"
       case .Unit:
         return "unit"
+      case let .Tuple(values):
+        return values.description
     }
   }
 }

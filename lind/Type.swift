@@ -12,11 +12,12 @@ import Result
 public typealias TypeResult = Result<(TypeContext, Type), TypeError>
 
 public indirect enum Type {
-  case function(parameterType: Type, returnType: Type)
-  case boolean
-  case integer
+  case Function(parameterType: Type, returnType: Type)
+  case Boolean
+  case Integer
   case Unit
-  case base(typeName: String)
+  case Base(typeName: String)
+  case Product([Type])
 }
 
 public typealias TypeContext = [Int:Type]
@@ -26,15 +27,15 @@ extension Type: Equatable {
 
 public func ==(lhs: Type, rhs: Type) -> Bool {
   switch (lhs, rhs) {
-    case (.boolean, .boolean):
+    case (.Boolean, .Boolean):
       return true
-    case (.integer, .integer):
+    case (.Integer, .Integer):
       return true
-    case let (.function(t1,t2), .function(t11, t22)):
+    case let (.Function(t1,t2), .Function(t11, t22)):
       return t1 == t11 && t2 == t22
     case (.Unit, .Unit):
       return true
-    case let (.base(firstType), .base(secondType)):
+    case let (.Base(firstType), .Base(secondType)):
       return firstType == secondType
     default:
       return false
@@ -44,16 +45,18 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
 extension Type: CustomStringConvertible {
   public var description: String {
     switch self {
-      case .boolean:
+      case .Boolean:
         return "bool"
-      case .integer:
+      case .Integer:
         return "int"
-      case let .function(parameterType, returnType):
+      case let .Function(parameterType, returnType):
         return "\(parameterType) => \(returnType)"
       case .Unit:
         return "unit"
-      case let .base(typeName):
+      case let .Base(typeName):
         return typeName
+      case let .Product(productTypes):
+        return productTypes.description
     }
   }
 }

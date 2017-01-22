@@ -259,7 +259,7 @@ fileprivate func _else() -> StringParser {
 private let baseType = _baseType()
 private func _baseType() -> TypeParser {
   return Bool <|> Int <|> Unit <|> (identifier >>- { context, identifier in
-    (pure(.base(typeName: String(identifier))), context)
+    (pure(.Base(typeName: String(identifier))), context)
   })
 }
 
@@ -267,18 +267,18 @@ private let type = _type()
 private func _type() -> TypeParser {
   return chainl1(p: baseType, op: string("->")
     *> pure({ t1, t2 in
-      return .function(parameterType: t1, returnType: t2)
+      return .Function(parameterType: t1, returnType: t2)
     }))
 }
 
 fileprivate let Bool = bool()
 fileprivate func bool() -> TypeParser {
-  return keyword(.BOOL) *> pure(.boolean)
+  return keyword(.BOOL) *> pure(.Boolean)
 }
 
 fileprivate let Int = int()
 fileprivate func int() -> TypeParser {
-  return keyword(.INT) *> pure(.integer)
+  return keyword(.INT) *> pure(.Integer)
 }
 
 fileprivate let Unit = unit_ty()
