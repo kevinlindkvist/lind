@@ -33,7 +33,10 @@ fileprivate enum Keyword: String.UnicodeScalarView {
   // Special characters
   case COLON = ":"
   case PERIOD = "."
+  case COMMA = ","
   case BACKSLASH = "\\"
+  case OPEN_TUPLE = "{"
+  case CLOSE_TUPLE = "}"
   // Extensions
   case AS = "as"
   case WILD = "_"
@@ -82,13 +85,18 @@ private func _term() -> TermParser {
 private let nonApplicationTerm = _nonApplicationTerm()
 private func _nonApplicationTerm() -> TermParser {
   return atom >>- { context, term in
-    // After an atom is parsed, check if there is an ascription, otherwise purely return the atom.
+    // After an atom is parsed, check if there is an ascription.
     return ((ascription
       >>- { context, type in
         let body: Term = .Variable(name: "x", index: 0)
         let abstraction: Term = .Abstraction(parameter: "x", parameterType: type, body: body)
         return (pure(.Application(left: abstraction, right: term)), context)
       })
+      // If there is no ascription, check If there is a projection.
+      <|> ((keyword(.PERIOD) *> identifier) >>- { innerContext, innerTerm in
+        return (pure(.Projection(collection: term, index: String(innerTerm))), context)
+      })
+      // If there is no projection, return the term.
       <|> pure(term), context)
   }
 }
@@ -290,7 +298,7 @@ fileprivate func unit_ty() -> TypeParser {
 
 fileprivate let Value = value()
 fileprivate func value() -> TermParser {
-  return TRUE <|> FALSE <|> ZERO <|> UNIT <|> LAMBDA <|> variable
+  return TRUE <|> FALSE <|> ZERO <|> UNIT <|> LAMBDA <|> TUPLE <|> variable
 }
 
 private let UNIT = _unit()
@@ -311,6 +319,13 @@ private func _false() -> TermParser {
 fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
   return keyword(.ZERO) *> pure(.Zero)
+}
+
+fileprivate let TUPLE = tuple()
+fileprivate func tuple() -> TermParser {
+  return (keyword(.OPEN_TUPLE) *> sepBy(p: term, separator: keyword(.COMMA)) <* keyword(.CLOSE_TUPLE)) >>- { context, terms in
+    return (.Tuple([]), context)
+  }
 }
 
 

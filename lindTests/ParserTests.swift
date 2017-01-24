@@ -238,5 +238,6 @@ class ParserTests: XCTestCase {
   }
 
   func testPair() {
+    check(input: "{unit, unit}", expectedTerm: .Tuple(["0": .Unit, "1": .Unit]))
   }
 }

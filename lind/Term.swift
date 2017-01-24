@@ -21,6 +21,7 @@ public indirect enum Term {
   case Pred(Term)
   case Variable(name: String, index: Int)
   case Tuple([String:Term])
+  case Projection(collection: Term, index: String)
 }
 
 public typealias TermContext = [String:Int]
@@ -52,6 +53,8 @@ extension Term: CustomStringConvertible {
         return "unit"
       case let .Tuple(values):
         return values.description
+      case let .Projection(collection, subs):
+        return "\(collection).\(subs)"
     }
   }
 }
