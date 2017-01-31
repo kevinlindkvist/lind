@@ -6,6 +6,8 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
+import full
+
 func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
   switch t {
   case let .va(_, idx):

@@ -35,6 +35,8 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     case .Tuple:
       // TODO: Implement.
       return .failure(.message("Tuple type checking not implemented."))
+    case .Projection:
+      return .failure(.message("Projection type checking not implemented."))
   }
 }
 

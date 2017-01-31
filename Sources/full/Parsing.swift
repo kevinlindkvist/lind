@@ -323,23 +323,21 @@ fileprivate func zero() -> TermParser {
 
 fileprivate let TUPLE = tuple()
 fileprivate func tuple() -> TermParser {
-  return (keyword(.OPEN_TUPLE) *> sepBy(p: term, separator: keyword(.COMMA)) <* keyword(.CLOSE_TUPLE)) >>- { context, terms in
-    return (.Tuple([]), context)
-  }
+  return fail("no tuple")
 }
 
 
 // MARK: - Variables
 
 private let identifier = _identifier()
-private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
+private func _identifier() -> Parser<String.UnicodeScalarView, [String:Int], String.UnicodeScalarView> {
   let alphas = CharacterSet.alphanumerics
   return skipSpaces() *> many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
 }
 
 private let variable = _variable()
 private func _variable() -> TermParser {
-  return identifier >>- { (context: NamingContext, t: String.UnicodeScalarView) in
+  return identifier >>- { (context: [String:Int], t: String.UnicodeScalarView) in
     if (Keyword(rawValue: t) != nil) {
       return (fail("Variable was keyword"), context)
     }

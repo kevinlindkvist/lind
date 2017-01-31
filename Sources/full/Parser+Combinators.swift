@@ -42,16 +42,3 @@ public func chainl1<In, Ctxt, Out>(p: Parser<In, Ctxt, Out>, op: Parser<In, Ctxt
   }
 }
 
-public func sepBy<In, Ctxt, Out, Sep>(p: Parser<In, Ctxt, Out>, separator: Parser<Sep, Ctxt, Out>) -> Parser<In, Ctxt, [Out]> {
-  return sepBy1(p: p, separator: separator) <|> pure([])
-}
-
-public func sepBy1<In, Ctxt, Out, Sep>(p: Parser<In, Ctxt, Out>, separator: Parser<Sep, Ctxt, Out>) -> Parser<In, Ctxt, [Out]> {
-  return p >>- { ctxt, out in
-    many(separator *> p) >>- { ctxt, outs in
-      let r = [out].append(contentsOf: outs)
-      return (pure(r), ctxt)
-    }
-  }
-}
-

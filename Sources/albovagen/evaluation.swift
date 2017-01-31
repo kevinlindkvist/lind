@@ -6,11 +6,11 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import lind
 import Foundation
 import Result
+import full
 
-public typealias Evaluation = Result<((Term, Type), NamingContext, TypeContext), EvaluationError>
+public typealias Evaluation = Result<((full.Term, Type), [String:Int], TypeContext), EvaluationError>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {

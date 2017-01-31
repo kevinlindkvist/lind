@@ -75,7 +75,7 @@ private func evaluate(term: Term, context: TermContext) -> Term {
   case .Tuple:
     // TODO: Implement.
     return term
-  case let .Projection(_, _):
+  case .Projection(_, _):
     // TODO: Implement.
     return term
   }

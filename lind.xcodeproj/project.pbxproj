@@ -7,148 +7,156 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		OBJ_100 /* Prelude.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* Prelude.swift */; };
-		OBJ_101 /* Reply.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Reply.swift */; };
-		OBJ_102 /* Term.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* Term.swift */; };
-		OBJ_103 /* Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* Type.swift */; };
-		OBJ_104 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* TypeChecking.swift */; };
-		OBJ_105 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* TypeError.swift */; };
-		OBJ_106 /* UnicodeScalarView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* UnicodeScalarView+Helpers.swift */; };
-		OBJ_108 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_115 /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* STLCParser.swift */; };
-		OBJ_116 /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* STLCTypeChecker.swift */; };
-		OBJ_117 /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* STLCTypes.swift */; };
-		OBJ_119 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_126 /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* UAEvaluator.swift */; };
-		OBJ_127 /* UAParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* UAParser.swift */; };
-		OBJ_128 /* UATerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* UATerms.swift */; };
-		OBJ_130 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_137 /* ULCEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* ULCEvaluation.swift */; };
-		OBJ_138 /* ULCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* ULCParser.swift */; };
-		OBJ_139 /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* ULCTerms.swift */; };
-		OBJ_141 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_148 /* EvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* EvaluationTests.swift */; };
-		OBJ_149 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* ParserTests.swift */; };
-		OBJ_150 /* TypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* TypeCheckerTests.swift */; };
-		OBJ_152 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_153 /* full.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_60 /* full.framework */; };
-		OBJ_161 /* STLCTypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* STLCTypeCheckerTests.swift */; };
-		OBJ_163 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_164 /* simplytypedlambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* simplytypedlambda.framework */; };
-		OBJ_172 /* UAEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* UAEvaluationTests.swift */; };
-		OBJ_173 /* UAParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_52 /* UAParserTests.swift */; };
-		OBJ_175 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_176 /* untypedarithmetic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* untypedarithmetic.framework */; };
-		OBJ_184 /* ULCEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_54 /* ULCEvaluationTests.swift */; };
-		OBJ_185 /* ULCParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_55 /* ULCParserTests.swift */; };
-		OBJ_187 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_188 /* untypedlambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_63 /* untypedlambda.framework */; };
+		OBJ_100 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* Parser.swift */; };
+		OBJ_101 /* Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Parsing.swift */; };
+		OBJ_102 /* Prelude.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* Prelude.swift */; };
+		OBJ_103 /* Reply.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Reply.swift */; };
+		OBJ_104 /* Term.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* Term.swift */; };
+		OBJ_105 /* Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* Type.swift */; };
+		OBJ_106 /* TypeChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* TypeChecking.swift */; };
+		OBJ_107 /* TypeError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* TypeError.swift */; };
+		OBJ_108 /* UnicodeScalarView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* UnicodeScalarView+Helpers.swift */; };
+		OBJ_110 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_117 /* STLCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* STLCParser.swift */; };
+		OBJ_118 /* STLCTypeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* STLCTypeChecker.swift */; };
+		OBJ_119 /* STLCTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* STLCTypes.swift */; };
+		OBJ_121 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_128 /* UAEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* UAEvaluator.swift */; };
+		OBJ_129 /* UAParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* UAParser.swift */; };
+		OBJ_130 /* UATerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* UATerms.swift */; };
+		OBJ_132 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_139 /* ULCEvaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* ULCEvaluation.swift */; };
+		OBJ_140 /* ULCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* ULCParser.swift */; };
+		OBJ_141 /* ULCTerms.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* ULCTerms.swift */; };
+		OBJ_143 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_150 /* EvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* EvaluationTests.swift */; };
+		OBJ_151 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* ParserTests.swift */; };
+		OBJ_152 /* TypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* TypeCheckerTests.swift */; };
+		OBJ_154 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_155 /* full.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_60 /* full.framework */; };
+		OBJ_163 /* STLCTypeCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* STLCTypeCheckerTests.swift */; };
+		OBJ_165 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_166 /* simplytypedlambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* simplytypedlambda.framework */; };
+		OBJ_174 /* UAEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* UAEvaluationTests.swift */; };
+		OBJ_175 /* UAParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_52 /* UAParserTests.swift */; };
+		OBJ_177 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_178 /* untypedarithmetic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* untypedarithmetic.framework */; };
+		OBJ_186 /* ULCEvaluationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_54 /* ULCEvaluationTests.swift */; };
+		OBJ_187 /* ULCParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_55 /* ULCParserTests.swift */; };
+		OBJ_189 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
+		OBJ_190 /* untypedlambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_63 /* untypedlambda.framework */; };
 		OBJ_73 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Result.swift */; };
 		OBJ_74 /* ResultProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* ResultProtocol.swift */; };
 		OBJ_81 /* console.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* console.swift */; };
 		OBJ_82 /* evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* evaluation.swift */; };
 		OBJ_83 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* main.swift */; };
 		OBJ_85 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Result.framework */; };
-		OBJ_92 /* Dictionary+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* Dictionary+Helpers.swift */; };
-		OBJ_93 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Evaluation.swift */; };
-		OBJ_94 /* EvaluationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* EvaluationError.swift */; };
-		OBJ_95 /* ParseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* ParseError.swift */; };
-		OBJ_96 /* Parser+Combinators.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* Parser+Combinators.swift */; };
-		OBJ_97 /* Parser+UnicodeScalars.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* Parser+UnicodeScalars.swift */; };
-		OBJ_98 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* Parser.swift */; };
-		OBJ_99 /* Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Parsing.swift */; };
+		OBJ_86 /* full.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_60 /* full.framework */; };
+		OBJ_94 /* Dictionary+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* Dictionary+Helpers.swift */; };
+		OBJ_95 /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Evaluation.swift */; };
+		OBJ_96 /* EvaluationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* EvaluationError.swift */; };
+		OBJ_97 /* ParseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* ParseError.swift */; };
+		OBJ_98 /* Parser+Combinators.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* Parser+Combinators.swift */; };
+		OBJ_99 /* Parser+UnicodeScalars.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* Parser+UnicodeScalars.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B418C6D11E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6DE1E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_68;
 			remoteInfo = Result;
 		};
-		B418C6D21E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6DF1E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_68;
-			remoteInfo = Result;
-		};
-		B418C6D31E4097A5003CB343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = OBJ_68;
-			remoteInfo = Result;
-		};
-		B418C6D41E4097A5003CB343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = OBJ_68;
-			remoteInfo = Result;
-		};
-		B418C6D51E4097A5003CB343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = OBJ_68;
-			remoteInfo = Result;
-		};
-		B418C6D61E4097A5003CB343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = OBJ_68;
-			remoteInfo = Result;
-		};
-		B418C6D71E4097A5003CB343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = OBJ_87;
+			remoteGlobalIDString = OBJ_89;
 			remoteInfo = full;
 		};
-		B418C6D81E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6E01E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_68;
 			remoteInfo = Result;
 		};
-		B418C6D91E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6E11E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_110;
+			remoteGlobalIDString = OBJ_68;
+			remoteInfo = Result;
+		};
+		B418C6E21E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_68;
+			remoteInfo = Result;
+		};
+		B418C6E31E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_68;
+			remoteInfo = Result;
+		};
+		B418C6E41E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_68;
+			remoteInfo = Result;
+		};
+		B418C6E51E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_89;
+			remoteInfo = full;
+		};
+		B418C6E61E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_68;
+			remoteInfo = Result;
+		};
+		B418C6E71E40987B003CB343 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = OBJ_112;
 			remoteInfo = simplytypedlambda;
 		};
-		B418C6DA1E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6E81E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_68;
 			remoteInfo = Result;
 		};
-		B418C6DB1E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6E91E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_121;
+			remoteGlobalIDString = OBJ_123;
 			remoteInfo = untypedarithmetic;
 		};
-		B418C6DC1E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6EA1E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_68;
 			remoteInfo = Result;
 		};
-		B418C6DD1E4097A5003CB343 /* PBXContainerItemProxy */ = {
+		B418C6EB1E40987B003CB343 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_132;
+			remoteGlobalIDString = OBJ_134;
 			remoteInfo = untypedlambda;
 		};
 /* End PBXContainerItemProxy section */
@@ -206,71 +214,71 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_107 /* Frameworks */ = {
+		OBJ_109 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_108 /* Result.framework in Frameworks */,
+				OBJ_110 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_118 /* Frameworks */ = {
+		OBJ_120 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_119 /* Result.framework in Frameworks */,
+				OBJ_121 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_129 /* Frameworks */ = {
+		OBJ_131 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_130 /* Result.framework in Frameworks */,
+				OBJ_132 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_140 /* Frameworks */ = {
+		OBJ_142 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_141 /* Result.framework in Frameworks */,
+				OBJ_143 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_151 /* Frameworks */ = {
+		OBJ_153 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_152 /* Result.framework in Frameworks */,
-				OBJ_153 /* full.framework in Frameworks */,
+				OBJ_154 /* Result.framework in Frameworks */,
+				OBJ_155 /* full.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_162 /* Frameworks */ = {
+		OBJ_164 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_163 /* Result.framework in Frameworks */,
-				OBJ_164 /* simplytypedlambda.framework in Frameworks */,
+				OBJ_165 /* Result.framework in Frameworks */,
+				OBJ_166 /* simplytypedlambda.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_174 /* Frameworks */ = {
+		OBJ_176 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_175 /* Result.framework in Frameworks */,
-				OBJ_176 /* untypedarithmetic.framework in Frameworks */,
+				OBJ_177 /* Result.framework in Frameworks */,
+				OBJ_178 /* untypedarithmetic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_186 /* Frameworks */ = {
+		OBJ_188 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_187 /* Result.framework in Frameworks */,
-				OBJ_188 /* untypedlambda.framework in Frameworks */,
+				OBJ_189 /* Result.framework in Frameworks */,
+				OBJ_190 /* untypedlambda.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,6 +294,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_85 /* Result.framework in Frameworks */,
+				OBJ_86 /* full.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,123 +474,123 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		OBJ_110 /* simplytypedlambda */ = {
+		OBJ_112 /* simplytypedlambda */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_111 /* Build configuration list for PBXNativeTarget "simplytypedlambda" */;
+			buildConfigurationList = OBJ_113 /* Build configuration list for PBXNativeTarget "simplytypedlambda" */;
 			buildPhases = (
-				OBJ_114 /* Sources */,
-				OBJ_118 /* Frameworks */,
+				OBJ_116 /* Sources */,
+				OBJ_120 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_120 /* PBXTargetDependency */,
+				OBJ_122 /* PBXTargetDependency */,
 			);
 			name = simplytypedlambda;
 			productName = simplytypedlambda;
 			productReference = OBJ_61 /* simplytypedlambda.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_121 /* untypedarithmetic */ = {
+		OBJ_123 /* untypedarithmetic */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_122 /* Build configuration list for PBXNativeTarget "untypedarithmetic" */;
+			buildConfigurationList = OBJ_124 /* Build configuration list for PBXNativeTarget "untypedarithmetic" */;
 			buildPhases = (
-				OBJ_125 /* Sources */,
-				OBJ_129 /* Frameworks */,
+				OBJ_127 /* Sources */,
+				OBJ_131 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_131 /* PBXTargetDependency */,
+				OBJ_133 /* PBXTargetDependency */,
 			);
 			name = untypedarithmetic;
 			productName = untypedarithmetic;
 			productReference = OBJ_62 /* untypedarithmetic.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_132 /* untypedlambda */ = {
+		OBJ_134 /* untypedlambda */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_133 /* Build configuration list for PBXNativeTarget "untypedlambda" */;
+			buildConfigurationList = OBJ_135 /* Build configuration list for PBXNativeTarget "untypedlambda" */;
 			buildPhases = (
-				OBJ_136 /* Sources */,
-				OBJ_140 /* Frameworks */,
+				OBJ_138 /* Sources */,
+				OBJ_142 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_142 /* PBXTargetDependency */,
+				OBJ_144 /* PBXTargetDependency */,
 			);
 			name = untypedlambda;
 			productName = untypedlambda;
 			productReference = OBJ_63 /* untypedlambda.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_143 /* fullTests */ = {
+		OBJ_145 /* fullTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_144 /* Build configuration list for PBXNativeTarget "fullTests" */;
+			buildConfigurationList = OBJ_146 /* Build configuration list for PBXNativeTarget "fullTests" */;
 			buildPhases = (
-				OBJ_147 /* Sources */,
-				OBJ_151 /* Frameworks */,
+				OBJ_149 /* Sources */,
+				OBJ_153 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_154 /* PBXTargetDependency */,
-				OBJ_155 /* PBXTargetDependency */,
+				OBJ_156 /* PBXTargetDependency */,
+				OBJ_157 /* PBXTargetDependency */,
 			);
 			name = fullTests;
 			productName = fullTests;
 			productReference = OBJ_64 /* fullTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		OBJ_156 /* simplytypedlambdaTests */ = {
+		OBJ_158 /* simplytypedlambdaTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_157 /* Build configuration list for PBXNativeTarget "simplytypedlambdaTests" */;
+			buildConfigurationList = OBJ_159 /* Build configuration list for PBXNativeTarget "simplytypedlambdaTests" */;
 			buildPhases = (
-				OBJ_160 /* Sources */,
-				OBJ_162 /* Frameworks */,
+				OBJ_162 /* Sources */,
+				OBJ_164 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_165 /* PBXTargetDependency */,
-				OBJ_166 /* PBXTargetDependency */,
+				OBJ_167 /* PBXTargetDependency */,
+				OBJ_168 /* PBXTargetDependency */,
 			);
 			name = simplytypedlambdaTests;
 			productName = simplytypedlambdaTests;
 			productReference = OBJ_65 /* simplytypedlambdaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		OBJ_167 /* untypedarithmeticTests */ = {
+		OBJ_169 /* untypedarithmeticTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_168 /* Build configuration list for PBXNativeTarget "untypedarithmeticTests" */;
+			buildConfigurationList = OBJ_170 /* Build configuration list for PBXNativeTarget "untypedarithmeticTests" */;
 			buildPhases = (
-				OBJ_171 /* Sources */,
-				OBJ_174 /* Frameworks */,
+				OBJ_173 /* Sources */,
+				OBJ_176 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_177 /* PBXTargetDependency */,
-				OBJ_178 /* PBXTargetDependency */,
+				OBJ_179 /* PBXTargetDependency */,
+				OBJ_180 /* PBXTargetDependency */,
 			);
 			name = untypedarithmeticTests;
 			productName = untypedarithmeticTests;
 			productReference = OBJ_66 /* untypedarithmeticTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		OBJ_179 /* untypedlambdaTests */ = {
+		OBJ_181 /* untypedlambdaTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_180 /* Build configuration list for PBXNativeTarget "untypedlambdaTests" */;
+			buildConfigurationList = OBJ_182 /* Build configuration list for PBXNativeTarget "untypedlambdaTests" */;
 			buildPhases = (
-				OBJ_183 /* Sources */,
-				OBJ_186 /* Frameworks */,
+				OBJ_185 /* Sources */,
+				OBJ_188 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_189 /* PBXTargetDependency */,
-				OBJ_190 /* PBXTargetDependency */,
+				OBJ_191 /* PBXTargetDependency */,
+				OBJ_192 /* PBXTargetDependency */,
 			);
 			name = untypedlambdaTests;
 			productName = untypedlambdaTests;
@@ -614,24 +623,25 @@
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_86 /* PBXTargetDependency */,
+				OBJ_87 /* PBXTargetDependency */,
+				OBJ_88 /* PBXTargetDependency */,
 			);
 			name = albovagen;
 			productName = albovagen;
 			productReference = OBJ_59 /* albovagen */;
 			productType = "com.apple.product-type.tool";
 		};
-		OBJ_87 /* full */ = {
+		OBJ_89 /* full */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_88 /* Build configuration list for PBXNativeTarget "full" */;
+			buildConfigurationList = OBJ_90 /* Build configuration list for PBXNativeTarget "full" */;
 			buildPhases = (
-				OBJ_91 /* Sources */,
-				OBJ_107 /* Frameworks */,
+				OBJ_93 /* Sources */,
+				OBJ_109 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_109 /* PBXTargetDependency */,
+				OBJ_111 /* PBXTargetDependency */,
 			);
 			name = full;
 			productName = full;
@@ -660,82 +670,82 @@
 			targets = (
 				OBJ_68 /* Result */,
 				OBJ_76 /* albovagen */,
-				OBJ_87 /* full */,
-				OBJ_110 /* simplytypedlambda */,
-				OBJ_121 /* untypedarithmetic */,
-				OBJ_132 /* untypedlambda */,
-				OBJ_143 /* fullTests */,
-				OBJ_156 /* simplytypedlambdaTests */,
-				OBJ_167 /* untypedarithmeticTests */,
-				OBJ_179 /* untypedlambdaTests */,
+				OBJ_89 /* full */,
+				OBJ_112 /* simplytypedlambda */,
+				OBJ_123 /* untypedarithmetic */,
+				OBJ_134 /* untypedlambda */,
+				OBJ_145 /* fullTests */,
+				OBJ_158 /* simplytypedlambdaTests */,
+				OBJ_169 /* untypedarithmeticTests */,
+				OBJ_181 /* untypedlambdaTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_114 /* Sources */ = {
+		OBJ_116 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_115 /* STLCParser.swift in Sources */,
-				OBJ_116 /* STLCTypeChecker.swift in Sources */,
-				OBJ_117 /* STLCTypes.swift in Sources */,
+				OBJ_117 /* STLCParser.swift in Sources */,
+				OBJ_118 /* STLCTypeChecker.swift in Sources */,
+				OBJ_119 /* STLCTypes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_125 /* Sources */ = {
+		OBJ_127 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_126 /* UAEvaluator.swift in Sources */,
-				OBJ_127 /* UAParser.swift in Sources */,
-				OBJ_128 /* UATerms.swift in Sources */,
+				OBJ_128 /* UAEvaluator.swift in Sources */,
+				OBJ_129 /* UAParser.swift in Sources */,
+				OBJ_130 /* UATerms.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_136 /* Sources */ = {
+		OBJ_138 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_137 /* ULCEvaluation.swift in Sources */,
-				OBJ_138 /* ULCParser.swift in Sources */,
-				OBJ_139 /* ULCTerms.swift in Sources */,
+				OBJ_139 /* ULCEvaluation.swift in Sources */,
+				OBJ_140 /* ULCParser.swift in Sources */,
+				OBJ_141 /* ULCTerms.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_147 /* Sources */ = {
+		OBJ_149 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_148 /* EvaluationTests.swift in Sources */,
-				OBJ_149 /* ParserTests.swift in Sources */,
-				OBJ_150 /* TypeCheckerTests.swift in Sources */,
+				OBJ_150 /* EvaluationTests.swift in Sources */,
+				OBJ_151 /* ParserTests.swift in Sources */,
+				OBJ_152 /* TypeCheckerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_160 /* Sources */ = {
+		OBJ_162 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_161 /* STLCTypeCheckerTests.swift in Sources */,
+				OBJ_163 /* STLCTypeCheckerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_171 /* Sources */ = {
+		OBJ_173 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_172 /* UAEvaluationTests.swift in Sources */,
-				OBJ_173 /* UAParserTests.swift in Sources */,
+				OBJ_174 /* UAEvaluationTests.swift in Sources */,
+				OBJ_175 /* UAParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_183 /* Sources */ = {
+		OBJ_185 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_184 /* ULCEvaluationTests.swift in Sources */,
-				OBJ_185 /* ULCParserTests.swift in Sources */,
+				OBJ_186 /* ULCEvaluationTests.swift in Sources */,
+				OBJ_187 /* ULCParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -758,100 +768,105 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_91 /* Sources */ = {
+		OBJ_93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_92 /* Dictionary+Helpers.swift in Sources */,
-				OBJ_93 /* Evaluation.swift in Sources */,
-				OBJ_94 /* EvaluationError.swift in Sources */,
-				OBJ_95 /* ParseError.swift in Sources */,
-				OBJ_96 /* Parser+Combinators.swift in Sources */,
-				OBJ_97 /* Parser+UnicodeScalars.swift in Sources */,
-				OBJ_98 /* Parser.swift in Sources */,
-				OBJ_99 /* Parsing.swift in Sources */,
-				OBJ_100 /* Prelude.swift in Sources */,
-				OBJ_101 /* Reply.swift in Sources */,
-				OBJ_102 /* Term.swift in Sources */,
-				OBJ_103 /* Type.swift in Sources */,
-				OBJ_104 /* TypeChecking.swift in Sources */,
-				OBJ_105 /* TypeError.swift in Sources */,
-				OBJ_106 /* UnicodeScalarView+Helpers.swift in Sources */,
+				OBJ_94 /* Dictionary+Helpers.swift in Sources */,
+				OBJ_95 /* Evaluation.swift in Sources */,
+				OBJ_96 /* EvaluationError.swift in Sources */,
+				OBJ_97 /* ParseError.swift in Sources */,
+				OBJ_98 /* Parser+Combinators.swift in Sources */,
+				OBJ_99 /* Parser+UnicodeScalars.swift in Sources */,
+				OBJ_100 /* Parser.swift in Sources */,
+				OBJ_101 /* Parsing.swift in Sources */,
+				OBJ_102 /* Prelude.swift in Sources */,
+				OBJ_103 /* Reply.swift in Sources */,
+				OBJ_104 /* Term.swift in Sources */,
+				OBJ_105 /* Type.swift in Sources */,
+				OBJ_106 /* TypeChecking.swift in Sources */,
+				OBJ_107 /* TypeError.swift in Sources */,
+				OBJ_108 /* UnicodeScalarView+Helpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_109 /* PBXTargetDependency */ = {
+		OBJ_111 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D21E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E01E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_120 /* PBXTargetDependency */ = {
+		OBJ_122 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D31E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E11E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_131 /* PBXTargetDependency */ = {
+		OBJ_133 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D41E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E21E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_142 /* PBXTargetDependency */ = {
+		OBJ_144 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D51E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E31E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_154 /* PBXTargetDependency */ = {
+		OBJ_156 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D61E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E41E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_155 /* PBXTargetDependency */ = {
+		OBJ_157 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_87 /* full */;
-			targetProxy = B418C6D71E4097A5003CB343 /* PBXContainerItemProxy */;
+			target = OBJ_89 /* full */;
+			targetProxy = B418C6E51E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_165 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D81E4097A5003CB343 /* PBXContainerItemProxy */;
-		};
-		OBJ_166 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = OBJ_110 /* simplytypedlambda */;
-			targetProxy = B418C6D91E4097A5003CB343 /* PBXContainerItemProxy */;
-		};
-		OBJ_177 /* PBXTargetDependency */ = {
+		OBJ_167 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6DA1E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E61E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_178 /* PBXTargetDependency */ = {
+		OBJ_168 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_121 /* untypedarithmetic */;
-			targetProxy = B418C6DB1E4097A5003CB343 /* PBXContainerItemProxy */;
+			target = OBJ_112 /* simplytypedlambda */;
+			targetProxy = B418C6E71E40987B003CB343 /* PBXContainerItemProxy */;
 		};
-		OBJ_189 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = OBJ_68 /* Result */;
-			targetProxy = B418C6DC1E4097A5003CB343 /* PBXContainerItemProxy */;
-		};
-		OBJ_190 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = OBJ_132 /* untypedlambda */;
-			targetProxy = B418C6DD1E4097A5003CB343 /* PBXContainerItemProxy */;
-		};
-		OBJ_86 /* PBXTargetDependency */ = {
+		OBJ_179 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_68 /* Result */;
-			targetProxy = B418C6D11E4097A5003CB343 /* PBXContainerItemProxy */;
+			targetProxy = B418C6E81E40987B003CB343 /* PBXContainerItemProxy */;
+		};
+		OBJ_180 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_123 /* untypedarithmetic */;
+			targetProxy = B418C6E91E40987B003CB343 /* PBXContainerItemProxy */;
+		};
+		OBJ_191 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_68 /* Result */;
+			targetProxy = B418C6EA1E40987B003CB343 /* PBXContainerItemProxy */;
+		};
+		OBJ_192 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_134 /* untypedlambda */;
+			targetProxy = B418C6EB1E40987B003CB343 /* PBXContainerItemProxy */;
+		};
+		OBJ_87 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_68 /* Result */;
+			targetProxy = B418C6DE1E40987B003CB343 /* PBXContainerItemProxy */;
+		};
+		OBJ_88 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_89 /* full */;
+			targetProxy = B418C6DF1E40987B003CB343 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		OBJ_112 /* Debug */ = {
+		OBJ_114 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -871,7 +886,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_113 /* Release */ = {
+		OBJ_115 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -891,7 +906,7 @@
 			};
 			name = Release;
 		};
-		OBJ_123 /* Debug */ = {
+		OBJ_125 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -911,7 +926,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_124 /* Release */ = {
+		OBJ_126 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -931,7 +946,7 @@
 			};
 			name = Release;
 		};
-		OBJ_134 /* Debug */ = {
+		OBJ_136 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -951,7 +966,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_135 /* Release */ = {
+		OBJ_137 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -971,7 +986,7 @@
 			};
 			name = Release;
 		};
-		OBJ_145 /* Debug */ = {
+		OBJ_147 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -988,7 +1003,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_146 /* Release */ = {
+		OBJ_148 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1005,7 +1020,7 @@
 			};
 			name = Release;
 		};
-		OBJ_158 /* Debug */ = {
+		OBJ_160 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1022,7 +1037,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_159 /* Release */ = {
+		OBJ_161 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1039,7 +1054,7 @@
 			};
 			name = Release;
 		};
-		OBJ_169 /* Debug */ = {
+		OBJ_171 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1056,7 +1071,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_170 /* Release */ = {
+		OBJ_172 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1073,7 +1088,7 @@
 			};
 			name = Release;
 		};
-		OBJ_181 /* Debug */ = {
+		OBJ_183 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1090,7 +1105,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_182 /* Release */ = {
+		OBJ_184 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -1225,7 +1240,7 @@
 			};
 			name = Release;
 		};
-		OBJ_89 /* Debug */ = {
+		OBJ_91 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1245,7 +1260,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_90 /* Release */ = {
+		OBJ_92 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1268,65 +1283,65 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		OBJ_111 /* Build configuration list for PBXNativeTarget "simplytypedlambda" */ = {
+		OBJ_113 /* Build configuration list for PBXNativeTarget "simplytypedlambda" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_112 /* Debug */,
-				OBJ_113 /* Release */,
+				OBJ_114 /* Debug */,
+				OBJ_115 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_122 /* Build configuration list for PBXNativeTarget "untypedarithmetic" */ = {
+		OBJ_124 /* Build configuration list for PBXNativeTarget "untypedarithmetic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_123 /* Debug */,
-				OBJ_124 /* Release */,
+				OBJ_125 /* Debug */,
+				OBJ_126 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_133 /* Build configuration list for PBXNativeTarget "untypedlambda" */ = {
+		OBJ_135 /* Build configuration list for PBXNativeTarget "untypedlambda" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_134 /* Debug */,
-				OBJ_135 /* Release */,
+				OBJ_136 /* Debug */,
+				OBJ_137 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_144 /* Build configuration list for PBXNativeTarget "fullTests" */ = {
+		OBJ_146 /* Build configuration list for PBXNativeTarget "fullTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_145 /* Debug */,
-				OBJ_146 /* Release */,
+				OBJ_147 /* Debug */,
+				OBJ_148 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_157 /* Build configuration list for PBXNativeTarget "simplytypedlambdaTests" */ = {
+		OBJ_159 /* Build configuration list for PBXNativeTarget "simplytypedlambdaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_158 /* Debug */,
-				OBJ_159 /* Release */,
+				OBJ_160 /* Debug */,
+				OBJ_161 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_168 /* Build configuration list for PBXNativeTarget "untypedarithmeticTests" */ = {
+		OBJ_170 /* Build configuration list for PBXNativeTarget "untypedarithmeticTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_169 /* Debug */,
-				OBJ_170 /* Release */,
+				OBJ_171 /* Debug */,
+				OBJ_172 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_180 /* Build configuration list for PBXNativeTarget "untypedlambdaTests" */ = {
+		OBJ_182 /* Build configuration list for PBXNativeTarget "untypedlambdaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_181 /* Debug */,
-				OBJ_182 /* Release */,
+				OBJ_183 /* Debug */,
+				OBJ_184 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1358,11 +1373,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_88 /* Build configuration list for PBXNativeTarget "full" */ = {
+		OBJ_90 /* Build configuration list for PBXNativeTarget "full" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_89 /* Debug */,
-				OBJ_90 /* Release */,
+				OBJ_91 /* Debug */,
+				OBJ_92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
