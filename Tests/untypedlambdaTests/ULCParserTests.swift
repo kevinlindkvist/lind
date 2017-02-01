@@ -8,6 +8,8 @@
 
 import XCTest
 import Result
+import parser
+@testable import untypedlambda
 
 fileprivate typealias ULCParseResult = ([String:Int], ULCTerm)
 

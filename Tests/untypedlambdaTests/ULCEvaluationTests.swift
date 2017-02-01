@@ -8,6 +8,7 @@
 
 import XCTest
 import Result
+@testable import untypedlambda
 
 class UntypedLambdaCalculusEvaluationTests: XCTestCase {
 

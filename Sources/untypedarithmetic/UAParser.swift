@@ -6,6 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
+import parser
 import Result
 
 typealias UATermParser = Parser<String.UnicodeScalarView, (), UATerm>
@@ -19,28 +20,28 @@ private func _UAZero() -> UATermParser {
 /// Parses true.
 let UATrue = _UATrue()
 func _UATrue() -> UATermParser {
-  return string( "true") *> pure(.True)
+  return string("true") *> pure(.True)
 }
 
 /// Parses false.
 let UAFalse = _UAFalse()
 func _UAFalse() -> UATermParser {
-  return string( "false") *> pure(.False)
+  return string("false") *> pure(.False)
 }
 
 let UASucc = _UASucc()
 func _UASucc() -> UATermParser {
-  return (string( "succ") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Succ(t)), ctxt) }
+  return (string("succ") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Succ(t)), ctxt) }
 }
 
 let UAPred = _UAPred()
 func _UAPred() -> UATermParser {
-  return (string( "pred") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Pred(t)), ctxt) }
+  return (string("pred") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.Pred(t)), ctxt) }
 }
 
 let UAIsZero = _UAIsZero()
 func _UAIsZero() -> UATermParser {
-  return (string( "isZero") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.IsZero(t)), ctxt) }
+  return (string("isZero") *> UATermP) >>- { (ctxt, t: UATerm) in (pure(.IsZero(t)), ctxt) }
 }
 
 // Parses an if-then-else statement.
@@ -71,7 +72,7 @@ func untypedArithmetic() -> UATermParser {
   return UATermP <* endOfInput()
 }
 
-func parseUntypedArithmetic(_ str: String) -> Result<((), UATerm), ParseError> {
+public func parseUntypedArithmetic(_ str: String) -> Result<((), UATerm), ParseError> {
   return parseOnly(untypedArithmetic(), input: (str.unicodeScalars, ()))
 }
 

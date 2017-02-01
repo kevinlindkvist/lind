@@ -8,6 +8,26 @@
 
 import Result
 
+precedencegroup ChainingPrecedence {
+  associativity: left
+  higherThan: LogicalConjunctionPrecedence
+  lowerThan: NilCoalescingPrecedence
+}
+
+precedencegroup ChoicePrecedence {
+  associativity: left
+  higherThan: LogicalConjunctionPrecedence
+}
+
+infix operator <*> : ChainingPrecedence
+infix operator <*  : ChainingPrecedence
+infix operator *> : ChainingPrecedence
+infix operator <^> : ChainingPrecedence
+infix operator <&> : ChainingPrecedence
+infix operator >>- : ChainingPrecedence
+
+infix operator <|> : ChoicePrecedence
+
 public struct Parser<In, Ctxt, Out> {
   let parse: (In, Ctxt) -> Reply<In, Ctxt, Out>
 }
@@ -23,14 +43,14 @@ public func parseOnly<In, Ctxt, Out>(_ p: Parser<In, Ctxt, Out>, input: (In, Ctx
 // MARK: Monad functions.
 
 /// Returns a Parser with a .Failure Reply containing `message`.
-func fail<In, Ctxt, Out>(_ message: String) -> Parser<In, Ctxt, Out> {
+public func fail<In, Ctxt, Out>(_ message: String) -> Parser<In, Ctxt, Out> {
   return Parser { .failure($0, [], message) }
 }
 
 /// Equivalent to Swift's flatMap. First parses the input with `parser` and
 /// then passes the output to `f` and uses the result to parse the remaining 
 /// input.
-func >>-<In, Ctxt, Out1, Out2>(parser: Parser<In, Ctxt, Out1>,
+public func >>-<In, Ctxt, Out1, Out2>(parser: Parser<In, Ctxt, Out1>,
          f: @escaping (Ctxt, Out1) -> (Parser<In, Ctxt, Out2>, Ctxt)) -> Parser<In, Ctxt, Out2> {
   return Parser { input in
     switch parse(parser, input: input) {
@@ -46,13 +66,13 @@ func >>-<In, Ctxt, Out1, Out2>(parser: Parser<In, Ctxt, Out1>,
 // Mark: Alternative functions.
 
 /// The identity of `<|>`.
-func empty<In, Ctxt, Out>() -> Parser<In, Ctxt, Out> {
+public func empty<In, Ctxt, Out>() -> Parser<In, Ctxt, Out> {
   return fail("empty")
 }
 
 /// Attempts parsing the input with `p`, and if that fails returns the result 
 /// of parsing the input with `q`.
-func <|><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>,
+public func <|><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>,
          q: @autoclosure @escaping () -> Parser<In, Ctxt, Out>) -> Parser<In, Ctxt, Out> {
   return Parser { input in
     let reply = parse(p, input: input)
@@ -68,31 +88,31 @@ func <|><In, Ctxt, Out>(p: Parser<In, Ctxt, Out>,
 // MARK: Applicative functions.
 
 /// Lifts `output` to `Parser<In, Ctxt, Out>`.
-func pure<In, Ctxt, Out>(_ output: Out) -> Parser<In, Ctxt, Out> {
+public func pure<In, Ctxt, Out>(_ output: Out) -> Parser<In, Ctxt, Out> {
   return Parser { .done($0.0, $0.1, output) }
 }
 
-func pure<In, Ctxt, Out>(_ context: Ctxt, _ output: Out) -> Parser<In, Ctxt, Out> {
+public func pure<In, Ctxt, Out>(_ context: Ctxt, _ output: Out) -> Parser<In, Ctxt, Out> {
   return Parser { .done($0.0, context, output) }
 }
 
 /// Rerturns a `Parser` that parses the input with `p`, and then parses the
 /// remaining input using the parser produced by `q`.
-func <*><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, (Out1) -> Out2>,
+public func <*><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, (Out1) -> Out2>,
          q: @autoclosure @escaping () -> Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
   return p >>- { (ctxt, f) in ((f <^> q()), ctxt) }
 }
 
 /// Sequences the provided actions, discarding the output of the right 
 /// argument.
-func <*<In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
+public func <*<In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
         q: @autoclosure @escaping () -> Parser<In, Ctxt, Out2>) -> Parser<In, Ctxt, Out1> {
     return const <^> p <*> q
 }
 
 /// Sequences the provided actions, discarding the output of the left
 /// argument.
-func *><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
+public func *><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
         q: @autoclosure @escaping () -> Parser<In, Ctxt, Out2>)
   -> Parser<In, Ctxt, Out2> {
     return const(id) <^> p <*> q
@@ -102,18 +122,18 @@ func *><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>,
 
 /// Swift's `map`. Parses the input using `p`, and then applies `f` to the
 /// resulting output before returning a parser with the converted output.
-func <^><In, Ctxt, Out1, Out2>(f: @escaping (Out1) -> Out2, p: Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
+public func <^><In, Ctxt, Out1, Out2>(f: @escaping (Out1) -> Out2, p: Parser<In, Ctxt, Out1>) -> Parser<In, Ctxt, Out2> {
   return p >>- { (ctxt: Ctxt, a: Out1) in (pure(f(a)), ctxt) }
 }
 
 /// Same as `<^>` with the arguments flipped.
-func <&><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>, f: @escaping (Out1) -> Out2) -> Parser<In, Ctxt, Out2> {
+public func <&><In, Ctxt, Out1, Out2>(p: Parser<In, Ctxt, Out1>, f: @escaping (Out1) -> Out2) -> Parser<In, Ctxt, Out2> {
   return f <^> p
 }
 
 // MARK: Peek
 
-func endOfInput<Ctxt, In: Collection>() -> Parser<In, Ctxt, ()> {
+public func endOfInput<Ctxt, In: Collection>() -> Parser<In, Ctxt, ()> {
   return Parser { input in
     if input.0.isEmpty {
       return .done(input.0, input.1, ())

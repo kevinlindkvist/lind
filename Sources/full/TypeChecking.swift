@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import parser
 
 public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   switch term {

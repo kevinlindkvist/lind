@@ -11,7 +11,7 @@ import Result
 public typealias NamingContext = [String:Int]
 
 public struct STLCContext {
-  let types: TypeContext = [:]
+  let types: [Int:STLCType] = [:]
   let namies: NamingContext = [:]
 }
 

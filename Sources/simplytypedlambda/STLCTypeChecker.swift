@@ -6,7 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import full
+import parser
 
 func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
   switch t {

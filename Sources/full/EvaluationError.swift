@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import parser
 
 public enum EvaluationError: Error {
   case parseError(ParseError)

@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import lind
+@testable import untypedarithmetic
 
 class UntypedArithmeticParserTests: XCTestCase {
 
