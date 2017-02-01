@@ -15,8 +15,8 @@ import parser
 // Keyword enum members are capitalized. Parsers for values and specific characters are capitalized. 
 // Convenience parsers for keywords and built-ins use CamelCase. All other parsers use camelCase.
 
-fileprivate typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, STLCTerm>
-fileprivate typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, STLCType>
+fileprivate typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, Term>
+fileprivate typealias TypeParser = Parser<String.UnicodeScalarView, NamingContext, Type>
 fileprivate typealias StringParser = Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView>
 
 fileprivate enum KeyWord: String.UnicodeScalarView {
@@ -261,8 +261,8 @@ fileprivate func _as() -> StringParser {
 fileprivate let Let = _let()
 fileprivate func _let() -> TermParser {
   return (keyword(.LET) *> identifier) >>- { (ctxt: NamingContext, identifier: String.UnicodeScalarView) in
-  return ((char("=") *> term) >>- { (ctxt: NamingContext, t1: STLCTerm) in
-  return ((keyword(.IN) *> skipSpaces() *> term) >>- { (ctxt: NamingContext, t2: STLCTerm) in
+  return ((char("=") *> term) >>- { (ctxt: NamingContext, t1: Term) in
+  return ((keyword(.IN) *> skipSpaces() *> term) >>- { (ctxt: NamingContext, t2: Term) in
     if let T1 = typeOf(t: t1, context: [:]) {
       return (pure(.app(.abs(String(identifier), T1, t2), t1)), ctxt)
     } else {
@@ -302,7 +302,7 @@ private func simplyTypedLambdaCalculus() -> TermParser {
   return sequence <* endOfInput()
 }
 
-func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], STLCTerm), ParseError> {
+func parseSimplyTypedLambdaCalculus(_ str: String) -> Result<([String:Int], Term), ParseError> {
   switch parseOnly(simplyTypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
   case let .success((g, term)): return .success(g, term)
   case let .failure(error): return .failure(error)

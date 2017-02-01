@@ -1,5 +1,5 @@
 //
-//  STLCTypeCheckerTests.swift
+//  TypeCheckerTests.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 9/7/16.
@@ -9,9 +9,9 @@
 import XCTest
 @testable import simplytypedlambda
 
-class STLCTypeCheckerTests: XCTestCase {
+class TypeCheckerTests: XCTestCase {
 
-  func check(program: String, type: STLCType?, context: [Int:STLCType] = [:]) {
+  func check(program: String, type: Type?, context: [Int:Type] = [:]) {
     let t = parseSimplyTypedLambdaCalculus(program)
     switch t {
     case let .success(_, t):

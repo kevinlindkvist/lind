@@ -1,5 +1,5 @@
 //
-//  STLCParserTests.swift
+//  ParserTests.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 9/7/16.
@@ -238,7 +238,4 @@ class ParserTests: XCTestCase {
     check(input: "0 as int", expectedTerm: .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: .Variable(name: "x", index: 0)), right: .Zero))
   }
 
-  func testPair() {
-    check(input: "{unit, unit}", expectedTerm: .Tuple(["0": .Unit, "1": .Unit]))
-  }
 }

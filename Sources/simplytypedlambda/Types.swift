@@ -10,25 +10,20 @@ import Result
 
 public typealias NamingContext = [String:Int]
 
-public struct STLCContext {
-  let types: [Int:STLCType] = [:]
-  let namies: NamingContext = [:]
-}
-
 // MARK: - Types
 
-public indirect enum STLCType {
-  case Function(STLCType, STLCType)
+public indirect enum Type {
+  case Function(Type, Type)
   case Bool
   case Integer
   case Unit
   case Base(String)
 }
 
-extension STLCType: Equatable {
+extension Type: Equatable {
 }
 
-public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
+public func ==(lhs: Type, rhs: Type) -> Bool {
   switch (lhs, rhs) {
     case (.Bool, .Bool): return true
     case (.Integer, .Integer): return true
@@ -39,7 +34,7 @@ public func ==(lhs: STLCType, rhs: STLCType) -> Bool {
   }
 }
 
-extension STLCType: CustomStringConvertible {
+extension Type: CustomStringConvertible {
   public var description: String {
     switch self {
       case .Bool: return "bool"
@@ -53,21 +48,21 @@ extension STLCType: CustomStringConvertible {
 
 // MARK: - Terms
 
-public indirect enum STLCTerm {
+public indirect enum Term {
   case True
   case False
   case Zero
   case Unit
-  case If(STLCTerm, STLCTerm, STLCTerm)
-  case Succ(STLCTerm)
-  case Pred(STLCTerm)
-  case IsZero(STLCTerm)
+  case If(Term, Term, Term)
+  case Succ(Term)
+  case Pred(Term)
+  case IsZero(Term)
   case va(String, Int)
-  case abs(String, STLCType, STLCTerm)
-  case app(STLCTerm, STLCTerm)
+  case abs(String, Type, Term)
+  case app(Term, Term)
 }
 
-extension STLCTerm: CustomStringConvertible {
+extension Term: CustomStringConvertible {
   public var description: String {
     switch self {
       case .True: return "true"
@@ -85,10 +80,10 @@ extension STLCTerm: CustomStringConvertible {
   }
 }
 
-extension STLCTerm: Equatable {
+extension Term: Equatable {
 }
 
-public func ==(lhs: STLCTerm, rhs: STLCTerm) -> Bool {
+public func ==(lhs: Term, rhs: Term) -> Bool {
   switch (lhs, rhs) {
     case (.True, .True): return true
     case (.False, .False): return true

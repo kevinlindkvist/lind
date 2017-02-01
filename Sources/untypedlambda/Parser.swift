@@ -11,7 +11,7 @@ import Foundation
 import parser
 
 private typealias NamingContext = [String: Int]
-private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, ULCTerm>
+private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, Term>
 
 private let identifier = _identifier()
 private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
@@ -43,7 +43,7 @@ private func _lambda() -> TermParser {
       }
       context[boundName] = 0
       return ((char(".") *> term)
-        >>- { (context: NamingContext, t: ULCTerm) in
+        >>- { (context: NamingContext, t: Term) in
           var context = context
           context.forEach { name, index in
             if (index != 0) {
@@ -71,7 +71,7 @@ private func untypedLambdaCalculus() -> TermParser {
   return term <* endOfInput()
 }
 
-func parseUntypedLambdaCalculus(_ str: String) -> Result<([String:Int], ULCTerm), ParseError> {
+func parseUntypedLambdaCalculus(_ str: String) -> Result<([String:Int], Term), ParseError> {
   switch parseOnly(untypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
     case let .success((g, term)): return .success(g, term)
     case let .failure(error): return .failure(error)

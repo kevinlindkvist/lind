@@ -1,25 +1,25 @@
 //
-//  UntypedArithmeticUATerms.swift
+//  UntypedArithmeticTerms.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 8/28/16.
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-public indirect enum UATerm {
+public indirect enum Term {
   case True
   case False
-  case If(IfElseUATerm)
+  case If(IfElseTerm)
   case Zero
-  case Succ(UATerm)
-  case Pred(UATerm)
-  case IsZero(UATerm)
+  case Succ(Term)
+  case Pred(Term)
+  case IsZero(Term)
 }
 
-extension UATerm: Equatable {
+extension Term: Equatable {
 }
 
-public func ==(lhs: UATerm, rhs: UATerm) -> Bool {
+public func ==(lhs: Term, rhs: Term) -> Bool {
   switch (lhs, rhs) {
   case (.True, .True):
     return true
@@ -40,19 +40,19 @@ public func ==(lhs: UATerm, rhs: UATerm) -> Bool {
   }
 }
 
-public struct IfElseUATerm {
-  let conditional: UATerm
-  let trueBranch: UATerm
-  let falseBranch: UATerm
+public struct IfElseTerm {
+  let conditional: Term
+  let trueBranch: Term
+  let falseBranch: Term
 
   var description: String {
     return "if \n\t\(conditional)\nthen\n\t\(trueBranch)\nelse\n\t\(trueBranch)"
   }
 }
 
-extension IfElseUATerm: Equatable {
+extension IfElseTerm: Equatable {
 }
 
-public func ==(lhs: IfElseUATerm, rhs: IfElseUATerm) -> Bool {
+public func ==(lhs: IfElseTerm, rhs: IfElseTerm) -> Bool {
   return (lhs.conditional == rhs.conditional) && (lhs.trueBranch == rhs.trueBranch) && (lhs.falseBranch == rhs.falseBranch)
 }

@@ -1,5 +1,5 @@
 //
-//  STLCChecker.swift
+//  Checker.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 9/4/16.
@@ -8,7 +8,7 @@
 
 import parser
 
-func typeOf(t: STLCTerm, context: [Int:STLCType]) -> STLCType? {
+func typeOf(t: Term, context: [Int:Type]) -> Type? {
   switch t {
   case let .va(_, idx):
     if let type = context[idx] {

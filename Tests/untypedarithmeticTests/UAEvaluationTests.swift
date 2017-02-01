@@ -12,7 +12,7 @@ import Result
 
 class UntypedArithmeticEvaluationTests: XCTestCase {
 
-  fileprivate func check(program: String, expected: UATerm?) {
+  fileprivate func check(program: String, expected: Term?) {
     switch parseUntypedArithmetic(program) {
     case let .success(result):
       XCTAssertEqual(expected, evaluateUntypedArithmetic(result.1))

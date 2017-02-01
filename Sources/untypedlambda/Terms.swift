@@ -8,16 +8,16 @@
 
 import Foundation
 
-public indirect enum ULCTerm {
+public indirect enum Term {
   case va(String, Int)
-  case abs(String, ULCTerm)
-  case app(ULCTerm, ULCTerm)
+  case abs(String, Term)
+  case app(Term, Term)
 }
 
-extension ULCTerm: Equatable {
+extension Term: Equatable {
 }
 
-extension ULCTerm: CustomStringConvertible {
+extension Term: CustomStringConvertible {
   public var description: String {
     switch self {
     case let .va(x, idx): return "\(x):\(idx)"
@@ -27,7 +27,7 @@ extension ULCTerm: CustomStringConvertible {
   }
 }
 
-public func ==(lhs: ULCTerm, rhs: ULCTerm) -> Bool {
+public func ==(lhs: Term, rhs: Term) -> Bool {
   switch (lhs, rhs) {
     case let (.va(ln, li), .va(rn, ri)): return ln == rn && ri == li
     case let (.abs(lv), .abs(rv)): return lv == rv

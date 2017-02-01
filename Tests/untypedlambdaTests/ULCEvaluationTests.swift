@@ -1,5 +1,5 @@
 //
-//  UntypedLambdaCalculusevaluateULCTermTests.swift
+//  UntypedLambdaCalculusevaluateTermTests.swift
 //  lind
 //
 //  Created by Kevin Lindkvist on 9/4/16.
@@ -12,40 +12,40 @@ import Result
 
 class UntypedLambdaCalculusEvaluationTests: XCTestCase {
 
-  func check(program: String, expectation: ULCTerm) {
+  func check(program: String, expectation: Term) {
     switch parseUntypedLambdaCalculus(program) {
       case let .success(_, term):
-        XCTAssertEqual(evaluateULCTerm(term), expectation)
+        XCTAssertEqual(evaluateTerm(term), expectation)
       default: XCTAssertTrue(false)
     }
   }
 
-  func testevaluateULCTerm() {
-    let expectation: ULCTerm = .abs("y", .va("y", 0))
+  func testevaluateTerm() {
+    let expectation: Term = .abs("y", .va("y", 0))
     let program = "(\\x.x) \\y.y"
     check(program: program, expectation: expectation)
   }
 
-  func testevaluateULCTermConstant() {
-    let expectation: ULCTerm = .va("x", 0)
+  func testevaluateTermConstant() {
+    let expectation: Term = .va("x", 0)
     let program = "(\\z.x) \\z.z"
     check(program: program, expectation: expectation)
   }
 
-  func testevaluateULCTermIdentifier() {
-    let expectation: ULCTerm = .abs("y", .va("y", 0))
+  func testevaluateTermIdentifier() {
+    let expectation: Term = .abs("y", .va("y", 0))
     let program = "(\\z.z \\y.y) \\x.x"
     check(program: program, expectation: expectation)
   }
 
-  func testevaluateULCTermRec() {
-    let expectation: ULCTerm = .abs("x", .va("y", 1))
+  func testevaluateTermRec() {
+    let expectation: Term = .abs("x", .va("y", 1))
     let program = "(\\x.x) (\\x.x) (\\x.y)"
     check(program: program, expectation: expectation)
   }
 
-  func testevaluateULCTermInternal() {
-    let expectation: ULCTerm = .abs("j", .va("j", 0))
+  func testevaluateTermInternal() {
+    let expectation: Term = .abs("j", .va("j", 0))
     let program = "(\\x.\\y.\\z.z y x) (\\i.i) (\\j.j) (\\k.\\l.k)"
     check(program: program, expectation: expectation)
   }

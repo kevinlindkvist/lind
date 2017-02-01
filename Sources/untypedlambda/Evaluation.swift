@@ -8,16 +8,16 @@
 
 import Foundation
 
-private typealias NameLookup = [Int:ULCTerm]
+private typealias NameLookup = [Int:Term]
 
-func evaluateULCTerm(_ term: ULCTerm) -> ULCTerm {
+func evaluateTerm(_ term: Term) -> Term {
   switch evaluate(term, [:]) {
-    case let .some(t): return evaluateULCTerm(t)
+    case let .some(t): return evaluateTerm(t)
     case .none: return term
   }
 }
 
-private func evaluate(_ term: ULCTerm, _ context: NameLookup) -> ULCTerm? {
+private func evaluate(_ term: Term, _ context: NameLookup) -> Term? {
   switch term {
   case let .app(.abs(_,body), v2) where isValue(v2, context):
     return termSubstop(v2, body)
@@ -35,14 +35,14 @@ private func evaluate(_ term: ULCTerm, _ context: NameLookup) -> ULCTerm? {
   }
 }
 
-private func isValue(_ term: ULCTerm, _ context: NameLookup) -> Bool {
+private func isValue(_ term: Term, _ context: NameLookup) -> Bool {
   switch term {
     case .abs: return true
     default: return false
   }
 }
 
-private func shift(_ d: Int, _ c: Int, _ t: ULCTerm) -> ULCTerm {
+private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
   switch t {
     case let .va(name, index) where index < c: return .va(name, index)
     case let .va(name, index): return .va(name, index+d)
@@ -51,7 +51,7 @@ private func shift(_ d: Int, _ c: Int, _ t: ULCTerm) -> ULCTerm {
   }
 }
 
-private func substitute(_ j: Int, _ s: ULCTerm, _ t: ULCTerm, _ c: Int) -> ULCTerm {
+private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
   switch t {
   case let .va(_, index) where index == j+c: return shift(c, 0, s)
   case let .va(name, index): return .va(name, index)
@@ -60,6 +60,6 @@ private func substitute(_ j: Int, _ s: ULCTerm, _ t: ULCTerm, _ c: Int) -> ULCTe
   }
 }
 
-private func termSubstop(_ s: ULCTerm, _ t: ULCTerm) -> ULCTerm {
+private func termSubstop(_ s: Term, _ t: Term) -> Term {
   return shift(-1, 0, substitute(0, shift(1, 0, s), t, 0))
 }
