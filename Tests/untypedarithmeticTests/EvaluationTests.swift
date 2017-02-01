@@ -8,7 +8,7 @@
 
 import XCTest
 import Result
-@testable import untypedarithmetic
+@testable import UntypedArithmetic
 
 class UntypedArithmeticEvaluationTests: XCTestCase {
 

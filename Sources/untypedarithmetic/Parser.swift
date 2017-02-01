@@ -6,7 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import parser
+import Parser
 import Result
 
 typealias TermParser = Parser<String.UnicodeScalarView, (), Term>

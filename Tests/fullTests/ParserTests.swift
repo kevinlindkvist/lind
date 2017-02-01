@@ -8,7 +8,7 @@
 
 import Result
 import XCTest
-@testable import full
+@testable import FullSimple
 
 class ParserTests: XCTestCase {
 

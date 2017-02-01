@@ -7,12 +7,12 @@
 //
 
 import Foundation
-import full
+import FullSimple
 
 write(line: "Welcome to lind, type 'q' to quit.\n")
 write(string: "λ: ")
 
-func run(input: String, namingContext: [String:Int] = [:], typeContext: full.TypeContext = [:]) {
+func run(input: String, namingContext: [String:Int] = [:], typeContext: TypeContext = [:]) {
   if (input == "q") {
    return;
   }

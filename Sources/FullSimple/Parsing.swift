@@ -6,9 +6,9 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import enum Result.Result
+import Result
 import Foundation
-import parser
+import Parser
 
 // # Note on capitalization.
 // 

@@ -8,7 +8,7 @@
 
 import Result
 import Foundation
-import parser
+import Parser
 
 private typealias NamingContext = [String: Int]
 private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, Term>

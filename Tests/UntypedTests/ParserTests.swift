@@ -8,8 +8,8 @@
 
 import XCTest
 import Result
-import parser
-@testable import untypedlambda
+import Parser
+@testable import Untyped
 
 fileprivate typealias ParseResult = ([String:Int], Term)
 

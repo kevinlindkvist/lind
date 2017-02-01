@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import simplytypedlambda
+@testable import Simple
 
 class TypeCheckerTests: XCTestCase {
 

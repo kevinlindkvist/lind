@@ -6,7 +6,7 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import parser
+import Parser
 
 func typeOf(t: Term, context: [Int:Type]) -> Type? {
   switch t {

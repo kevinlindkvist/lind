@@ -7,7 +7,8 @@
 //
 
 import XCTest
-@testable import full
+import Parser
+@testable import FullSimple
 
 class TypeCheckerTests: XCTestCase {
 

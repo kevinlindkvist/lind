@@ -8,9 +8,9 @@
 
 import Foundation
 import Result
-import full
+import FullSimple
 
-public typealias Evaluation = Result<((full.Term, Type), [String:Int], TypeContext), EvaluationError>
+public typealias Evaluation = Result<((Term, Type), [String:Int], TypeContext), EvaluationError>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
