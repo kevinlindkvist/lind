@@ -6,73 +6,67 @@
 //  Copyright © 2016 lindkvist. All rights reserved.
 //
 
-import Parser
-import Result
+import Parswift
 
-typealias TermParser = Parser<String.UnicodeScalarView, (), Term>
+typealias TermParser = Parser<Term, String.CharacterView, ()>
 
 /// Parses 0.
-let Zero = _Zero()
-private func _Zero() -> TermParser {
-  return char("0") *> pure(.Zero)
+private func Zero() -> TermParser {
+  return (keyword(identifier: "0") *> create(x: .Zero))()
 }
 
 /// Parses true.
-let True = _True()
-func _True() -> TermParser {
-  return string("true") *> pure(.True)
+func True() -> TermParser {
+  return (keyword(identifier: "true") *> create(x: .True))()
 }
 
 /// Parses false.
-let False = _False()
-func _False() -> TermParser {
-  return string("false") *> pure(.False)
+func False() -> TermParser {
+  return (keyword(identifier: "false") *> create(x:.False))()
 }
 
-let Succ = _Succ()
-func _Succ() -> TermParser {
-  return (string("succ") *> TermP) >>- { (ctxt, t: Term) in (pure(.Succ(t)), ctxt) }
+func Succ() -> TermParser {
+  return ((keyword(identifier: "succ") *> TermP) >>- { t in create(x: .Succ(t)) })()
 }
 
-let Pred = _Pred()
-func _Pred() -> TermParser {
-  return (string("pred") *> TermP) >>- { (ctxt, t: Term) in (pure(.Pred(t)), ctxt) }
+func Pred() -> TermParser {
+  return ((keyword(identifier: "pred") *> TermP) >>- { t in create(x: .Pred(t)) })()
 }
 
-let IsZero = _IsZero()
-func _IsZero() -> TermParser {
-  return (string("isZero") *> TermP) >>- { (ctxt, t: Term) in (pure(.IsZero(t)), ctxt) }
+func IsZero() -> TermParser {
+  return ((keyword(identifier: "isZero") *> TermP) >>- { t in create(x: .IsZero(t)) })()
+}
+
+func keyword(identifier: String) -> ParserClosure<String, String.CharacterView, ()> {
+  return attempt(parser: skipSpaces *> string(string: identifier) <* skipSpaces)
 }
 
 // Parses an if-then-else statement.
-let IfElse = _IfElse()
-func _IfElse() -> TermParser {
-  return (string("if") *> TermP) >>- { (ctxt, conditional: Term) in
-    return (( string("then") *> TermP) >>- { (ctxt, trueBranch: Term) in
-      return (( string("else") *> TermP) >>- { (ctxt, falseBranch: Term) in
+func IfElse() -> TermParser {
+  return ((keyword(identifier: "if") *> TermP) >>- { conditional in
+    return (keyword(identifier: "then") *> TermP) >>- { trueBranch in
+      return (keyword(identifier: "else") *> TermP) >>- { falseBranch in
         let ifElse = IfElseTerm(conditional: conditional,
                                 trueBranch: trueBranch,
                                 falseBranch: falseBranch)
-        return (pure(.If(ifElse)), ())
-      }, ctxt)
-    }, ctxt)
-  }
+        return create(x: .If(ifElse))
+      }
+    }
+  })()
 }
 
 /// Parses a term.
-let TermP = _term()
-private func _term() -> TermParser {
-  return skipSpaces(())
-    *> (IfElse <|> True <|> False <|> Zero <|> Succ <|> Pred <|> IsZero)
-    <* skipSpaces(())
+private func TermP() -> TermParser {
+  return 
+    (IfElse <|> True <|> False <|> Zero <|> Succ <|> Pred <|> IsZero)()
 }
 
 /// Parses an untyped arithmetic program.
 func untypedArithmetic() -> TermParser {
-  return TermP <* endOfInput()
+  return TermP()
 }
 
-public func parseUntypedArithmetic(_ str: String) -> Result<((), Term), ParseError> {
-  return parseOnly(untypedArithmetic(), input: (str.unicodeScalars, ()))
+public func parseUntypedArithmetic(_ str: String) -> Either<ParseError, Term> {
+  return parse(input: str.characters, with: untypedArithmetic)
 }
 

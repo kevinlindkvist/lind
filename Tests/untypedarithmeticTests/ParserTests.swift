@@ -13,10 +13,10 @@ class UntypedArithmeticParserTests: XCTestCase {
 
   func check(program: String, expected: Term) {
     switch parseUntypedArithmetic(program) {
-    case let .success(result):
-      XCTAssertEqual(expected, result.1)
+    case let .right(result):
+      XCTAssertEqual(expected, result)
       break
-    case .failure(_):
+    case .left(_):
       XCTAssertTrue(false)
       break
     }

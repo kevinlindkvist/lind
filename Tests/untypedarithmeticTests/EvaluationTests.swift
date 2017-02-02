@@ -14,11 +14,11 @@ class UntypedArithmeticEvaluationTests: XCTestCase {
 
   fileprivate func check(program: String, expected: Term?) {
     switch parseUntypedArithmetic(program) {
-    case let .success(result):
-      XCTAssertEqual(expected, evaluateUntypedArithmetic(result.1))
+    case let .right(result):
+      XCTAssertEqual(expected, evaluateUntypedArithmetic(result))
       break
-    case .failure(_):
-      XCTAssertTrue(expected == nil)
+    case let .left(error):
+      XCTAssertTrue(expected == nil, error.description)
       break
     }
   }

@@ -9,5 +9,8 @@ let package = Package(
       Target(name: "UntypedArithmetic", dependencies: ["Parser"]),
       Target(name: "Albovagen", dependencies: ["FullSimple"]),
       ],
-      dependencies: [ .Package(url: "git@github.com:antitypical/Result.git", majorVersion: 3) ]
+      dependencies: [ 
+      .Package(url: "git@github.com:antitypical/Result.git", majorVersion: 3),
+      .Package(url: "git@github.com:kevinlindkvist/Parswift.git", majorVersion: 1),
+      ]
 )
