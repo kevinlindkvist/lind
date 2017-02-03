@@ -37,10 +37,6 @@ func IsZero() -> TermParser {
   return ((keyword(identifier: "isZero") *> TermP) >>- { t in create(x: .IsZero(t)) })()
 }
 
-func keyword(identifier: String) -> ParserClosure<String, String.CharacterView, ()> {
-  return attempt(parser: skipSpaces *> string(string: identifier) <* skipSpaces)
-}
-
 // Parses an if-then-else statement.
 func IfElse() -> TermParser {
   return ((keyword(identifier: "if") *> TermP) >>- { conditional in

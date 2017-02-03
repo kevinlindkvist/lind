@@ -8,72 +8,77 @@
 
 import Result
 import Foundation
-import Parser
+import Parswift
 
 private typealias NamingContext = [String: Int]
-private typealias TermParser = Parser<String.UnicodeScalarView, NamingContext, Term>
+private typealias TermParser = Parser<Term, String.CharacterView, NamingContext>
 
-private let identifier = _identifier()
-private func _identifier() -> Parser<String.UnicodeScalarView, NamingContext, String.UnicodeScalarView> {
-  let alphas = CharacterSet.alphanumerics
-  return many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
+private func identifier() -> Parser<String, String.CharacterView, NamingContext> {
+  return (many1(parser: alphanumeric) >>- { create(x: String($0)) })()
 }
 
-private let variable = _variable()
-private func _variable() -> TermParser {
-  return identifier >>- { (context: NamingContext, t: String.UnicodeScalarView) in
-    let id = String(t)
-    if let index = context[id] {
-      return (pure(.va(id, index)), context)
-    } else {
-      let index = context.count
-      return (pure(.va(id, index)), union(context, [id:index]))
+private func add(name: String) -> (NamingContext) -> NamingContext {
+  return { context in
+    if context[name] != nil {
+      return context
     }
+
+    var newContext = context
+    newContext[name] = context.count
+    return newContext
   }
 }
 
-private let lambda = _lambda()
-private func _lambda() -> TermParser {
-  return (char("\\") *> identifier)
-    >>- { (context: NamingContext, identifier: String.UnicodeScalarView) in
-      let boundName = String(identifier)
-      var context = context
-      context.forEach { name, index in
-        return context[name] = index + 1
-      }
-      context[boundName] = 0
-      return ((char(".") *> term)
-        >>- { (context: NamingContext, t: Term) in
-          var context = context
-          context.forEach { name, index in
-            if (index != 0) {
-              context[name] = index - 1
-            }
-          }
-          context.removeValue(forKey: boundName)
-          return (pure(.abs(boundName, t)), context)
-        }, context)
+private func shiftContext(name: String) -> (NamingContext) -> NamingContext {
+  return { context in
+    var newContext: NamingContext = [:]
+    context.forEach { existingName, index in
+      newContext[existingName] = index + 1
     }
+    newContext[name] = 0
+    return newContext
+  }
 }
 
-private let nonAppTerm = _nonAppTerm()
-private func _nonAppTerm() -> TermParser {
-  return (char("(") *> term <* char(")")) <|> lambda <|> variable
+private func unshiftContext(name: String) -> (NamingContext) -> NamingContext {
+  return { context in
+    var newContext: NamingContext = [:]
+    context.forEach { existingName, index in
+      if (existingName != name) {
+        newContext[existingName] = index - 1
+      }
+    }
+    return newContext
+  }
 }
 
-private let term = _term()
-private func _term() -> TermParser {
-  return chainl1(p: nonAppTerm,
-                 op: char(" ") *> pure( { t1, t2 in .app(t1, t2)}))
+private func variable() -> TermParser {
+  return (identifier >>- { name in modifyState(f: add(name: name)) *> userState >>- { x in
+    print(x)
+    let i = x[name]!
+    return create(x: .va(name, i))
+    }})()
+}
+
+private func lambda() -> TermParser {
+  return ((string(string: "\\") *> identifier)
+    >>- { name in modifyState(f: shiftContext(name: name)) *> (string(string: ".") *> term)
+      >>- { t in create(x: .abs(name, t)) } <* modifyState(f: unshiftContext(name: name))})()
+}
+
+private func nonAppTerm() -> TermParser {
+  return ((string(string: "(") *> term <* string(string: ")")) <|> lambda <|> variable)()
+}
+
+private func term() -> TermParser {
+  return chainl1(parser: nonAppTerm,
+                 oper: string(string: " ") *> create(x: { t1, t2 in .app(t1, t2)}))()
 }
 
 private func untypedLambdaCalculus() -> TermParser {
-  return term <* endOfInput()
+  return term()
 }
 
-func parseUntypedLambdaCalculus(_ str: String) -> Result<([String:Int], Term), ParseError> {
-  switch parseOnly(untypedLambdaCalculus(), input: (str.unicodeScalars, [:])) {
-    case let .success((g, term)): return .success(g, term)
-    case let .failure(error): return .failure(error)
-  }
+func parseUntypedLambdaCalculus(_ str: String) -> Either<ParseError, Term> {
+  return parse(input: str.characters, with: untypedLambdaCalculus, userState: [:], fileName: "")
 }

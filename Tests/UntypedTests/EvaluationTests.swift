@@ -13,42 +13,45 @@ import Parser
 
 class UntypedLambdaCalculusEvaluationTests: XCTestCase {
 
-  func check(program: String, expectation: Term) {
+  fileprivate func check(program: String, expected: Term?) {
     switch parseUntypedLambdaCalculus(program) {
-      case let .success(_, term):
-        XCTAssertEqual(evaluateTerm(term), expectation)
-      default: XCTAssertTrue(false)
+    case let .right(result):
+      XCTAssertEqual(expected, evaluateTerm(result))
+      break
+    case let .left(error):
+      XCTAssertTrue(expected == nil, error.description)
+      break
     }
   }
 
   func testevaluateTerm() {
-    let expectation: Term = .abs("y", .va("y", 0))
+    let expected: Term = .abs("y", .va("y", 0))
     let program = "(\\x.x) \\y.y"
-    check(program: program, expectation: expectation)
+    check(program: program, expected: expected)
   }
 
   func testevaluateTermConstant() {
-    let expectation: Term = .va("x", 0)
+    let expected: Term = .va("x", 0)
     let program = "(\\z.x) \\z.z"
-    check(program: program, expectation: expectation)
+    check(program: program, expected: expected)
   }
 
   func testevaluateTermIdentifier() {
-    let expectation: Term = .abs("y", .va("y", 0))
+    let expected: Term = .abs("y", .va("y", 0))
     let program = "(\\z.z \\y.y) \\x.x"
-    check(program: program, expectation: expectation)
+    check(program: program, expected: expected)
   }
 
   func testevaluateTermRec() {
-    let expectation: Term = .abs("x", .va("y", 1))
+    let expected: Term = .abs("x", .va("y", 1))
     let program = "(\\x.x) (\\x.x) (\\x.y)"
-    check(program: program, expectation: expectation)
+    check(program: program, expected: expected)
   }
 
   func testevaluateTermInternal() {
-    let expectation: Term = .abs("j", .va("j", 0))
+    let expected: Term = .abs("j", .va("j", 0))
     let program = "(\\x.\\y.\\z.z y x) (\\i.i) (\\j.j) (\\k.\\l.k)"
-    check(program: program, expectation: expectation)
+    check(program: program, expected: expected)
   }
 
 }
