@@ -123,7 +123,7 @@ fileprivate func Let() -> TermParser {
 // MARK: Patterns
 
 private func pattern() -> Parser<Pattern, String.CharacterView, TermContext> {
-  return ((identifier >>- { name in create(x: .Variable(name: name)) })
+  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name)) })
     <|> (keyword(.OPEN_TUPLE) *>
       separate(parser: patternEntry,
                byAtLeastOne: keyword(.COMMA)) >>- { contents in

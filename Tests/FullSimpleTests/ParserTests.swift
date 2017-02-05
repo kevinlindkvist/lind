@@ -268,7 +268,8 @@ class ParserTests: XCTestCase {
   }
 
   func testPatternMatching() {
-    check(input: "let {x, y}={0,true} in x", expectedTerm: .Zero)
+    let expected: Term = .Pattern(pattern: .Record(["1":.Variable(name: "x"), "2":.Variable(name: "y")]), argument: .Tuple(["1":.Zero, "2":.True]), body: .Variable(name: "x", index: 0))
+    check(input: "let {x, y}={0,true} in x", expectedTerm: expected)
   }
 
 }
