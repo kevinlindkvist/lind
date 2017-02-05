@@ -28,8 +28,12 @@ class ParserTests: XCTestCase {
     case let (.left(error), .right):
       XCTFail("Unexpected parser failure for \(input): \(error)")
     default:
-      XCTFail("Succeded in parsing \(input) when expecting failure.")
+      XCTFail("Succeded in parsing \(result) when expecting failure.")
     }
+  }
+
+  func parseError() -> ParseError {
+    return ParseError(position: SourcePosition(name: "", line: 1, column: 1), messages: [])
   }
 
   func testAbsBaseType() {
@@ -247,6 +251,27 @@ class ParserTests: XCTestCase {
 
   func testAscription() {
     check(input: "0 as int", expectedTerm: .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: .Variable(name: "x", index: 0)), right: .Zero))
+  }
+
+  func testTuple() {
+    check(input: "{0, unit,true}", expectedTerm: .Tuple(["1":.Zero,"2":.Unit,"3":.True]))
+  }
+
+  func testEmptyTuple() {
+    check(input: "{}", expectedTerm: .Tuple([:]))
+  }
+
+  func testTupleNonValue() {
+    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Boolean, body: .Zero), right: .True)
+    check(input: "{(\\x:bool.0) true}", expectedTerm: .Tuple(["1":expected]))
+  }
+
+  func testTupleProjection() {
+    check(input: "{true}.1", expectedTerm: .Projection(collection: .Tuple(["1":.True]), index: "1"))
+  }
+
+  func testLabeledTuple() {
+    check(input: "{0, 7:unit,true}", expectedTerm: .Tuple(["1":.Zero,"7":.Unit,"3":.True]))
   }
 
 }

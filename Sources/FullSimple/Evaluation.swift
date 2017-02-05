@@ -72,12 +72,20 @@ private func evaluate(term: Term, context: TermContext) -> Term {
   case .Variable(_, _):
     return term
   // Tuples
-  case .Tuple:
-    // TODO: Implement.
-    return term
-  case .Projection(_, _):
-    // TODO: Implement.
-    return term
+  case let .Tuple(contents):
+    var evaluatedTerms: [String:Term] = [:]
+    for (key,value) in contents {
+      evaluatedTerms[key] = evaluate(term: value, context: context)
+    }
+    return .Tuple(evaluatedTerms)
+  case let .Projection(term, index):
+    switch term {
+    case let .Tuple(contents):
+      return contents[index]!
+    default:
+      assertionFailure()
+      return .Unit
+    }
   }
 }
 

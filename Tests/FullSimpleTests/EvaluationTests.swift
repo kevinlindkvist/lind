@@ -56,4 +56,29 @@ class EvaluationTests: XCTestCase {
   func testAscription() {
     check(program: "0 as int", expectation: .Zero)
   }
+
+  func testTuple() {
+    check(program: "{0, unit,true}", expectation: .Tuple(["1":.Zero,"2":.Unit,"3":.True]))
+  }
+
+  func testEmptyTuple() {
+    check(program: "{}", expectation: .Tuple([:]))
+  }
+
+  func testTupleProjection() {
+    check(program: "{true}.1", expectation: .True)
+  }
+
+  func testLabeledTuple() {
+    check(program: "{0, 7:unit,true}", expectation: .Tuple(["1":.Zero,"7":.Unit,"3":.True]))
+  }
+
+  func testTupleNonValue() {
+    check(program: "{(\\x:bool.0) true}", expectation: .Tuple(["1":.Zero]))
+  }
+
+  func testLabeledTupleProjection() {
+    check(program: "{0, 7:unit,true}.7", expectation: .Unit)
+    check(program: "{0, 7:unit,true}.1", expectation: .Zero)
+  }
 }

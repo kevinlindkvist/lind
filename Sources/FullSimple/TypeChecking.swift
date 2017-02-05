@@ -33,11 +33,33 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
       return typeOf(predOrSucc: term, context: context)
     case .Unit:
       return .success(context, .Unit)
-    case .Tuple:
-      // TODO: Implement.
-      return .failure(.message("Tuple type checking not implemented."))
+    case let .Tuple(contents):
+      var types: [String:Type] = [:]
+      var encounteredError = false
+      contents.forEach { (key, value) in
+        switch typeOf(term: value, context: context) {
+          case let .success(type):
+          types[key] = type.1
+          break
+        case .failure:
+          encounteredError = true
+          break
+        }
+      }
+
+      if encounteredError {
+        return .failure(.message("Tuple contents has incorrect type."))
+      } else {
+        return .success(context, .Product(types))
+      }
+    case let .Projection(.Tuple(entries), index):
+      if let entry = entries[index] {
+        return typeOf(term: entry, context: context)
+      } else {
+        return .failure(.message("Invalid index into record."))
+      }
     case .Projection:
-      return .failure(.message("Projection type checking not implemented."))
+      return .failure(.message("Projection into invalid term."))
   }
 }
 

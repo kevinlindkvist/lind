@@ -17,7 +17,7 @@ public indirect enum Type {
   case Integer
   case Unit
   case Base(typeName: String)
-  case Product([Type])
+  case Product([String:Type])
 }
 
 public typealias TypeContext = [Int:Type]
@@ -37,6 +37,8 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
       return true
     case let (.Base(firstType), .Base(secondType)):
       return firstType == secondType
+    case let (.Product(firstContents), .Product(secondContents)):
+      return firstContents == secondContents
     default:
       return false
   }

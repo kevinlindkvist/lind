@@ -134,4 +134,35 @@ class TypeCheckerTests: XCTestCase {
     check(malformedProgram:"(\\x:int.x) (0 as bool)")
   }
 
+  func testTuple() {
+    check(program: "{0, unit,true}", type: .Product(["1":.Integer, "2":.Unit, "3":.Boolean]))
+  }
+
+  func testEmptyTuple() {
+    check(program: "{}", type: .Product([:]))
+  }
+
+  func testTupleNonValue() {
+    check(program: "{(\\x:bool.0) true}", type: .Product(["1":.Integer]))
+  }
+
+  func testTupleProjection() {
+    check(program: "{true}.1", type: .Boolean)
+  }
+
+  func testLabeledTuple() {
+    check(program: "{0, 7:unit,true}", type: .Product(["1":.Integer,"7":.Unit,"3":.Boolean]))
+  }
+
+  func testInvalidTupleProjection() {
+    check(malformedProgram: "{true}.2", context: [:])
+  }
+  
+  func testTupleArgument() {
+    check(program: "(\\x:bool.x) {true}.1", type: .Boolean)
+  }
+  
+  func testInvalidTupleArgument() {
+    check(malformedProgram: "(\\x:int.x) {true}.1", context: [:])
+  }
 }

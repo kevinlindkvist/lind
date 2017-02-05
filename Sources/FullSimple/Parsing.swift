@@ -274,7 +274,26 @@ fileprivate func zero() -> TermParser {
 }
 
 fileprivate func tuple() -> TermParser {
-  return fail(message: "Tuple has yet to be implemented.")()
+  return (keyword(.OPEN_TUPLE) *>
+    separate(parser: tupleEntry, by: keyword(.COMMA)) >>- { contents in
+      var values: [String:Term] = [:]
+      var counter = 1
+      contents.forEach {
+        if $0.0 == "" {
+          values[String(counter)] = $0.1
+        } else {
+          values[$0.0] = $0.1
+        }
+        counter = counter + 1
+      }
+      return create(x: .Tuple(values))
+    }
+    <* keyword(.CLOSE_TUPLE))();
+}
+
+fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, TermContext> {
+  return (attempt(parser: identifier >>- { name in keyword(.COLON) *> term >>- { t in create(x: (name, t)) } })
+    <|> attempt(parser: term >>- { t in create(x: ("", t)) }))()
 }
 
 

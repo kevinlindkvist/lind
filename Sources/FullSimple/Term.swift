@@ -86,6 +86,10 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return leftValue == rightValue
   case (.Unit, .Unit):
     return true
+  case let (.Tuple(t1), .Tuple(t2)):
+    return t1 == t2
+  case let (.Projection(t11, t12), .Projection(t21, t22)):
+    return t11 == t21 && t12 == t22
   default:
     return false
   }
