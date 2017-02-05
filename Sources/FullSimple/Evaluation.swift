@@ -86,16 +86,54 @@ private func evaluate(term: Term, context: TermContext) -> Term {
       assertionFailure()
       return .Unit
     }
+  case let .Pattern(pattern, matchTerm, body):
+    let argument = evaluate(term: matchTerm, context: context)
+    let substitutions = match(pattern: pattern, argument: argument)
+    var currentAbstraction = body
+    substitutions.forEach { name, substitution in
+      currentAbstraction = .Application(left: .Abstraction(parameter: name, parameterType: .Unit, body: currentAbstraction), right: substitution)
+    }
+    return evaluate(term: currentAbstraction, context: context)
+  }
+}
+
+private func match(pattern: Pattern, argument: Term) -> [(String, Term)] {
+  switch pattern {
+  case let .Variable(name):
+    return [(name, argument)]
+  case let .Record(contents):
+    switch argument {
+    case let .Tuple(arguments):
+      if contents.count != arguments.count {
+        assertionFailure()
+        return []
+      }
+      var matches: [(String, Term)] = []
+      contents.forEach { key, value in
+        matches.append(contentsOf: match(pattern: value, argument: arguments[key]!))
+      }
+      return matches
+    default:
+      assertionFailure()
+      return []
+    }
   }
 }
 
 private func isValue(term: Term) -> Bool {
   switch term {
-    case .Abstraction: return true
-    case .Unit: return true
-    case .True: return true
-    case .False: return true
-    default: return isNumericValue(term: term)
+  case .Abstraction: return true
+  case .Unit: return true
+  case .True: return true
+  case .False: return true
+  case let .Tuple(contents):
+    for (_, value) in contents {
+      if !isValue(term: value) {
+        return false
+      }
+    }
+    return true
+  default: return isNumericValue(term: term)
   }
 }
 

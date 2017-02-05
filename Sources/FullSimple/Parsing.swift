@@ -110,20 +110,43 @@ fileprivate func As() -> StringParser {
 fileprivate func Let() -> TermParser {
   // Let is a slightly different derived form in that it actually runs
   // the typechecker to verify the statement.
-  return (keyword(.LET) *> identifier >>- { name in
+  return (keyword(.LET) *> pattern >>- { letPattern in
     return keyword(.EQUALS) *> term >>- { t1 in
       return keyword(.IN) *> term >>- { t2 in
-        // Verify the type of t1 before passing it to t2.
-        switch typeOf(term: t1, context: [:]) {
-        case let .success(_, type1):
-          let left: Term = .Abstraction(parameter: name, parameterType: type1, body: t2)
-          return create(x: .Application(left: left, right: t1))
-        case .failure(_):
-          return fail(message: "Could not determine type of \(t1)")
-        }
+        return create(x: .Pattern(pattern: letPattern, argument: t1, body: t2))
       }
     }
     })()
+}
+
+
+// MARK: Patterns
+
+private func pattern() -> Parser<Pattern, String.CharacterView, TermContext> {
+  return ((identifier >>- { name in create(x: .Variable(name: name)) })
+    <|> (keyword(.OPEN_TUPLE) *>
+      separate(parser: patternEntry,
+               byAtLeastOne: keyword(.COMMA)) >>- { contents in
+      var values: [String:Pattern] = [:]
+      var counter = 1
+      contents.forEach {
+        if $0.0 == "" {
+          values[String(counter)] = $0.1
+        } else {
+          values[$0.0] = $0.1
+        }
+        counter = counter + 1
+      }
+      return create(x: .Record(values))
+    }
+    <* keyword(.CLOSE_TUPLE)))()
+}
+
+fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterView, TermContext> {
+  return (
+    attempt(parser: identifier >>- { name in keyword(.COLON) *> pattern >>- { p in create(x: (name, p)) } })
+    <|> attempt(parser: pattern >>- { p in create(x: ("", p)) })
+    )()
 }
 
 // MARK: - Built Ins

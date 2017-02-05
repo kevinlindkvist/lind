@@ -8,6 +8,24 @@
 
 import Foundation
 
+public indirect enum Pattern {
+  case Variable(name: String)
+  case Record([String:Pattern])
+}
+
+extension Pattern: Equatable {
+}
+
+public func ==(lhs: Pattern, rhs: Pattern) -> Bool {
+  switch (lhs, rhs) {
+  case let (.Variable(name), .Variable(otherName)):
+    return name == otherName
+  case let (.Record(contents), .Record(otherContents)):
+    return contents == otherContents
+  default: return false
+  }
+}
+
 public indirect enum Term {
   case Unit
   case Abstraction(parameter: String, parameterType: Type, body: Term)
@@ -22,6 +40,7 @@ public indirect enum Term {
   case Variable(name: String, index: Int)
   case Tuple([String:Term])
   case Projection(collection: Term, index: String)
+  case Pattern(pattern: Pattern, argument: Term, body: Term)
 }
 
 public typealias TermContext = [String:Int]
@@ -55,6 +74,8 @@ extension Term: CustomStringConvertible {
         return values.description
       case let .Projection(collection, subs):
         return "\(collection).\(subs)"
+      case let .Pattern(pattern, match, body):
+        return "{\(pattern)}=\(match) in \(body)"
     }
   }
 }
@@ -90,6 +111,8 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return t1 == t2
   case let (.Projection(t11, t12), .Projection(t21, t22)):
     return t11 == t21 && t12 == t22
+  case let (.Pattern(p1, a1, b1), .Pattern(p2, a2, b2)):
+    return p1 == p2 && a1 == a2 && b1 == b2
   default:
     return false
   }

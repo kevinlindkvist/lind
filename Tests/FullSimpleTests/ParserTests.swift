@@ -212,8 +212,7 @@ class ParserTests: XCTestCase {
   func testLetSimple() {
     let t1: Term = .Zero
     let t2: Term = .Variable(name: "x", index: 0)
-    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: t2),
-                                      right: t1)
+    let expected: Term = .Pattern(pattern: .Variable(name: "x"), argument: t1, body: t2)
     check(input: "let x = 0 in x", expectedResult: .right(expected))
   }
 
@@ -223,8 +222,7 @@ class ParserTests: XCTestCase {
                                 parameterType: .Integer,
                                 body: .Application(left: .Variable(name: "y", index: 0),
                                                    right: .Variable(name: "x", index: 1)))
-    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: t2),
-                                      right: t1)
+    let expected: Term =  .Pattern(pattern: .Variable(name: "x"), argument: t1, body: t2)
     check(input: "let x=0 in \\y:int.y x", expectedResult: .right(expected))
   }
 
@@ -235,12 +233,7 @@ class ParserTests: XCTestCase {
                                                    right: .True))
     let t2: Term = .Application(left: .Variable(name: "e", index: 0),
                                 right: .Abstraction(parameter: "y", parameterType: .Boolean, body: .Zero))
-    let expected: Term = .Application(left: .Abstraction(parameter: "e",
-                                                         parameterType: .Function(parameterType: .Function(parameterType: .Boolean,
-                                                                                                           returnType: .Integer),
-                                                                                  returnType: .Integer),
-                                                         body: t2),
-                                      right: t1)
+    let expected: Term = .Pattern(pattern: .Variable(name: "e"), argument: t1, body: t2)
     check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .right(expected))
   }
 
@@ -272,6 +265,10 @@ class ParserTests: XCTestCase {
 
   func testLabeledTuple() {
     check(input: "{0, 7:unit,true}", expectedTerm: .Tuple(["1":.Zero,"7":.Unit,"3":.True]))
+  }
+
+  func testPatternMatching() {
+    check(input: "let {x, y}={0,true} in x", expectedTerm: .Zero)
   }
 
 }

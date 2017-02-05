@@ -60,6 +60,8 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
       }
     case .Projection:
       return .failure(.message("Projection into invalid term."))
+    case .Pattern:
+      return .failure(.message("Haven't implemented pattern types."))
   }
 }
 
