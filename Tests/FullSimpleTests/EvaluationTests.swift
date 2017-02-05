@@ -13,9 +13,9 @@ class EvaluationTests: XCTestCase {
 
   func check(program: String, expectation: Term) {
     switch parse(input: program, terms: [:]) {
-      case let .success(_, term):
+      case let .right(term):
         XCTAssertEqual(evaluate(term: term), expectation)
-      default: XCTAssertTrue(false)
+      case let .left(error): XCTAssertTrue(false, "Could not parse \(program): \(error)")
     }
   }
 

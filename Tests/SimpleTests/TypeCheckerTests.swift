@@ -12,12 +12,12 @@ import XCTest
 class TypeCheckerTests: XCTestCase {
 
   func check(program: String, type: Type?, context: [Int:Type] = [:]) {
-    let t = parseSimplyTypedLambdaCalculus(program)
+    let t = parse(input: program)
     switch t {
-    case let .success(_, t):
+    case let .right(t):
       XCTAssertEqual(typeOf(t: t, context: context), type)
-    default:
-      XCTFail("Could not parse program: \(program)")
+    case let .left(error):
+      XCTFail("Could not parse program: \(error)")
     }
   }
 

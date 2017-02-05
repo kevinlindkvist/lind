@@ -23,15 +23,15 @@ func evaluate(input: String,
               terms: TermContext = [:],
               types: TypeContext = [:]) -> Evaluation {
   switch parse(input: input, terms: terms) {
-  case let .success(result):
-    switch typeOf(term: result.1, context: types) {
+  case let .right(result):
+    switch typeOf(term: result, context: types) {
       case let .success(_, type):
-        let evaluatedTerm = evaluate(term: result.1)
+        let evaluatedTerm = evaluate(term: result)
         return .success(((evaluatedTerm, type), terms, types))
       case let .failure(error):
         return .failure(.typeError(error))
     }
-  case let .failure(error):
+  case let .left(error):
     return .failure(.parseError(error))
   }
 }

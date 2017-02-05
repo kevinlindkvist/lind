@@ -14,29 +14,29 @@ class TypeCheckerTests: XCTestCase {
 
   func check(program: String, type: Type, context: TypeContext = [:]) {
     switch parse(input: program, terms: [:]) {
-    case let .success(_, t):
+    case let .right(t):
       switch typeOf(term: t, context: context) {
       case let .success(parsedType):
         XCTAssertEqual(type, parsedType.1)
       case let .failure(error):
         XCTFail("Type check failed: \(error)")
       }
-    case let .failure(error):
+    case let .left(error):
       XCTFail("Could not parse program: \(error)")
     }
   }
 
   func check(malformedProgram: String, context: TypeContext = [:]) {
     switch parse(input: malformedProgram, terms: [:]) {
-    case let .success(_, t):
+    case let .right(t):
       switch typeOf(term: t, context: [:]) {
       case .success:
         XCTFail("Type check did not fail on malformed program.")
       default:
         break
       }
-    case .failure:
-      XCTFail("Could not parse program.")
+    case let .left(error):
+      XCTFail("Could not parse program \(error)")
     }
   }
 

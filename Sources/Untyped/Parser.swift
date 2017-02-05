@@ -54,7 +54,6 @@ private func unshiftContext(name: String) -> (NamingContext) -> NamingContext {
 
 private func variable() -> TermParser {
   return (identifier >>- { name in modifyState(f: add(name: name)) *> userState >>- { x in
-    print(x)
     let i = x[name]!
     return create(x: .va(name, i))
     }})()

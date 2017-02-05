@@ -8,24 +8,27 @@
 
 import Result
 import XCTest
+import Parswift
 @testable import FullSimple
 
 class ParserTests: XCTestCase {
 
   fileprivate func check(input: String, expectedTerm: Term) {
-    check(input: input, expectedResult: .success([:], expectedTerm))
+    check(input: input, expectedResult: .right(expectedTerm))
   }
 
-  fileprivate func check(input: String, expectedResult: ParseResult) {
+  fileprivate func check(input: String, expectedResult: Either<ParseError, Term>) {
     let result = parse(input: input, terms: [:])
     switch (result, expectedResult) {
-    case let (.success(t1), .success(t2)):
-      XCTAssertEqual(t1.0, t2.0)
-      XCTAssertEqual(t1.1, t2.1)
-    case (.failure, .failure):
+    case let (.right(t1), .right(t2)):
+      XCTAssertEqual(t1, t2)
+      XCTAssertEqual(t1, t2)
+    case (.left, .left):
       break
+    case let (.left(error), .right):
+      XCTFail("Unexpected parser failure for \(input): \(error)")
     default:
-      XCTFail()
+      XCTFail("Succeded in parsing \(input) when expecting failure.")
     }
   }
 
@@ -38,10 +41,10 @@ class ParserTests: XCTestCase {
 
   func testAppSpaces() {
     let expected: Term = .Application(left: .Variable(name: "a", index: 0), right: .Variable(name: "b", index: 1))
-    check(input: "a b", expectedResult: .success(["a": 0, "b": 1], expected))
-    check(input: "a  b", expectedResult: .success(["a":0, "b":1], expected))
-    check(input: "a     b", expectedResult: .success(["a":0, "b":1], expected))
-    check(input: "ab", expectedResult: .success(["ab":0], .Variable(name: "ab", index: 0)))
+    check(input: "a b", expectedResult: .right(expected))
+    check(input: "a  b", expectedResult: .right(expected))
+    check(input: "a     b", expectedResult: .right(expected))
+    check(input: "ab", expectedResult: .right(.Variable(name: "ab", index: 0)))
   }
 
   func testSucc() {
@@ -87,7 +90,7 @@ class ParserTests: XCTestCase {
                                                                          right: .Variable(name: "x", index: 1))),
                              falseBranch: .True)
     check(input: "if \\x:int.x if \\x:bool.x then false else true then \\y:bool->int.y x else true",
-          expectedResult: .success(["x":0], expected))
+          expectedResult: .right(expected))
   }
 
   func testAppInSucc() {
@@ -159,10 +162,10 @@ class ParserTests: XCTestCase {
                                 right: .Variable(name: "d", index: 3))
     let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: t2),
                                       right: t1)
-    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b ;c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
-    check(input: "a b ; c d", expectedResult: .success(["a":0, "b":1, "c":2, "d":3],expected))
+    check(input: "a b; c d", expectedResult: .right(expected))
+    check(input: "a b ;c d", expectedResult: .right(expected))
+    check(input: "a b; c d", expectedResult: .right(expected))
+    check(input: "a b ; c d", expectedResult: .right(expected))
   }
 
   func testBaseType() {
@@ -187,10 +190,10 @@ class ParserTests: XCTestCase {
 
   func testAs() {
     check(input: "x as bool",
-          expectedResult: .success(["x":0], .Application(left: .Abstraction(parameter: "x",
-                                                                            parameterType: .Boolean,
-                                                                            body: .Variable(name: "x", index: 0)),
-                                                         right: .Variable(name: "x", index: 0))))
+          expectedResult: .right(.Application(left: .Abstraction(parameter: "x",
+                                                                 parameterType: .Boolean,
+                                                                 body: .Variable(name: "x", index: 0)),
+                                              right: .Variable(name: "x", index: 0))))
   }
 
   func testAsLambda() {
@@ -202,6 +205,14 @@ class ParserTests: XCTestCase {
     check(input: "(\\x:bool.unit) as bool->unit", expectedTerm: expected)
   }
 
+  func testLetSimple() {
+    let t1: Term = .Zero
+    let t2: Term = .Variable(name: "x", index: 0)
+    let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: t2),
+                                      right: t1)
+    check(input: "let x = 0 in x", expectedResult: .right(expected))
+  }
+
   func testLet() {
     let t1: Term = .Zero
     let t2: Term = .Abstraction(parameter: "y",
@@ -210,7 +221,7 @@ class ParserTests: XCTestCase {
                                                    right: .Variable(name: "x", index: 1)))
     let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Integer, body: t2),
                                       right: t1)
-    check(input: "let x=0 in \\y:int.y x", expectedResult: .success(["x":0], expected))
+    check(input: "let x=0 in \\y:int.y x", expectedResult: .right(expected))
   }
 
   func testLetApp() {
@@ -226,7 +237,7 @@ class ParserTests: XCTestCase {
                                                                                   returnType: .Integer),
                                                          body: t2),
                                       right: t1)
-    check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .success(["e":0], expected))
+    check(input: "let e=\\z:bool->int.(z true) in e \\y:bool.0", expectedResult: .right(expected))
   }
 
   func testWildcard() {

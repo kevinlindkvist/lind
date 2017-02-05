@@ -8,14 +8,9 @@
 
 import Result
 import Foundation
-import Parser
+import Parswift
 
-// # Note on capitalization.
-// 
-// Keyword enum members are capitalized. Parsers for values and specific characters are capitalized.
-// Convenience parsers for keywords and built-ins use CamelCase. All other parsers use camelCase.
-
-fileprivate enum Keyword: String.UnicodeScalarView {
+fileprivate enum Keyword: String {
   // Built ins
   case IF = "if"
   case THEN = "then"
@@ -31,6 +26,7 @@ fileprivate enum Keyword: String.UnicodeScalarView {
   // Base Types
   case BOOL = "bool"
   case INT = "int"
+  case ARROW = "->"
   // Special characters
   case COLON = ":"
   case PERIOD = "."
@@ -38,317 +34,266 @@ fileprivate enum Keyword: String.UnicodeScalarView {
   case BACKSLASH = "\\"
   case OPEN_TUPLE = "{"
   case CLOSE_TUPLE = "}"
+  case OPEN_PAREN = "("
+  case CLOSE_PAREN = ")"
   // Extensions
   case AS = "as"
   case WILD = "_"
   case LET = "let"
+  case EQUALS = "="
   case IN = "in"
 }
 
-public typealias ParseResult = Result<(TermContext, Term), ParseError>
+private typealias TermParser = Parser<Term, String.CharacterView, TermContext>
+private typealias TypeParser = Parser<Type, String.CharacterView, TermContext>
+private typealias StringParser = Parser<String, String.CharacterView, TermContext>
 
-public func ==(lhs: ParseResult, rhs: ParseResult) -> Bool {
-  return true
-}
-
-private typealias TermParser = Parser<String.UnicodeScalarView, TermContext, Term>
-private typealias TypeParser = Parser<String.UnicodeScalarView, TermContext, Type>
-private typealias StringParser = Parser<String.UnicodeScalarView, TermContext, String.UnicodeScalarView>
-
-public func parse(input: String, terms: TermContext) -> ParseResult {
-  return parseOnly(lind(), input: (input.unicodeScalars, terms))
+public func parse(input: String, terms: TermContext) -> Either<ParseError, Term> {
+  return parse(input: input.characters, with: lind, userState: terms, fileName: "")
 }
 
 private func lind() -> TermParser {
-  return sequence <* endOfInput()
+  return sequence()
 }
 
-private let sequence = _sequence()
-private func _sequence() -> TermParser {
-  return chainl1(p: term,
-                 op: (skipSpaces() *> char(";") <* skipSpaces())
-                  *> pure ({ t1, t2 in
+private func sequence() -> TermParser {
+  return chainl1(parser: term,
+                 oper: (spaces *> string(string: ";") <* spaces)
+                  *> create(x: { t1, t2 in
                     let abstraction: Term = .Abstraction(parameter: "_",
                                                          parameterType: .Unit,
                                                          body: t2)
                     return .Application(left: abstraction, right: t1)
-                  }))
+                  }))()
 }
 
-private let term = _term()
-private func _term() -> TermParser {
-  return chainl1(p: nonApplicationTerm,
-                 op: char(" ") *> skipSpaces() *> pure( { t1, t2 in
-                  .Application(left: t1, right: t2)
-                 }))
+private func term() -> TermParser {
+  return chainl1(parser: nonApplicationTerm,
+                 oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
 }
 
-private let nonApplicationTerm = _nonApplicationTerm()
-private func _nonApplicationTerm() -> TermParser {
-  return atom >>- { context, term in
+private func nonApplicationTerm() -> TermParser {
+  return (atom >>- { term in
     // After an atom is parsed, check if there is an ascription.
-    return ((ascription
-      >>- { context, type in
-        let body: Term = .Variable(name: "x", index: 0)
-        let abstraction: Term = .Abstraction(parameter: "x", parameterType: type, body: body)
-        return (pure(.Application(left: abstraction, right: term)), context)
+    return ascription >>- { type in
+      let body: Term = .Variable(name: "x", index: 0)
+      let abstraction: Term = .Abstraction(parameter: "x", parameterType: type, body: body)
+      return create(x: .Application(left: abstraction, right: term))
+      }
+      // Check for a projection if there was no ascription.
+      <|> (keyword(.PERIOD) *> identifier >>- { projection in
+        create(x: .Projection(collection: term, index: projection))
       })
-      // If there is no ascription, check If there is a projection.
-      <|> ((keyword(.PERIOD) *> identifier) >>- { innerContext, innerTerm in
-        return (pure(.Projection(collection: term, index: String(innerTerm))), context)
-      })
-      // If there is no projection, return the term.
-      <|> pure(term), context)
-  }
+      // If no projection or ascription, return the atom.
+      <|> create(x: term)
+    })()
 }
 
 // MARK: - Atoms
 
-fileprivate let atom = _atom()
-private func _atom() -> TermParser {
-  return (char("(") *> sequence <* char(")")) <|> builtIn <|> Value
+private func atom() -> TermParser {
+  return ((keyword(.OPEN_PAREN) *> sequence <* keyword(.CLOSE_PAREN)) <|> builtIn <|> value)()
 }
 
 // MARK: - Ascription
 
-fileprivate let ascription = _ascription()
-fileprivate func _ascription() -> TypeParser {
-  return As *> type
+fileprivate func ascription() -> TypeParser {
+  return (As *> type)()
 }
 
-fileprivate let As = _as()
-fileprivate func _as() -> StringParser {
-  return keyword(.AS)
+fileprivate func As() -> StringParser {
+  return keyword(.AS)()
 }
 
 // MARK: - Assignment
 
-fileprivate let Let = _let()
-fileprivate func _let() -> TermParser {
-  // Let is a slightly different derived form in that it actually runs 
+fileprivate func Let() -> TermParser {
+  // Let is a slightly different derived form in that it actually runs
   // the typechecker to verify the statement.
-  return (keyword(.LET) *> identifier)
-    >>- { (context: TermContext, identifier: String.UnicodeScalarView) in
-      return ((char("=") *> term)
-        >>- { (context: TermContext, t1: Term) in
-          return ((keyword(.IN) *> skipSpaces() *> term)
-            >>- { (context: TermContext, t2: Term) in
-                let result = typeOf(term: t1, context: [:])
-                switch result {
-                case let .success(_, T1):
-                  let left: Term = .Abstraction(parameter: String(identifier),
-                                                parameterType: T1,
-                                                body: t2)
-                  return (pure(.Application(left: left, right: t1)), context)
-                case .failure(_):
-                  return (fail("Could not determine type of \(t1)"), context)
-                }
-            }, context) 
-        }, context)
+  return (keyword(.LET) *> identifier >>- { name in
+    return keyword(.EQUALS) *> term >>- { t1 in
+      return keyword(.IN) *> term >>- { t2 in
+        // Verify the type of t1 before passing it to t2.
+        switch typeOf(term: t1, context: [:]) {
+        case let .success(_, type1):
+          let left: Term = .Abstraction(parameter: name, parameterType: type1, body: t2)
+          return create(x: .Application(left: left, right: t1))
+        case .failure(_):
+          return fail(message: "Could not determine type of \(t1)")
+        }
+      }
     }
+    })()
 }
 
 // MARK: - Built Ins
 
-fileprivate let builtIn = _builtIn()
-fileprivate func _builtIn() -> TermParser {
-  return Succ <|> Pred <|> IsZero <|> IfElse <|> Let
+fileprivate func builtIn() -> TermParser {
+  return (succ <|> pred <|> isZero <|> ifElse <|> Let)()
 }
 
-private let Succ = succ()
 private func succ() -> TermParser {
-  return (keyword(.SUCC) *> skipSpaces() *> term) >>- { context, t in (pure(.Succ(t)), context) }
+  return (keyword(.SUCC) *> spaces *> term >>- { t in create(x: .Succ(t)) })()
 }
 
-private let Pred = pred()
 private func pred() -> TermParser {
-  return (keyword(.PRED) *> skipSpaces() *> term) >>- { context, t in (pure(.Pred(t)), context) }
+  return (keyword(.PRED) *> spaces *> term >>- { t in create(x: .Pred(t)) })()
 }
 
-private let IsZero = isZero()
 private func isZero() -> TermParser {
-  return (keyword(.ISZERO) *> skipSpaces() *> term) >>- { context, t in (pure(.IsZero(t)), context) }
+  return (keyword(.ISZERO) *> spaces *> term >>- { t in create(x: .IsZero(t)) })()
 }
 
 
 // MARK: Context Modifications
 
-fileprivate func shiftContext(context: TermContext,
-                              identifier: String.UnicodeScalarView) -> TermContext {
-  var context = context
-  context.forEach { name, index in
-    return context[name] = index + 1
+private func shiftContext(name: String) -> (TermContext) -> TermContext {
+  return { context in
+    var newContext: TermContext = [:]
+    context.forEach { existingName, index in
+      newContext[existingName] = index + 1
+    }
+    newContext[name] = 0
+    return newContext
   }
-  context[String(identifier)] = 0
-  return context
 }
 
-fileprivate func unshiftContext(context: TermContext,
-                                identifier: String.UnicodeScalarView) -> TermContext {
-  var context = context
-  context.forEach { name, index in
-    if (index != 0) {
-      context[name] = index - 1
+private func unshiftContext(name: String) -> (TermContext) -> TermContext {
+  return { context in
+    var newContext: TermContext = [:]
+    context.forEach { existingName, index in
+      if (existingName != name) {
+        newContext[existingName] = index - 1
+      }
     }
+    return newContext
   }
-  context.removeValue(forKey: String(identifier))
-  return context
+}
+
+private func addToContext(name: String) -> (TermContext) -> TermContext {
+  return { state in
+      if state[name] != nil {
+        return state
+      }
+      var newState = state
+      newState[name] = state.count
+      return newState
+  }
 }
 
 // ΜARK: - Keywords
 
-private func keyword(_ word: Keyword) -> StringParser {
-  return skipSpaces() *> string(word.rawValue)
+private func keyword(_ word: Keyword) -> ParserClosure<String, String.CharacterView, TermContext> {
+  return attempt(parser: spaces *> string(string: word.rawValue))
 }
 
 // ΜARK: - λ
 
-private let LAMBDA = _lambda()
-private func _lambda() -> TermParser {
-  return (BACKSLASH *> (identifier <|> keyword(.WILD))) >>- { context, identifier in
-
-  let context = shiftContext(context: context, identifier: identifier)
-
-  return ((COLON *> type) >>- { context, type in
-  return ((PERIOD *> term) >>- { context, t in
-      
-  let context = unshiftContext(context: context, identifier: identifier)
-    
-  return (pure(.Abstraction(parameter: String(identifier), parameterType: type, body: t)), context)
-  }, context)
-  }, context)
-  }
-}
-
-fileprivate let PERIOD = period()
-fileprivate func period() -> StringParser {
-  return keyword(.PERIOD)
-}
-
-fileprivate let COLON = colon()
-fileprivate func colon() -> StringParser {
-  return keyword(.COLON)
-}
-
-fileprivate let BACKSLASH = backslash()
-fileprivate func backslash() -> StringParser {
-  return keyword(.BACKSLASH)
+private func lambda() -> TermParser {
+  // Parse the parameter name.
+  return (keyword(.BACKSLASH) *> (identifier <|> keyword(.WILD)) >>- { name in
+    // Parse the type annotation of the parameter.
+    return modifyState(f: shiftContext(name: name)) *> keyword(.COLON) *> type >>- { argumentType in
+      // Parse the body.
+      return keyword(.PERIOD) *> term >>- { body in
+        // Unshift the state after parsing the body.
+        return  modifyState(f: unshiftContext(name: name)) *> create(x: .Abstraction(parameter: name, parameterType: argumentType, body: body))
+      }
+    }
+  })()
 }
 
 // MARK: - If Statements
 
-private let IfElse = ifElse()
 private func ifElse() -> TermParser {
-  return (If *> term) >>- { context, conditional in
-  return ((Then *> term) >>- { context, tBranch in
-  return ((Else *> term) >>- { context, fBranch in
-  return (pure(.If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch)), context)
-  }, context)
-  }, context)
-  }
+  return (If *> term >>- { conditional in
+    return Then *> term >>- { tBranch in
+      return Else *> term >>- { fBranch in
+        return create(x: .If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch))
+      }
+    }
+    })()
 }
 
-fileprivate let If = _if()
-fileprivate func _if() -> StringParser {
-  return keyword(.IF) <* skipSpaces()
+fileprivate func If() -> StringParser {
+  return keyword(.IF)()
 }
 
-fileprivate let Then = then()
-fileprivate func then() -> StringParser {
-  return keyword(.THEN) <* skipSpaces()
+fileprivate func Then() -> StringParser {
+  return keyword(.THEN)()
 }
 
-fileprivate let Else = _else()
-fileprivate func _else() -> StringParser {
-  return keyword(.ELSE) <* skipSpaces()
+fileprivate func Else() -> StringParser {
+  return keyword(.ELSE)()
 }
 
 // MARK: - Types
 
-private let baseType = _baseType()
-private func _baseType() -> TypeParser {
-  return Bool <|> Int <|> Unit <|> (identifier >>- { context, identifier in
-    (pure(.Base(typeName: String(identifier))), context)
-  })
+private func baseType() -> TypeParser {
+  return (bool <|> int <|> unitType <|> identifier >>- { typeName in
+    create(x: .Base(typeName: typeName))
+  })()
 }
 
-private let type = _type()
-private func _type() -> TypeParser {
-  return chainl1(p: baseType, op: string("->")
-    *> pure({ t1, t2 in
-      return .Function(parameterType: t1, returnType: t2)
-    }))
+private func type() -> TypeParser {
+  return chainl1(parser: baseType, oper: keyword(.ARROW) *> create(x: { t1, t2 in .Function(parameterType: t1, returnType: t2)}))()
 }
 
-fileprivate let Bool = bool()
 fileprivate func bool() -> TypeParser {
-  return keyword(.BOOL) *> pure(.Boolean)
+  return (keyword(.BOOL) *> create(x: .Boolean))()
 }
 
-fileprivate let Int = int()
 fileprivate func int() -> TypeParser {
-  return keyword(.INT) *> pure(.Integer)
+  return (keyword(.INT) *> create(x: .Integer))()
 }
 
-fileprivate let Unit = unit_ty()
-fileprivate func unit_ty() -> TypeParser {
-  return keyword(.UNIT) *> pure(.Unit)
+fileprivate func unitType() -> TypeParser {
+  return (keyword(.UNIT) *> create(x: .Unit))()
 }
 
 // MARK: - Values
 
-fileprivate let Value = value()
 fileprivate func value() -> TermParser {
-  return TRUE <|> FALSE <|> ZERO <|> UNIT <|> LAMBDA <|> TUPLE <|> variable
+  return (True <|> False <|> zero <|> unit <|> lambda <|> tuple <|> variable)()
 }
 
-private let UNIT = _unit()
-private func _unit() -> TermParser {
-  return keyword(.UNIT) *> pure(.Unit)
+private func unit() -> TermParser {
+  return (keyword(.UNIT) *> create(x: .Unit))()
 }
 
-private let TRUE = _true()
-private func _true() -> TermParser {
-  return keyword(.TRUE) *> pure(.True)
+private func True() -> TermParser {
+  return (keyword(.TRUE) *> create(x: .True))()
 }
 
-private let FALSE = _false()
-private func _false() -> TermParser {
-  return keyword(.FALSE) *> pure(.False)
+private func False() -> TermParser {
+  return (keyword(.FALSE) *> create(x: .False))()
 }
 
-fileprivate let ZERO = zero()
 fileprivate func zero() -> TermParser {
-  return keyword(.ZERO) *> pure(.Zero)
+  return (keyword(.ZERO) *> create(x: .Zero))()
 }
 
-fileprivate let TUPLE = tuple()
 fileprivate func tuple() -> TermParser {
-  return fail("no tuple")
+  return fail(message: "Tuple has yet to be implemented.")()
 }
 
 
 // MARK: - Variables
 
-private let identifier = _identifier()
-private func _identifier() -> Parser<String.UnicodeScalarView, [String:Int], String.UnicodeScalarView> {
-  let alphas = CharacterSet.alphanumerics
-  return skipSpaces() *> many1( satisfy { alphas.contains(UnicodeScalar($0.value)!) } )
+private func identifier() -> Parser<String, String.CharacterView, TermContext> {
+  return (spaces *> many1(parser: alphanumeric) >>- { x in
+    return create(x: String(x))
+    })()
 }
 
-private let variable = _variable()
-private func _variable() -> TermParser {
-  return identifier >>- { (context: [String:Int], t: String.UnicodeScalarView) in
-    if (Keyword(rawValue: t) != nil) {
-      return (fail("Variable was keyword"), context)
+private func variable() -> TermParser {
+  return (identifier >>- { name in
+    if (Keyword(rawValue: name) != nil) {
+      return fail(message: "Variable \"\(name)\" is keyword")
     }
-
-    let id = String(t)
-    if let index = context[id] {
-      return (pure(.Variable(name: id, index: index)), context)
-    } else {
-      let index = context.count
-      return (pure(.Variable(name: id, index: index)), union(context, [id:index]))
+    return modifyState(f: addToContext(name: name)) *> userState >>- { state in
+      let index = state[name]!
+      return create(x: .Variable(name: name, index: index))
     }
-  }
+  })()
 }
