@@ -79,7 +79,7 @@ private func evaluate(term: Term, context: TermContext) -> Term {
     }
     return .Tuple(evaluatedTerms)
   case let .Projection(term, index):
-    switch term {
+    switch evaluate(term: term, context: context) {
     case let .Tuple(contents):
       return contents[index]!
     default:

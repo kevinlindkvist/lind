@@ -58,7 +58,7 @@ extension Type: CustomStringConvertible {
       case let .Base(typeName):
         return typeName
       case let .Product(productTypes):
-        return productTypes.description
+        return "{\(productTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))}"
     }
   }
 }
