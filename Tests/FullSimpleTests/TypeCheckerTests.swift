@@ -42,7 +42,7 @@ class TypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(malformedProgram: "x")
-    check(program: "x", type: .Integer, context:[0:.Integer])
+    check(program: "x", type: .Integer, context:["x":.Integer])
   }
 
   func testAbs() {
@@ -104,8 +104,8 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testAs() {
-    check(program: "x as bool", type: .Boolean, context: [0: .Boolean])
-    check(malformedProgram: "x as bool", context: [0: .Integer])
+    check(program: "x as bool", type: .Boolean, context: ["x": .Boolean])
+    check(malformedProgram: "x as bool", context: ["x": .Integer])
   }
 
   func testAsLambda() {
@@ -164,5 +164,27 @@ class TypeCheckerTests: XCTestCase {
   
   func testInvalidTupleArgument() {
     check(malformedProgram: "(\\x:int.x) {true}.1", context: [:])
+  }
+  
+  func testLabeledTupleProjection() {
+    check(program: "{0, 7:unit,true}.7", type: .Unit)
+    check(program: "{0, 7:unit,true}.1", type: .Integer)
+  }
+
+  func testLetNested() {
+    check(program: "let x=0 in (\\z:int->int.z) (\\y:int.y) x", type: .Integer)
+  }
+
+  func testLetRecordPattern() {
+    check(program: "let {x,y}={0,true} in (\\z:bool.z) y", type: .Boolean)
+    check(malformedProgram:"let {x,y}={0,{true}} in (\\z:bool.z) y")
+  }
+  
+  func testLetRecordNested() {
+    check(program: "let {x,{y}}={0,{true}} in (\\z:bool.z) y", type: .Boolean)
+  }
+  
+  func testLetVariablePattern() {
+    check(program: "let x={0,true} in x.1", type: .Integer)
   }
 }

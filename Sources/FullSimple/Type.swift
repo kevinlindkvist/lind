@@ -20,7 +20,7 @@ public indirect enum Type {
   case Product([String:Type])
 }
 
-public typealias TypeContext = [Int:Type]
+public typealias TypeContext = [String:Type]
 
 extension Type: Equatable {
 }

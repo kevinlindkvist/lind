@@ -272,4 +272,16 @@ class ParserTests: XCTestCase {
     check(input: "let {x, y}={0,true} in x", expectedTerm: expected)
   }
 
+  func testLetNested() {
+    let inner: Term = .Application(left: .Abstraction(parameter: "z", parameterType: .Function(parameterType: .Integer, returnType: .Integer), body: .Variable(name: "z", index: 0)),
+                                   right: .Abstraction(parameter: "y", parameterType: .Integer, body: .Variable(name: "y", index: 0)))
+    let outer: Term = .Application(left: inner, right: .Variable(name: "x", index: 0))
+    let expected: Term = .Pattern(pattern: .Variable(name: "x"), argument: .Zero, body: outer)
+    check(input: "let x=0 in (\\z:int->int.z) (\\y:int.y) x", expectedTerm: expected)
+  }
+
+  func testProductType() {
+    check(input: "\\x:{int, bool}.x", expectedTerm: .Abstraction(parameter: "x", parameterType: .Product(["1":.Integer,"2":.Boolean]), body: .Variable(name: "x", index: 0)))
+  }
+
 }

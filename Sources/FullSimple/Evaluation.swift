@@ -28,11 +28,11 @@ private func evaluate(term: Term, context: TermContext) -> Term {
 
   case let .Application(v1, t2) where isValue(term: v1):
     let t2p = evaluate(term: t2, context: context)
-    return .Application(left: v1, right: t2p)
+    return evaluate(term: .Application(left: v1, right: t2p), context: context)
 
   case let .Application(t1, t2):
     let t1p = evaluate(term: t1, context: context)
-    return .Application(left: t1p, right: t2)
+    return evaluate(term: .Application(left: t1p, right: t2), context: context)
   // Numbers
   case .Zero: return .Zero
     
@@ -91,7 +91,7 @@ private func evaluate(term: Term, context: TermContext) -> Term {
     let substitutions = match(pattern: pattern, argument: argument)
     var currentAbstraction = body
     substitutions.forEach { name, substitution in
-      currentAbstraction = .Application(left: .Abstraction(parameter: name, parameterType: .Unit, body: currentAbstraction), right: substitution)
+      currentAbstraction = termSubstop(substitution, currentAbstraction)
     }
     return evaluate(term: currentAbstraction, context: context)
   }
@@ -168,6 +168,8 @@ private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
       return .Pred(shift(d, c, body))
     case let .IsZero(body):
       return .IsZero(shift(d, c, body))
+    case let .Projection(body, index):
+      return .Projection(collection: shift(d, c, body), index: index)
     default:
       return t
   }
@@ -193,6 +195,8 @@ private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
       return .Pred(substitute(j, s, body, c))
     case let .IsZero(body):
       return .IsZero(substitute(j, s, body, c))
+    case let .Projection(body, index):
+      return .Projection(collection: substitute(j, s, body, c), index: index)
     default:
       return t
   }

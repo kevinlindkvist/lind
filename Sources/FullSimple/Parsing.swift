@@ -253,9 +253,32 @@ fileprivate func Else() -> StringParser {
 // MARK: - Types
 
 private func baseType() -> TypeParser {
-  return (bool <|> int <|> unitType <|> identifier >>- { typeName in
+  return (bool <|> int <|> unitType <|> productType <|> identifier >>- { typeName in
     create(x: .Base(typeName: typeName))
   })()
+}
+
+fileprivate func productType() -> TypeParser {
+  return (keyword(.OPEN_TUPLE) *>
+    separate(parser: productEntry, by: keyword(.COMMA)) >>- { contents in
+      var values: [String:Type] = [:]
+      var counter = 1
+      contents.forEach {
+        if $0.0 == "" {
+          values[String(counter)] = $0.1
+        } else {
+          values[$0.0] = $0.1
+        }
+        counter = counter + 1
+      }
+      return create(x: .Product(values))
+    }
+    <* keyword(.CLOSE_TUPLE))();
+}
+
+fileprivate func productEntry() -> Parser<(String, Type), String.CharacterView, TermContext> {
+  return (attempt(parser: identifier >>- { name in keyword(.COLON) *> type >>- { t in create(x: (name, t)) } })
+    <|> attempt(parser: type >>- { t in create(x: ("", t)) }))()
 }
 
 private func type() -> TypeParser {

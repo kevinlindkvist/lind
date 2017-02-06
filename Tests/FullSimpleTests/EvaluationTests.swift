@@ -81,4 +81,21 @@ class EvaluationTests: XCTestCase {
     check(program: "{0, 7:unit,true}.7", expectation: .Unit)
     check(program: "{0, 7:unit,true}.1", expectation: .Zero)
   }
+
+  func testLet() {
+    check(program: "let x=0 in x", expectation: .Zero)
+  }
+
+  func testLetNested() {
+    check(program: "let x=0 in (\\z:int->int.z) (\\y:int.y) x", expectation: .Zero)
+  }
+
+  func testLetRecordPattern() {
+    check(program: "let {x,y}={0,true} in (\\z:bool.z) y", expectation: .True)
+    check(program: "let {x,{y}}={0,{true}} in (\\z:bool.z) y", expectation: .True)
+  }
+  
+  func testLetVariablePattern() {
+    check(program: "let x={0,true} in x.1", expectation: .Zero)
+  }
 }
