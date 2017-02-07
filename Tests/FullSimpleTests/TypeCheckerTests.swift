@@ -209,4 +209,13 @@ class TypeCheckerTests: XCTestCase {
     check(program: "let x={0} in let y=x in let z=y in z.1", type: .Integer)
     check(malformedProgram: "let x={0} in let y=x in let z=y in g")
   }
+
+  func testLetAbstractionSameParameter() {
+    check(program: "\\x:bool.let x=0 in x", type: .Function(parameterType: .Boolean, returnType: .Integer))
+    check(program: "let x=0 in \\x:bool.x", type: .Function(parameterType: .Boolean, returnType: .Boolean))
+  }
+
+  func testLetAbstractionDifferentParameter() {
+    check(program: "\\x:bool.let y=0 in x", type: .Function(parameterType: .Boolean, returnType: .Boolean))
+  }
 }
