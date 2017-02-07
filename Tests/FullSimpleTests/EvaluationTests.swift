@@ -112,6 +112,10 @@ class EvaluationTests: XCTestCase {
   }
   
   func testLetDeeper() {
-    check(program: "let x={0} in let y=true in let z=unit in x", expectation: .Zero)
+    check(program: "let x={0} in let y=true in let z=unit in x.1", expectation: .Zero)
+  }
+  
+  func testLetDeepest() {
+    check(program: "let x={0} in let y=x in let z=y in z.1", expectation: .Zero)
   }
 }

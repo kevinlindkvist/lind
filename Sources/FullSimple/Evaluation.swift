@@ -8,11 +8,13 @@
 
 import Foundation
 
+private typealias BoundTerms = [String:Term]
+
 public func evaluate(term: Term) -> Term {
   return evaluate(term: term, context: [:])
 }
 
-private func evaluate(term: Term, context: TermContext) -> Term {
+private func evaluate(term: Term, context: BoundTerms) -> Term {
   switch term {
   case .Unit: return .Unit
   // Application and Abstraction
@@ -69,7 +71,10 @@ private func evaluate(term: Term, context: TermContext) -> Term {
         return evaluate(term: falseBranch, context: context)
     }
   // Variables
-  case .Variable(_, _):
+  case let .Variable(name, _):
+    if let boundTerm = context[name] {
+      return evaluate(term: boundTerm, context: context)
+    }
     return term
   // Tuples
   case let .Tuple(contents):
@@ -81,11 +86,11 @@ private func evaluate(term: Term, context: TermContext) -> Term {
   case let .Pattern(pattern, matchTerm, body):
     let argument = evaluate(term: matchTerm, context: context)
     let substitutions = match(pattern: pattern, argument: argument)
-    var currentAbstraction = body
+    var boundTerms: BoundTerms = context
     substitutions.forEach { name, substitution in
-      currentAbstraction = termSubstop(substitution, currentAbstraction)
+      boundTerms[name] = substitution
     }
-    return evaluate(term: currentAbstraction, context: context)
+    return evaluate(term: body, context: boundTerms)
   }
 }
 
@@ -102,6 +107,7 @@ private func match(pattern: Pattern, argument: Term) -> [(String, Term)] {
       }
       return matches
     default:
+      assertionFailure()
       return []
     }
   }

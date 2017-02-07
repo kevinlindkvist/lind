@@ -199,5 +199,14 @@ class TypeCheckerTests: XCTestCase {
   
   func testLetDeeper() {
     check(program: "let x={0} in let y=true in let z=unit in x", type: .Product(["1":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in x.1", type: .Integer)
+  }
+
+  func testLetDeepest() {
+    check(program: "let x={0} in let y=x in let z=y in x", type: .Product(["1":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in y", type: .Product(["1":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in z", type: .Product(["1":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in z.1", type: .Integer)
+    check(malformedProgram: "let x={0} in let y=x in let z=y in g")
   }
 }
