@@ -21,8 +21,7 @@ class ParserTests: XCTestCase {
     let result = parse(input: input, terms: [:])
     switch (result, expectedResult) {
     case let (.right(t1), .right(t2)):
-      XCTAssertEqual(t1, t2)
-      XCTAssertEqual(t1, t2)
+      XCTAssertEqual(t1, t2, "\n\(t1)\n\(t2)")
     case (.left, .left):
       break
     case let (.left(error), .right):
@@ -260,7 +259,7 @@ class ParserTests: XCTestCase {
   }
 
   func testTupleProjection() {
-    check(input: "{true}.1", expectedTerm: .Projection(collection: .Tuple(["1":.True]), index: "1"))
+    check(input: "{true}.1", expectedTerm: .Pattern(pattern: .Record(["1":.Variable(name: "$")]), argument: .Tuple(["1":.True]), body: .Variable(name: "$", index: 0)))
   }
 
   func testLabeledTuple() {
@@ -282,6 +281,13 @@ class ParserTests: XCTestCase {
 
   func testProductType() {
     check(input: "\\x:{int, bool}.x", expectedTerm: .Abstraction(parameter: "x", parameterType: .Product(["1":.Integer,"2":.Boolean]), body: .Variable(name: "x", index: 0)))
+  }
+
+  func testLetVariablePattern() {
+    let inner: Term = .Pattern(pattern: .Record(["1":.Variable(name: "$")]), argument: .Variable(name: "x", index: 0), body: .Variable(name: "$", index: 0))
+    let outer: Term = .Pattern(pattern: .Variable(name: "x"), argument: .Tuple(["1":.Zero, "2":.True]), body: inner)
+    print(outer)
+    check(input: "let x={0,true} in x.1", expectedTerm: outer)
   }
 
 }

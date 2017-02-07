@@ -78,14 +78,6 @@ private func evaluate(term: Term, context: TermContext) -> Term {
       evaluatedTerms[key] = evaluate(term: value, context: context)
     }
     return .Tuple(evaluatedTerms)
-  case let .Projection(term, index):
-    switch evaluate(term: term, context: context) {
-    case let .Tuple(contents):
-      return contents[index]!
-    default:
-      assertionFailure()
-      return .Unit
-    }
   case let .Pattern(pattern, matchTerm, body):
     let argument = evaluate(term: matchTerm, context: context)
     let substitutions = match(pattern: pattern, argument: argument)
@@ -104,17 +96,12 @@ private func match(pattern: Pattern, argument: Term) -> [(String, Term)] {
   case let .Record(contents):
     switch argument {
     case let .Tuple(arguments):
-      if contents.count != arguments.count {
-        assertionFailure()
-        return []
-      }
       var matches: [(String, Term)] = []
       contents.forEach { key, value in
         matches.append(contentsOf: match(pattern: value, argument: arguments[key]!))
       }
       return matches
     default:
-      assertionFailure()
       return []
     }
   }
@@ -168,8 +155,14 @@ private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
       return .Pred(shift(d, c, body))
     case let .IsZero(body):
       return .IsZero(shift(d, c, body))
-    case let .Projection(body, index):
-      return .Projection(collection: shift(d, c, body), index: index)
+    case let .Pattern(pattern, argument, body):
+      return .Pattern(pattern: pattern, argument: shift(d, c, argument), body: shift(d, c, body))
+    case let .Tuple(contents):
+      var newContents: [String:Term] = [:]
+      contents.forEach { key, value in
+        newContents[key] = shift(d, c, value)
+      }
+      return .Tuple(newContents)
     default:
       return t
   }
@@ -195,8 +188,14 @@ private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
       return .Pred(substitute(j, s, body, c))
     case let .IsZero(body):
       return .IsZero(substitute(j, s, body, c))
-    case let .Projection(body, index):
-      return .Projection(collection: substitute(j, s, body, c), index: index)
+    case let .Tuple(contents):
+      var newContents: [String:Term] = [:]
+      contents.forEach { key, value in
+        newContents[key] = substitute(j, s, value, c)
+      }
+      return .Tuple(newContents)
+    case let .Pattern(pattern, argument, body):
+      return .Pattern(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c))
     default:
       return t
   }

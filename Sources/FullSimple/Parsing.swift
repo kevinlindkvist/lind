@@ -82,7 +82,9 @@ private func nonApplicationTerm() -> TermParser {
       }
       // Check for a projection if there was no ascription.
       <|> (keyword(.PERIOD) *> identifier >>- { projection in
-        create(x: .Projection(collection: term, index: projection))
+        let pattern: Pattern = .Record([projection:.Variable(name: "$")])
+        let t: Term = .Pattern(pattern: pattern, argument: term, body: .Variable(name: "$", index: 0))
+        return create(x: t)
       })
       // If no projection or ascription, return the atom.
       <|> create(x: term)

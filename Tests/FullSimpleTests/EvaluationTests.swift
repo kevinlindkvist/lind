@@ -77,6 +77,10 @@ class EvaluationTests: XCTestCase {
     check(program: "{(\\x:bool.0) true}", expectation: .Tuple(["1":.Zero]))
   }
 
+  func testTupleVariable() {
+    check(program: "let x=0 in {x}.1", expectation: .Zero)
+  }
+
   func testLabeledTupleProjection() {
     check(program: "{0, 7:unit,true}.7", expectation: .Unit)
     check(program: "{0, 7:unit,true}.1", expectation: .Zero)
@@ -97,5 +101,17 @@ class EvaluationTests: XCTestCase {
   
   func testLetVariablePattern() {
     check(program: "let x={0,true} in x.1", expectation: .Zero)
+  }
+
+  func testLetShadowing() {
+    check(program: "let x=0 in let x=true in let x=unit in x", expectation: .Unit)
+  }
+
+  func testLetDeep() {
+    check(program: "let x=0 in let y=true in let z=unit in x", expectation: .Zero)
+  }
+  
+  func testLetDeeper() {
+    check(program: "let x={0} in let y=true in let z=unit in x", expectation: .Zero)
   }
 }

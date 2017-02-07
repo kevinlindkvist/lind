@@ -186,5 +186,18 @@ class TypeCheckerTests: XCTestCase {
   
   func testLetVariablePattern() {
     check(program: "let x={0,true} in x.1", type: .Integer)
+    check(program: "let x={0,true} in x.2", type: .Boolean)
+  }
+
+  func testLetShadowing() {
+    check(program: "let x=0 in let x=true in let x=unit in x", type: .Unit)
+  }
+
+  func testLetDeep() {
+    check(program: "let x=0 in let y=true in let z=unit in x", type: .Integer)
+  }
+  
+  func testLetDeeper() {
+    check(program: "let x={0} in let y=true in let z=unit in x", type: .Product(["1":.Integer]))
   }
 }

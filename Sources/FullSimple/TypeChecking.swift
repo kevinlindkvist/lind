@@ -52,23 +52,6 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     } else {
       return .success(context, .Product(types))
     }
-  case let .Projection(.Tuple(entries), index):
-    if let entry = entries[index] {
-      return typeOf(term: entry, context: context)
-    } else {
-      return .failure(.message("Invalid index into record."))
-    }
-  case let .Projection(collection, index):
-    switch typeOf(term: collection, context: context) {
-    case let .Product(contents):
-      if let term = contents[index] {
-        return typeOf(term: term, context: context)
-      } else {
-        return .failure(.message("Projection into invalid term."))
-      }
-    default:
-      return .failure(.message("Projection into invalid term."))
-    }
   case let .Pattern(pattern, argument, body):
     switch typeOf(term: argument, context: context) {
     case let .success(_, type):

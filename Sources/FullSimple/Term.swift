@@ -13,6 +13,21 @@ public indirect enum Pattern {
   case Record([String:Pattern])
 }
 
+extension Pattern: CustomStringConvertible {
+  public var description: String {
+    switch self {
+    case let .Variable(name):
+      return name
+    case let .Record(contents):
+      var string = "{"
+      contents.forEach { key, value in
+        string += "\(key)=\(value.description),"
+      }
+      return string + "}"
+    }
+  }
+}
+
 extension Pattern: Equatable {
 }
 
@@ -39,7 +54,6 @@ public indirect enum Term {
   case Pred(Term)
   case Variable(name: String, index: Int)
   case Tuple([String:Term])
-  case Projection(collection: Term, index: String)
   case Pattern(pattern: Pattern, argument: Term, body: Term)
 }
 
@@ -62,8 +76,8 @@ extension Term: CustomStringConvertible {
         return "pred(\(t))"
       case let .IsZero(t):
         return "isZero(\(t))"
-      case let .Variable(name, _):
-        return "\(name)"
+      case let .Variable(name, index):
+        return "\(name)(\(index))"
       case let .Abstraction(parameter, type, body):
         return "\\\(parameter):\(type).(\(body))"
       case let .Application(lhs, rhs):
@@ -72,11 +86,15 @@ extension Term: CustomStringConvertible {
         return "unit"
       case let .Tuple(values):
         return values.description
-      case let .Projection(collection, subs):
-        return "\(collection).\(subs)"
       case let .Pattern(pattern, match, body):
-        return "{\(pattern)}=\(match) in \(body)"
+        return "\(pattern) = \(match) in \(body)"
     }
+  }
+}
+
+extension Term: CustomDebugStringConvertible {
+  public var debugDescription: String {
+    return self.description
   }
 }
 
@@ -109,8 +127,6 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return true
   case let (.Tuple(t1), .Tuple(t2)):
     return t1 == t2
-  case let (.Projection(t11, t12), .Projection(t21, t22)):
-    return t11 == t21 && t12 == t22
   case let (.Pattern(p1, a1, b1), .Pattern(p2, a2, b2)):
     return p1 == p2 && a1 == a2 && b1 == b2
   default:
