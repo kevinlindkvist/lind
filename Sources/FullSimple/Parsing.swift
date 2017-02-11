@@ -74,7 +74,7 @@ private func sequence() -> TermParser {
 
 private func term() -> TermParser {
   return chainl1(parser: nonApplicationTerm,
-                   oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
+                 oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
 }
 
 private func nonApplicationTerm() -> TermParser {
@@ -90,7 +90,7 @@ private func nonApplicationTerm() -> TermParser {
         let pattern: Pattern = .Record([projection:.Variable(name: "$")])
         let t: Term = .Let(pattern: pattern, argument: term, body: .Variable(name: "$", index: 0))
         return create(x: t)
-      })
+        })
       // If no projection or ascription, return the atom.
       <|> create(x: term)
     })()
@@ -125,8 +125,10 @@ fileprivate func Let() -> TermParser {
   // the typechecker to verify the statement.
   return (keyword(.LET) *> pattern >>- { letPattern in
     return keyword(.EQUALS) *> term >>- { t1 in
-      return modifyState(f: shiftContext(pattern: letPattern)) *> keyword(.IN) *> term >>- { t2 in
-        return modifyState(f: unshiftContext(pattern: letPattern)) *> create(x: .Let(pattern: letPattern, argument: t1, body: t2))
+      return userState >>- { savedContext in
+        return modifyState(f: shiftContext(pattern: letPattern)) *> keyword(.IN) *> term >>- { t2 in
+          return modifyState(f: { _ in savedContext}) *> create(x: .Let(pattern: letPattern, argument: t1, body: t2))
+        }
       }
     }
     })()
@@ -140,25 +142,25 @@ private func pattern() -> Parser<Pattern, String.CharacterView, TermContext> {
     <|> (keyword(.OPEN_TUPLE) *>
       separate(parser: patternEntry,
                byAtLeastOne: keyword(.COMMA)) >>- { contents in
-      var values: [String:Pattern] = [:]
-      var counter = 1
-      contents.forEach {
-        if $0.0 == "" {
-          values[String(counter)] = $0.1
-        } else {
-          values[$0.0] = $0.1
-        }
-        counter = counter + 1
+                var values: [String:Pattern] = [:]
+                var counter = 1
+                contents.forEach {
+                  if $0.0 == "" {
+                    values[String(counter)] = $0.1
+                  } else {
+                    values[$0.0] = $0.1
+                  }
+                  counter = counter + 1
+                }
+                return create(x: .Record(values))
       }
-      return create(x: .Record(values))
-    }
-    <* keyword(.CLOSE_TUPLE)))()
+      <* keyword(.CLOSE_TUPLE)))()
 }
 
 fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterView, TermContext> {
   return (
     attempt(parser: identifier >>- { name in keyword(.COLON) *> pattern >>- { p in create(x: (name, p)) } })
-    <|> attempt(parser: pattern >>- { p in create(x: ("", p)) })
+      <|> attempt(parser: pattern >>- { p in create(x: ("", p)) })
     )()
 }
 
@@ -207,39 +209,14 @@ private func shiftContext(pattern: Pattern) -> (TermContext) -> TermContext {
   }
 }
 
-private func unshiftContext(name: String) -> (TermContext) -> TermContext {
-  return { context in
-    var newContext: TermContext = [:]
-    context.forEach { existingName, index in
-      if (existingName != name) {
-        newContext[existingName] = index - 1
-      }
-    }
-    return newContext
-  }
-}
-
-private func unshiftContext(pattern: Pattern) -> (TermContext) -> TermContext {
-  return { context in
-    var newContext: TermContext = [:]
-    let variables = pattern.variables
-    context.forEach { existingName, index in
-      if (!variables.contains(existingName)) {
-        newContext[existingName] = index - 1
-      }
-    }
-    return newContext
-  }
-}
-
 private func addToContext(name: String) -> (TermContext) -> TermContext {
   return { state in
-      if state[name] != nil {
-        return state
-      }
-      var newState = state
-      newState[name] = state.count
-      return newState
+    if state[name] != nil {
+      return state
+    }
+    var newState = state
+    newState[name] = state.count
+    return newState
   }
 }
 
@@ -255,14 +232,16 @@ private func lambda() -> TermParser {
   // Parse the parameter name.
   return (keyword(.BACKSLASH) *> (identifier <|> keyword(.WILD)) >>- { name in
     // Parse the type annotation of the parameter.
-    return modifyState(f: shiftContext(name: name)) *> keyword(.COLON) *> type >>- { argumentType in
-      // Parse the body.
-      return keyword(.PERIOD) *> term >>- { body in
-        // Unshift the state after parsing the body.
-        return  modifyState(f: unshiftContext(name: name)) *> create(x: .Abstraction(parameter: name, parameterType: argumentType, body: body))
+    return userState >>- { savedContext in
+      return modifyState(f: shiftContext(name: name)) *> keyword(.COLON) *> type >>- { argumentType in
+        // Parse the body.
+        return keyword(.PERIOD) *> term >>- { body in
+          // Unshift the state after parsing the body.
+          return  modifyState(f: { _ in savedContext}) *> create(x: .Abstraction(parameter: name, parameterType: argumentType, body: body))
+        }
       }
     }
-  })()
+    })()
 }
 
 // MARK: - If Statements
@@ -294,7 +273,7 @@ fileprivate func Else() -> StringParser {
 private func baseType() -> TypeParser {
   return (bool <|> int <|> unitType <|> productType <|> identifier >>- { typeName in
     create(x: .Base(typeName: typeName))
-  })()
+    })()
 }
 
 fileprivate func productType() -> TypeParser {
@@ -399,5 +378,5 @@ private func variable() -> TermParser {
       let index = state[name]!
       return create(x: .Variable(name: name, index: index))
     }
-  })()
+    })()
 }

@@ -218,4 +218,12 @@ class TypeCheckerTests: XCTestCase {
   func testLetAbstractionDifferentParameter() {
     check(program: "\\x:bool.let y=0 in x", type: .Function(parameterType: .Boolean, returnType: .Boolean))
   }
+
+  func testLetRecordPatternMultipleUseLabeled() {
+    check(program: "let {wah:x,nah:y}={nah:0, wah:\\x:int.x} in x ((\\z:int.z) y)", type: .Integer)
+  }
+
+  func testNestedProjection() {
+    check(program: "let x={{{0}}} in x.1.1.1", type: .Integer)
+  }
 }

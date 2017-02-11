@@ -130,4 +130,8 @@ class EvaluationTests: XCTestCase {
   func testLetDeepest() {
     check(program: "let x={0} in let y=x in let z=y in z.1", expectation: .Zero)
   }
+
+  func testNestedProjection() {
+    check(program: "let x={{{0}}} in x.1.1.1", expectation: .Zero)
+  }
 }
