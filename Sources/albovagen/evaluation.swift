@@ -10,7 +10,7 @@ import Foundation
 import Result
 import FullSimple
 
-public typealias Evaluation = Result<((Term, Type), [String:Int], TypeContext), EvaluationError>
+public typealias Evaluation = Result<((Term, Type), [String:Int], [String:Type]), EvaluationError>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
@@ -32,6 +32,9 @@ func evaluate(input: String,
         return .failure(.typeError(error))
     }
   case let .left(error):
+    switch parseBinding(input: input) {
+      case .right(<#T##Right#>)
+    }
     return .failure(.parseError(error))
   }
 }

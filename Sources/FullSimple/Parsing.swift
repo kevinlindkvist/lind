@@ -47,9 +47,14 @@ fileprivate enum Keyword: String {
 private typealias TermParser = Parser<Term, String.CharacterView, TermContext>
 private typealias TypeParser = Parser<Type, String.CharacterView, TermContext>
 private typealias StringParser = Parser<String, String.CharacterView, TermContext>
+private typealias TypeBindingParser = Parser<(String, Type), String.CharacterView, TermContext>
 
 public func parse(input: String, terms: TermContext) -> Either<ParseError, Term> {
   return parse(input: input.characters, with: lind, userState: terms, fileName: "")
+}
+
+public func parseBinding(input: String) -> Either<ParseError, (String, Type)> {
+  return parse(input: input.characters, with: abbreviation, userState: [:], fileName: "")
 }
 
 private func lind() -> TermParser {
@@ -69,7 +74,7 @@ private func sequence() -> TermParser {
 
 private func term() -> TermParser {
   return chainl1(parser: nonApplicationTerm,
-                 oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
+                   oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
 }
 
 private func nonApplicationTerm() -> TermParser {
@@ -89,6 +94,12 @@ private func nonApplicationTerm() -> TermParser {
       // If no projection or ascription, return the atom.
       <|> create(x: term)
     })()
+}
+
+// MARK: - Abbreviations
+
+private func abbreviation() -> TypeBindingParser {
+  return (identifier >>- { name in type >>- { type in create(x: (name, type)) }})()
 }
 
 // MARK: - Atoms

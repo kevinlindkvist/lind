@@ -207,6 +207,8 @@ private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
   }
 }
 
-private func termSubstop(_ s: Term, _ t: Term) -> Term {
+/// Shifts the term being substituted (`s`) up by one, then substitutes `s` in `t`, 
+/// then shifts the result back down.
+private func termSubstTop(_ s: Term, _ t: Term) -> Term {
   return shift(-1, 0, substitute(0, shift(1, 0, s), t, 0))
 }
