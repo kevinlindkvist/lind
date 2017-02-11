@@ -52,7 +52,7 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     } else {
       return .success(context, .Product(types))
     }
-  case let .Pattern(pattern, argument, body):
+  case let .Let(pattern, argument, body):
     switch typeOf(term: argument, context: context) {
     case let .success(_, type):
       if let patternContext = typeOf(pattern: pattern, argument: type, context: context) {

@@ -88,7 +88,7 @@ private func nonApplicationTerm() -> TermParser {
       // Check for a projection if there was no ascription.
       <|> (keyword(.PERIOD) *> identifier >>- { projection in
         let pattern: Pattern = .Record([projection:.Variable(name: "$")])
-        let t: Term = .Pattern(pattern: pattern, argument: term, body: .Variable(name: "$", index: 0))
+        let t: Term = .Let(pattern: pattern, argument: term, body: .Variable(name: "$", index: 0))
         return create(x: t)
       })
       // If no projection or ascription, return the atom.
@@ -125,8 +125,8 @@ fileprivate func Let() -> TermParser {
   // the typechecker to verify the statement.
   return (keyword(.LET) *> pattern >>- { letPattern in
     return keyword(.EQUALS) *> term >>- { t1 in
-      return keyword(.IN) *> term >>- { t2 in
-        return create(x: .Pattern(pattern: letPattern, argument: t1, body: t2))
+      return modifyState(f: shiftContext(pattern: letPattern)) *> keyword(.IN) *> term >>- { t2 in
+        return modifyState(f: unshiftContext(pattern: letPattern)) *> create(x: .Let(pattern: letPattern, argument: t1, body: t2))
       }
     }
     })()
@@ -194,11 +194,37 @@ private func shiftContext(name: String) -> (TermContext) -> TermContext {
   }
 }
 
+private func shiftContext(pattern: Pattern) -> (TermContext) -> TermContext {
+  return { context in
+    var newContext: TermContext = [:]
+    context.forEach { existingName, index in
+      newContext[existingName] = index + 1
+    }
+    for (index, patternVariable) in pattern.variables.enumerated() {
+      newContext[patternVariable] = index
+    }
+    return newContext
+  }
+}
+
 private func unshiftContext(name: String) -> (TermContext) -> TermContext {
   return { context in
     var newContext: TermContext = [:]
     context.forEach { existingName, index in
       if (existingName != name) {
+        newContext[existingName] = index - 1
+      }
+    }
+    return newContext
+  }
+}
+
+private func unshiftContext(pattern: Pattern) -> (TermContext) -> TermContext {
+  return { context in
+    var newContext: TermContext = [:]
+    let variables = pattern.variables
+    context.forEach { existingName, index in
+      if (!variables.contains(existingName)) {
         newContext[existingName] = index - 1
       }
     }

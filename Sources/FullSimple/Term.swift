@@ -11,6 +11,24 @@ import Foundation
 public indirect enum Pattern {
   case Variable(name: String)
   case Record([String:Pattern])
+
+  var length: Int {
+    switch self {
+      case .Variable:
+        return 1
+      case let .Record(contents):
+        return contents.map { key, value in value.length }.reduce(0, +)
+    }
+  }
+
+  var variables: [String] {
+    switch self {
+    case let .Variable(name):
+      return [name]
+    case let .Record(contents):
+      return contents.flatMap { _, pattern in pattern.variables }
+    }
+  }
 }
 
 extension Pattern: CustomStringConvertible {
@@ -54,7 +72,7 @@ public indirect enum Term {
   case Pred(Term)
   case Variable(name: String, index: Int)
   case Tuple([String:Term])
-  case Pattern(pattern: Pattern, argument: Term, body: Term)
+  case Let(pattern: Pattern, argument: Term, body: Term)
 }
 
 public typealias TermContext = [String:Int]
@@ -86,7 +104,7 @@ extension Term: CustomStringConvertible {
         return "unit"
       case let .Tuple(values):
         return values.description
-      case let .Pattern(pattern, match, body):
+      case let .Let(pattern, match, body):
         return "\(pattern) = \(match) in \(body)"
     }
   }
@@ -127,7 +145,7 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return true
   case let (.Tuple(t1), .Tuple(t2)):
     return t1 == t2
-  case let (.Pattern(p1, a1, b1), .Pattern(p2, a2, b2)):
+  case let (.Let(p1, a1, b1), .Let(p2, a2, b2)):
     return p1 == p2 && a1 == a2 && b1 == b2
   default:
     return false

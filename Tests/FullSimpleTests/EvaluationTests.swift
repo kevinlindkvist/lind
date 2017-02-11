@@ -14,6 +14,7 @@ class EvaluationTests: XCTestCase {
   func check(program: String, expectation: Term) {
     switch parse(input: program, terms: [:]) {
       case let .right(term):
+        print("\(term)")
         XCTAssertEqual(evaluate(term: term), expectation)
       case let .left(error): XCTAssertTrue(false, "Could not parse \(program): \(error)")
     }
@@ -96,6 +97,17 @@ class EvaluationTests: XCTestCase {
 
   func testLetRecordPattern() {
     check(program: "let {x,y}={0,true} in (\\z:bool.z) y", expectation: .True)
+  }
+
+  func testLetRecordPatternMultipleUse() {
+    check(program: "let {x,y}={\\x:int.x,0} in x ((\\z:int.z) y)", expectation: .Zero)
+  }
+
+  func testLetRecordPatternMultipleUseLabeled() {
+    check(program: "let {wah:x,nah:y}={nah:0, wah:\\x:int.x} in x ((\\z:int.z) y)", expectation: .Zero)
+  }
+
+  func testLetRecordPatternNested() {
     check(program: "let {x,{y}}={0,{true}} in (\\z:bool.z) y", expectation: .True)
   }
   

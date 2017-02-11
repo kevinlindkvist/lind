@@ -32,9 +32,6 @@ func evaluate(input: String,
         return .failure(.typeError(error))
     }
   case let .left(error):
-    switch parseBinding(input: input) {
-      case .right(<#T##Right#>)
-    }
     return .failure(.parseError(error))
   }
 }

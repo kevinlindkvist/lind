@@ -11,10 +11,6 @@ import Foundation
 private typealias BoundTerms = [String:Term]
 
 public func evaluate(term: Term) -> Term {
-  return evaluate(term: term, context: [:])
-}
-
-private func evaluate(term: Term, context: BoundTerms) -> Term {
   switch term {
   case .Unit: return .Unit
   // Application and Abstraction
@@ -23,18 +19,18 @@ private func evaluate(term: Term, context: BoundTerms) -> Term {
 
   case let .Application(.Abstraction(parameter, _, body), v2) where isValue(term: v2):
     if parameter == "_" {
-      return evaluate(term: body, context: context)
+      return evaluate(term: body)
     }
-    let t2 = termSubstop(v2, body)
-    return evaluate(term: t2, context: context)
+    let t2 = termSubstTop(v2, body)
+    return evaluate(term: t2)
 
   case let .Application(v1, t2) where isValue(term: v1):
-    let t2p = evaluate(term: t2, context: context)
-    return evaluate(term: .Application(left: v1, right: t2p), context: context)
+    let t2p = evaluate(term: t2)
+    return evaluate(term: .Application(left: v1, right: t2p))
 
   case let .Application(t1, t2):
-    let t1p = evaluate(term: t1, context: context)
-    return evaluate(term: .Application(left: t1p, right: t2), context: context)
+    let t1p = evaluate(term: t1)
+    return evaluate(term: .Application(left: t1p, right: t2))
   // Numbers
   case .Zero: return .Zero
     
@@ -43,72 +39,71 @@ private func evaluate(term: Term, context: BoundTerms) -> Term {
   case .IsZero(.Succ(_)):
     return .False
   case let .IsZero(zeroTerm):
-    let evaluatedTerm = evaluate(term: zeroTerm, context: context)
-    return evaluate(term: .IsZero(evaluatedTerm), context: context)
+    let evaluatedTerm = evaluate(term: zeroTerm)
+    return evaluate(term: .IsZero(evaluatedTerm))
 
   case .Succ(.Zero):
     return .Succ(.Zero)
   case let .Succ(succTerm):
-    return .Succ(evaluate(term: succTerm, context: context))
+    return .Succ(evaluate(term: succTerm))
     
   case .Pred(.Zero):
     return .Zero
   case let .Pred(.Succ(succTerm)):
     return succTerm
   case let .Pred(predTerm):
-    let evaluatedTerm = evaluate(term: predTerm, context: context)
-    return evaluate(term: .Pred(evaluatedTerm), context: context)
+    let evaluatedTerm = evaluate(term: predTerm)
+    return evaluate(term: .Pred(evaluatedTerm))
     
   // Booleans
   case .True: return .True
   case .False: return .False
 
   case let .If(conditional, trueBranch, falseBranch):
-    switch evaluate(term: conditional, context: context) {
+    switch evaluate(term: conditional) {
       case .True:
-        return evaluate(term: trueBranch, context: context)
+        return evaluate(term: trueBranch)
       default:
-        return evaluate(term: falseBranch, context: context)
+        return evaluate(term: falseBranch)
     }
   // Variables
-  case let .Variable(name, _):
-    if let boundTerm = context[name] {
-      return evaluate(term: boundTerm, context: context)
-    }
+  case .Variable:
     return term
   // Tuples
   case let .Tuple(contents):
     var evaluatedTerms: [String:Term] = [:]
     for (key,value) in contents {
-      evaluatedTerms[key] = evaluate(term: value, context: context)
+      evaluatedTerms[key] = evaluate(term: value)
     }
     return .Tuple(evaluatedTerms)
-  case let .Pattern(pattern, matchTerm, body):
-    let argument = evaluate(term: matchTerm, context: context)
-    let substitutions = match(pattern: pattern, argument: argument)
-    var boundTerms: BoundTerms = context
-    substitutions.forEach { name, substitution in
-      boundTerms[name] = substitution
+  case let .Let(p, argument, body):
+    let argumentValue = evaluate(term: argument)
+    var substitutedTerm = body
+    let matches = match(pattern: p, argument: argumentValue)
+    for (index, name) in p.variables.enumerated() {
+      substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
-    return evaluate(term: body, context: boundTerms)
+    return evaluate(term: substitutedTerm)
   }
 }
 
-private func match(pattern: Pattern, argument: Term) -> [(String, Term)] {
+private func match(pattern: Pattern, argument: Term) -> [String:Term] {
   switch pattern {
   case let .Variable(name):
-    return [(name, argument)]
+    return [name: argument]
   case let .Record(contents):
     switch argument {
     case let .Tuple(arguments):
-      var matches: [(String, Term)] = []
+      var matches: [String:Term] = [:]
       contents.forEach { key, value in
-        matches.append(contentsOf: match(pattern: value, argument: arguments[key]!))
+        match(pattern: value, argument: arguments[key]!).forEach { key, value in
+          matches[key] = value
+        }
       }
       return matches
     default:
       assertionFailure()
-      return []
+      return [:]
     }
   }
 }
@@ -161,8 +156,8 @@ private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
       return .Pred(shift(d, c, body))
     case let .IsZero(body):
       return .IsZero(shift(d, c, body))
-    case let .Pattern(pattern, argument, body):
-      return .Pattern(pattern: pattern, argument: shift(d, c, argument), body: shift(d, c, body))
+    case let .Let(pattern, argument, body):
+      return .Let(pattern: pattern, argument: shift(d, c, argument), body: shift(d, c, body))
     case let .Tuple(contents):
       var newContents: [String:Term] = [:]
       contents.forEach { key, value in
@@ -200,8 +195,8 @@ private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
         newContents[key] = substitute(j, s, value, c)
       }
       return .Tuple(newContents)
-    case let .Pattern(pattern, argument, body):
-      return .Pattern(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c))
+    case let .Let(pattern, argument, body):
+      return .Let(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c+pattern.length))
     default:
       return t
   }
