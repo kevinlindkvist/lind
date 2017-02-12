@@ -224,6 +224,6 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testNestedProjection() {
-    check(program: "let x={{{0}}} in x.1.1.1", type: .Integer)
+    check(program: "{{{0}}}.1.1.1", type: .Integer)
   }
 }

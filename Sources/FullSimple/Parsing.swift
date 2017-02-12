@@ -58,7 +58,7 @@ public func parseBinding(input: String) -> Either<ParseError, (String, Type)> {
 }
 
 private func lind() -> TermParser {
-  return sequence()
+  return (sequence <* endOfInput)()
 }
 
 private func sequence() -> TermParser {
@@ -86,14 +86,21 @@ private func nonApplicationTerm() -> TermParser {
       return create(x: .Application(left: abstraction, right: term))
       }
       // Check for a projection if there was no ascription.
-      <|> (keyword(.PERIOD) *> identifier >>- { projection in
-        let pattern: Pattern = .Record([projection:.Variable(name: "$")])
-        let t: Term = .Let(pattern: pattern, argument: term, body: .Variable(name: "$", index: 0))
-        return create(x: t)
-        })
+      <|> projection(term: term)
       // If no projection or ascription, return the atom.
       <|> create(x: term)
     })()
+}
+
+private func projection(term: Term) -> () -> TermParser {
+  return keyword(.PERIOD) *> separate(parser: identifier, by: keyword(.PERIOD)) >>- { identifiers in
+    var term = term
+    identifiers.forEach { projection in
+      let pattern: Pattern = .Record([projection:.Variable(name: "x")])
+      term = .Let(pattern: pattern, argument: term, body: .Variable(name: "x", index: 0))
+    }
+    return create(x: term)
+  }
 }
 
 // MARK: - Abbreviations

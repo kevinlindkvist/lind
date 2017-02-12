@@ -81,6 +81,7 @@ public func evaluate(term: Term) -> Term {
     var substitutedTerm = body
     let matches = match(pattern: p, argument: argumentValue)
     for (index, name) in p.variables.enumerated() {
+      print("\(substitutedTerm)")
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
     return evaluate(term: substitutedTerm)

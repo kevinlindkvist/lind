@@ -113,6 +113,7 @@ class EvaluationTests: XCTestCase {
   
   func testLetVariablePattern() {
     check(program: "let x={0,true} in x.1", expectation: .Zero)
+    check(program: "let x={0,true} in x.2", expectation: .True)
   }
 
   func testLetShadowing() {
@@ -132,6 +133,6 @@ class EvaluationTests: XCTestCase {
   }
 
   func testNestedProjection() {
-    check(program: "let x={{{0}}} in x.1.1.1", expectation: .Zero)
+    check(program: "let x={unit, a:{b:{c:0,d:true}, false}} in x.a.b.c", expectation: .Zero)
   }
 }

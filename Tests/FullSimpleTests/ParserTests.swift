@@ -259,7 +259,7 @@ class ParserTests: XCTestCase {
   }
 
   func testTupleProjection() {
-    check(input: "{true}.1", expectedTerm: .Let(pattern: .Record(["1":.Variable(name: "$")]), argument: .Tuple(["1":.True]), body: .Variable(name: "$", index: 0)))
+    check(input: "{true}.1", expectedTerm: .Let(pattern: .Record(["1":.Variable(name: "x")]), argument: .Tuple(["1":.True]), body: .Variable(name: "x", index: 0)))
   }
 
   func testLabeledTuple() {
@@ -284,7 +284,7 @@ class ParserTests: XCTestCase {
   }
 
   func testLetVariablePattern() {
-    let inner: Term = .Let(pattern: .Record(["1":.Variable(name: "$")]), argument: .Variable(name: "x", index: 0), body: .Variable(name: "$", index: 0))
+    let inner: Term = .Let(pattern: .Record(["1":.Variable(name: "x")]), argument: .Variable(name: "x", index: 0), body: .Variable(name: "x", index: 0))
     let outer: Term = .Let(pattern: .Variable(name: "x"), argument: .Tuple(["1":.Zero, "2":.True]), body: inner)
     print(outer)
     check(input: "let x={0,true} in x.1", expectedTerm: outer)
