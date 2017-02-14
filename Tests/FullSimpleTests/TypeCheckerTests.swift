@@ -226,4 +226,16 @@ class TypeCheckerTests: XCTestCase {
   func testNestedProjection() {
     check(program: "{{{0}}}.1.1.1", type: .Integer)
   }
+
+  func testVariantCasesMissmatch() {
+    check(malformedProgram: "case <a=0> as <a:int,b:unit> of <a=x> => x | <b=y> => y")
+  }
+
+  func testVariantCasesFirst() {
+    check(program: "case <a=0> as <a:int,b:unit> of <a=x> => x | <b=y> => 0", type: .Integer)
+  }
+
+  func testVariantCasesSecond() {
+    check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => unit | <b=y> => y", type: .Unit)
+  }
 }

@@ -36,12 +36,18 @@ fileprivate enum Keyword: String {
   case CLOSE_TUPLE = "}"
   case OPEN_PAREN = "("
   case CLOSE_PAREN = ")"
+  case OPEN_ANGLE = "<"
+  case CLOSE_ANGLE = ">"
+  case EQUALS = "="
+  case BAR = "|"
   // Extensions
   case AS = "as"
   case WILD = "_"
   case LET = "let"
-  case EQUALS = "="
   case IN = "in"
+  case CASE = "case"
+  case OF = "of"
+  case CASE_ARROW = "=>"
 }
 
 private typealias TermParser = Parser<Term, String.CharacterView, TermContext>
@@ -174,7 +180,7 @@ fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterVie
 // MARK: - Built Ins
 
 fileprivate func builtIn() -> TermParser {
-  return (succ <|> pred <|> isZero <|> ifElse <|> Let)()
+  return (succ <|> pred <|> isZero <|> ifElse <|> Let <|> variantCase)()
 }
 
 private func succ() -> TermParser {
@@ -278,9 +284,26 @@ fileprivate func Else() -> StringParser {
 // MARK: - Types
 
 private func baseType() -> TypeParser {
-  return (bool <|> int <|> unitType <|> productType <|> identifier >>- { typeName in
+  return (bool <|> int <|> unitType <|> productType <|> sumType <|> identifier >>- { typeName in
     create(x: .Base(typeName: typeName))
     })()
+}
+
+fileprivate func sumType() -> TypeParser {
+  return (keyword(.OPEN_ANGLE) *> separate(parser: productEntry, byAtLeastOne: keyword(.COMMA)) >>- { contents in
+      var values: [String:Type] = [:]
+      var counter = 1
+      contents.forEach {
+        if $0.0 == "" {
+          values[String(counter)] = $0.1
+        } else {
+          values[$0.0] = $0.1
+        }
+        counter = counter + 1
+      }
+      return create(x: .Sum(values))
+    }
+    <* keyword(.CLOSE_ANGLE))()
 }
 
 fileprivate func productType() -> TypeParser {
@@ -325,7 +348,7 @@ fileprivate func unitType() -> TypeParser {
 // MARK: - Values
 
 fileprivate func value() -> TermParser {
-  return (True <|> False <|> zero <|> unit <|> lambda <|> tuple <|> variable)()
+  return (True <|> False <|> zero <|> unit <|> lambda <|> tuple <|> tag <|> variable)()
 }
 
 private func unit() -> TermParser {
@@ -384,6 +407,40 @@ private func variable() -> TermParser {
     return modifyState(f: addToContext(name: name)) *> userState >>- { state in
       let index = state[name]!
       return create(x: .Variable(name: name, index: index))
+    }
+    })()
+}
+
+// MARK: Variants
+
+private func tag() -> TermParser {
+  return (keyword(.OPEN_ANGLE) *> identifier >>- { name in
+    return keyword(.EQUALS) *> term >>- { t in
+      return keyword(.CLOSE_ANGLE) *> ascription >>- { ascribedType in
+        return create(x: .Tag(label: name, term: t, ascribedType: ascribedType))
+      }
+    }
+  })()
+}
+
+private func variantCase() -> TermParser {
+  return (keyword(.CASE) *> term >>- { t in
+    return keyword(.OF) *> separate(parser: caseStatement, byAtLeastOne: keyword(.BAR)) >>- { cases in
+      var taggedCases: [String:Case] = [:]
+      cases.forEach { taggedCases[$0.label] = $0 }
+      return create(x: .Case(term: t, cases: taggedCases))
+    }
+  })()
+}
+
+private func caseStatement() -> Parser<Case, String.CharacterView, TermContext> {
+  return (keyword(.OPEN_ANGLE) *> identifier >>- { label in
+    return keyword(.EQUALS) *> identifier >>- { parameter in
+      return keyword(.CLOSE_ANGLE) *> keyword(.CASE_ARROW) *> userState >>- { savedContext in
+        return modifyState(f: shiftContext(name: parameter)) *> term >>- { t in
+          return modifyState(f: { _ in savedContext}) *> create(x: Case(label: label, parameter: parameter, term: t))
+        }
+      }
     }
     })()
 }

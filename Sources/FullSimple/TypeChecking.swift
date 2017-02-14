@@ -63,6 +63,41 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     default:
       return .failure(.message("Couldn't typecheck pattern argument \(argument)"))
     }
+  case let .Tag(label, t, ascribedType):
+    switch (typeOf(term: t, context: context), ascribedType) {
+    case let (.success(_, type), .Sum(labeledTypes)) where type == labeledTypes[label]:
+      return .success(context, ascribedType)
+    default:
+      return .failure(.message("Couldn't typecheck tag."))
+    }
+  case let .Case(t, cases):
+    switch typeOf(term: t, context: context) {
+    case let .success(_, .Sum(sumTypes)):
+      let deducedTypes = sumTypes.flatMap { (label, labeledType) -> (String, Type)? in
+        if let variantCase = cases[label] {
+          switch typeOf(term: variantCase.term, context: union(context, [variantCase.parameter:labeledType])) {
+          case let .success(_, deducedType):
+            return (label, deducedType)
+          default:
+            return nil
+          }
+        } else {
+          return nil
+        }
+      }
+
+      let filteredTypes = deducedTypes.filter { label, deducedType in
+        deducedType != deducedTypes.first!.1
+      }
+      
+      if filteredTypes.isEmpty {
+        return .success(context, deducedTypes.first!.1)
+      } else {
+        return .failure(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))
+      }
+    default:
+      return .failure(.message("Couldn't typecheck case."))
+    }
   }
 }
 

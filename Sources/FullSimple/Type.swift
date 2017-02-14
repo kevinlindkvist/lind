@@ -18,6 +18,7 @@ public indirect enum Type {
   case Unit
   case Base(typeName: String)
   case Product([String:Type])
+  case Sum([String:Type])
 }
 
 public typealias TypeContext = [String:Type]
@@ -39,6 +40,8 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
       return firstType == secondType
     case let (.Product(firstContents), .Product(secondContents)):
       return firstContents == secondContents
+    case let (.Sum(firstContents), .Sum(secondContents)):
+      return firstContents == secondContents
     default:
       return false
   }
@@ -59,6 +62,8 @@ extension Type: CustomStringConvertible {
         return typeName
       case let .Product(productTypes):
         return "{\(productTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))}"
+      case let .Sum(sumTypes):
+        return "<\(sumTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))>"
     }
   }
 }

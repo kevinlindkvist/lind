@@ -135,4 +135,12 @@ class EvaluationTests: XCTestCase {
   func testNestedProjection() {
     check(program: "let x={unit, a:{b:{c:0,d:true}, false}} in x.a.b.c", expectation: .Zero)
   }
+
+  func testVariantCasesFirst() {
+    check(program: "case <a=0> as <a:int,b:unit> of <a=x> => x | <b=y> => y", expectation: .Zero)
+  }
+
+  func testVariantCasesSecond() {
+    check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => x | <b=y> => y", expectation: .Unit)
+  }
 }

@@ -59,6 +59,25 @@ public func ==(lhs: Pattern, rhs: Pattern) -> Bool {
   }
 }
 
+public struct Case {
+  let label: String
+  let parameter: String
+  let term: Term
+}
+
+extension Case: CustomStringConvertible {
+  public var description: String {
+    return "<\(label)=\(parameter)> in \(term)"
+  }
+}
+
+extension Case: Equatable {
+}
+
+public func ==(lhs: Case, rhs: Case) -> Bool {
+  return lhs.label == rhs.label && lhs.parameter == rhs.parameter && lhs.term == rhs.term
+}
+
 public indirect enum Term {
   case Unit
   case Abstraction(parameter: String, parameterType: Type, body: Term)
@@ -73,6 +92,8 @@ public indirect enum Term {
   case Variable(name: String, index: Int)
   case Tuple([String:Term])
   case Let(pattern: Pattern, argument: Term, body: Term)
+  case Tag(label: String, term: Term, ascribedType: Type)
+  case Case(term: Term, cases: [String:Case])
 }
 
 public typealias TermContext = [String:Int]
@@ -106,6 +127,10 @@ extension Term: CustomStringConvertible {
         return values.description
       case let .Let(pattern, match, body):
         return "\(pattern) = \(match) in \(body)"
+      case let .Tag(label, term, type):
+        return "<\(label)=\(term)> as \(type)"
+      case let .Case(term, cases):
+        return "case \(term) of\n\t" + cases.map { $0.value.description }.joined(separator: "\n")
     }
   }
 }
@@ -147,6 +172,10 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return t1 == t2
   case let (.Let(p1, a1, b1), .Let(p2, a2, b2)):
     return p1 == p2 && a1 == a2 && b1 == b2
+  case let (.Tag(leftName, leftTerm, leftType), .Tag(rightName, rightTerm, rightType)):
+    return leftName == rightName && leftTerm == rightTerm && leftType == rightType
+  case let (.Case(leftTerm, leftCases), .Case(rightTerm, rightCases)):
+    return leftTerm == rightTerm && leftCases == rightCases
   default:
     return false
   }

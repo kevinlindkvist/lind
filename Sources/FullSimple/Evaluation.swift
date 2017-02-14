@@ -85,6 +85,18 @@ public func evaluate(term: Term) -> Term {
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
     return evaluate(term: substitutedTerm)
+  case let .Tag(label, term, type):
+    return .Tag(label: label, term: evaluate(term: term), ascribedType: type)
+  case let .Case(term, cases):
+    switch evaluate(term: term) {
+    case let .Tag(label, t, _):
+      // The typechecker makes sure that this case exists.
+      let c = cases.filter { $0.value.label == label }.first!
+      return substitute(0, t, c.value.term, 0)
+    default:
+      assertionFailure()
+    }
+    return term
   }
 }
 

@@ -290,4 +290,25 @@ class ParserTests: XCTestCase {
     check(input: "let x={0,true} in x.1", expectedTerm: outer)
   }
 
+  func testVariantTag() {
+    check(input: "<a=0> as <a:int>", expectedTerm: .Tag(label: "a", term: .Zero, ascribedType: .Sum(["a":.Integer])))
+  }
+
+  func testVariantTagMultiple() {
+    check(input: "<a=0> as <a:int, b:bool>", expectedTerm: .Tag(label: "a", term: .Zero, ascribedType: .Sum(["a":.Integer, "b":.Boolean])))
+  }
+
+  func testVariantCase() {
+    let expected: Term = .Case(term: .Tag(label: "a", term: .Zero, ascribedType: .Sum(["a":.Integer])), cases: ["a":Case(label: "a", parameter: "x", term: .Variable(name: "x", index: 0))])
+    check(input: "case <a=0> as <a:int> of <a=x> => x", expectedTerm:expected)
+  }
+
+  func testVariantCases() {
+    let cases: [String:Case] = ["a":Case(label: "a", parameter: "x", term: .Variable(name: "x", index: 0)),
+                         "b":Case(label: "b", parameter: "y", term: .Variable(name: "y", index: 0))
+                         ]
+    let expected: Term = .Case(term: .Tag(label: "a", term: .Zero, ascribedType: .Sum(["a":.Integer])), cases: cases)
+    check(input: "case <a=0> as <a:int> of <a=x> => x | <b=y> => y", expectedTerm:expected)
+  }
+
 }
