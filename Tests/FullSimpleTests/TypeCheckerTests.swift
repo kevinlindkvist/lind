@@ -238,4 +238,8 @@ class TypeCheckerTests: XCTestCase {
   func testVariantCasesSecond() {
     check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => unit | <b=y> => y", type: .Unit)
   }
+
+  func testVariantInLambda() {
+    check(program: "\\x:<a:int,b:unit>.case x of <a=x> => unit | <b=y> => y", type: .Function(parameterType: .Sum(["a":.Integer, "b":.Unit]), returnType: .Unit))
+  }
 }
