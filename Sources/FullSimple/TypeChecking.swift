@@ -90,7 +90,7 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
         deducedType != deducedTypes.first!.1
       }
       
-      if filteredTypes.isEmpty {
+      if filteredTypes.isEmpty && deducedTypes.count == sumTypes.count {
         return .success(context, deducedTypes.first!.1)
       } else {
         return .failure(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))

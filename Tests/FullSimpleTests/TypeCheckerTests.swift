@@ -30,8 +30,8 @@ class TypeCheckerTests: XCTestCase {
     switch parse(input: malformedProgram, terms: [:]) {
     case let .right(t):
       switch typeOf(term: t, context: [:]) {
-      case .success:
-        XCTFail("Type check did not fail on malformed program.")
+      case let .success(_, type):
+        XCTFail("Type check did not fail on malformed program \(t) :: \(type).")
       default:
         break
       }
@@ -237,6 +237,10 @@ class TypeCheckerTests: XCTestCase {
 
   func testVariantCasesSecond() {
     check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => unit | <b=y> => y", type: .Unit)
+  }
+
+  func testVariantCasesInsufficientCases() {
+    check(malformedProgram: "case <b=unit> as <a:int,b:unit> of <b=y> => y")
   }
 
   func testVariantInLambda() {
