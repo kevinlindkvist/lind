@@ -246,7 +246,7 @@ class ParserTests: XCTestCase {
   }
 
   func testTuple() {
-    check(input: "{0, unit,true}", expectedTerm: .Tuple(["1":.Zero,"2":.Unit,"3":.True]))
+    check(input: "{0, unit,true}", expectedTerm: .Tuple(["0":.Zero,"1":.Unit,"2":.True]))
   }
 
   func testEmptyTuple() {
@@ -255,19 +255,19 @@ class ParserTests: XCTestCase {
 
   func testTupleNonValue() {
     let expected: Term = .Application(left: .Abstraction(parameter: "x", parameterType: .Boolean, body: .Zero), right: .True)
-    check(input: "{(\\x:bool.0) true}", expectedTerm: .Tuple(["1":expected]))
+    check(input: "{(\\x:bool.0) true}", expectedTerm: .Tuple(["0":expected]))
   }
 
   func testTupleProjection() {
-    check(input: "{true}.1", expectedTerm: .Let(pattern: .Record(["1":.Variable(name: "x")]), argument: .Tuple(["1":.True]), body: .Variable(name: "x", index: 0)))
+    check(input: "{true}.1", expectedTerm: .Let(pattern: .Record(["1":.Variable(name: "x")]), argument: .Tuple(["0":.True]), body: .Variable(name: "x", index: 0)))
   }
 
   func testLabeledTuple() {
-    check(input: "{0, 7:unit,true}", expectedTerm: .Tuple(["1":.Zero,"7":.Unit,"3":.True]))
+    check(input: "{0, 7:unit,true}", expectedTerm: .Tuple(["0":.Zero,"7":.Unit,"2":.True]))
   }
 
   func testPatternMatching() {
-    let expected: Term = .Let(pattern: .Record(["1":.Variable(name: "x"), "2":.Variable(name: "y")]), argument: .Tuple(["1":.Zero, "2":.True]), body: .Variable(name: "x", index: 1))
+    let expected: Term = .Let(pattern: .Record(["0":.Variable(name: "x"), "1":.Variable(name: "y")]), argument: .Tuple(["0":.Zero, "1":.True]), body: .Variable(name: "x", index: 0))
     check(input: "let {x, y}={0,true} in x", expectedTerm: expected)
   }
 
@@ -280,12 +280,12 @@ class ParserTests: XCTestCase {
   }
 
   func testProductType() {
-    check(input: "\\x:{int, bool}.x", expectedTerm: .Abstraction(parameter: "x", parameterType: .Product(["1":.Integer,"2":.Boolean]), body: .Variable(name: "x", index: 0)))
+    check(input: "\\x:{int, bool}.x", expectedTerm: .Abstraction(parameter: "x", parameterType: .Product(["0":.Integer,"1":.Boolean]), body: .Variable(name: "x", index: 0)))
   }
 
   func testLetVariablePattern() {
     let inner: Term = .Let(pattern: .Record(["1":.Variable(name: "x")]), argument: .Variable(name: "x", index: 0), body: .Variable(name: "x", index: 0))
-    let outer: Term = .Let(pattern: .Variable(name: "x"), argument: .Tuple(["1":.Zero, "2":.True]), body: inner)
+    let outer: Term = .Let(pattern: .Variable(name: "x"), argument: .Tuple(["0":.Zero, "1":.True]), body: inner)
     print(outer)
     check(input: "let x={0,true} in x.1", expectedTerm: outer)
   }

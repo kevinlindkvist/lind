@@ -59,7 +59,7 @@ class EvaluationTests: XCTestCase {
   }
 
   func testTuple() {
-    check(program: "{0, unit,true}", expectation: .Tuple(["1":.Zero,"2":.Unit,"3":.True]))
+    check(program: "{0, unit,true}", expectation: .Tuple(["0":.Zero,"1":.Unit,"2":.True]))
   }
 
   func testEmptyTuple() {
@@ -67,24 +67,24 @@ class EvaluationTests: XCTestCase {
   }
 
   func testTupleProjection() {
-    check(program: "{true}.1", expectation: .True)
+    check(program: "{true}.0", expectation: .True)
   }
 
   func testLabeledTuple() {
-    check(program: "{0, 7:unit,true}", expectation: .Tuple(["1":.Zero,"7":.Unit,"3":.True]))
+    check(program: "{0, 7:unit,true}", expectation: .Tuple(["0":.Zero,"7":.Unit,"2":.True]))
   }
 
   func testTupleNonValue() {
-    check(program: "{(\\x:bool.0) true}", expectation: .Tuple(["1":.Zero]))
+    check(program: "{(\\x:bool.0) true}", expectation: .Tuple(["0":.Zero]))
   }
 
   func testTupleVariable() {
-    check(program: "let x=0 in {x}.1", expectation: .Zero)
+    check(program: "let x=0 in {x}.0", expectation: .Zero)
   }
 
   func testLabeledTupleProjection() {
     check(program: "{0, 7:unit,true}.7", expectation: .Unit)
-    check(program: "{0, 7:unit,true}.1", expectation: .Zero)
+    check(program: "{0, 7:unit,true}.0", expectation: .Zero)
   }
 
   func testLet() {
@@ -112,8 +112,8 @@ class EvaluationTests: XCTestCase {
   }
   
   func testLetVariablePattern() {
-    check(program: "let x={0,true} in x.1", expectation: .Zero)
-    check(program: "let x={0,true} in x.2", expectation: .True)
+    check(program: "let x={0,true} in x.0", expectation: .Zero)
+    check(program: "let x={0,true} in x.1", expectation: .True)
   }
 
   func testLetShadowing() {
@@ -125,11 +125,11 @@ class EvaluationTests: XCTestCase {
   }
   
   func testLetDeeper() {
-    check(program: "let x={0} in let y=true in let z=unit in x.1", expectation: .Zero)
+    check(program: "let x={0} in let y=true in let z=unit in x.0", expectation: .Zero)
   }
   
   func testLetDeepest() {
-    check(program: "let x={0} in let y=x in let z=y in z.1", expectation: .Zero)
+    check(program: "let x={0} in let y=x in let z=y in z.0", expectation: .Zero)
   }
 
   func testNestedProjection() {

@@ -43,77 +43,15 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   case .Unit:
     return .right(context, .Unit)
   case let .Tuple(contents):
-    var types: [String:Type] = [:]
-    var encounteredError = false
-    contents.forEach { (key, value) in
-      switch typeOf(term: value, context: context) {
-      case let .right(type):
-        types[key] = type.1
-        break
-      case .left:
-        encounteredError = true
-        break
-      }
-    }
-
-    if encounteredError {
-      return .left(.message("Tuple contents has incorrect type."))
-    } else {
-      return .right(context, .Product(types))
-    }
+    return typeOf(tuple: contents, context: context)
   case let .Let(pattern, argument, body):
-    switch typeOf(term: argument, context: context) {
-    case let .right(_, type):
-      if let patternContext = typeOf(pattern: pattern, argument: type, context: context) {
-        return typeOf(term: body, context: union(context, patternContext))
-      } else {
-        return .left(.message("Haven't implemented pattern types."))
-      }
-    default:
-      return .left(.message("Couldn't typecheck pattern argument \(argument)"))
-    }
+    return typeOf(letTerm: pattern, argument: argument, body: body, context: context)
   case let .Tag(label, t, ascribedType):
-    switch (typeOf(term: t, context: context), ascribedType) {
-    case let (.right(_, type), .Sum(labeledTypes)) where type == labeledTypes[label]:
-      return .right(context, ascribedType)
-    default:
-      return .left(.message("Couldn't typecheck tag."))
-    }
+    return typeOf(tag: label, term: t, ascribedType: ascribedType, context: context)
   case let .Case(t, cases):
-    switch typeOf(term: t, context: context) {
-    case let .right(_, .Sum(sumTypes)):
-      let deducedTypes = sumTypes.flatMap { (label, labeledType) -> (String, Type)? in
-        if let variantCase = cases[label] {
-          switch typeOf(term: variantCase.term, context: add(type: labeledType, to: context)) {
-          case let .right(_, deducedType):
-            return (label, deducedType)
-          default:
-            return nil
-          }
-        } else {
-          return nil
-        }
-      }
-
-      let filteredTypes = deducedTypes.filter { label, deducedType in
-        deducedType != deducedTypes.first!.1
-      }
-      
-      if filteredTypes.isEmpty && deducedTypes.count == sumTypes.count {
-        return .right(context, deducedTypes.first!.1)
-      } else {
-        return .left(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))
-      }
-    default:
-      return .left(.message("Couldn't typecheck case."))
-    }
+    return typeOf(case: t, cases: cases, context: context)
   case let .Fix(body):
-    switch typeOf(term: body, context: context) {
-    case let .right(_, .Function(parameterType, returnType)) where parameterType == returnType:
-      return .right(context, returnType)
-    default:
-      return .left(.message("Couldn't typecheck fix."))
-    }
+    return typeOf(fix: body, context: context)
   }
 }
 
@@ -214,5 +152,87 @@ private func typeOf(ifElse: (conditional: Term, trueBranch: Term, falseBranch: T
     return .left(.message("Incorrect type of conditional: \(type)"))
   case let .left(message):
     return .left(message)
+  }
+}
+
+private func typeOf(tuple contents: [String:Term], context: TypeContext) -> TypeResult {
+  var types: [String:Type] = [:]
+  var encounteredError = false
+  contents.forEach { (key, value) in
+    switch typeOf(term: value, context: context) {
+    case let .right(type):
+      types[key] = type.1
+      break
+    case .left:
+      encounteredError = true
+      break
+    }
+  }
+
+  if encounteredError {
+    return .left(.message("Tuple contents has incorrect type."))
+  } else {
+    return .right(context, .Product(types))
+  }
+}
+
+private func typeOf(letTerm pattern: Pattern, argument: Term, body: Term, context: TypeContext) -> TypeResult {
+  switch typeOf(term: argument, context: context) {
+  case let .right(_, type):
+    if let patternContext = typeOf(pattern: pattern, argument: type, context: context) {
+      return typeOf(term: body, context: union(context, patternContext))
+    } else {
+      return .left(.message("Haven't implemented pattern types."))
+    }
+  default:
+    return .left(.message("Couldn't typecheck pattern argument \(argument)"))
+  }
+}
+
+private func typeOf(tag label: String, term: Term, ascribedType: Type, context: TypeContext) -> TypeResult {
+  switch (typeOf(term: term, context: context), ascribedType) {
+  case let (.right(_, type), .Sum(labeledTypes)) where type == labeledTypes[label]:
+    return .right(context, ascribedType)
+  default:
+    return .left(.message("Couldn't typecheck tag."))
+  }
+}
+
+private func typeOf(case term: Term, cases: [String:Case], context: TypeContext) -> TypeResult {
+  switch typeOf(term: term, context: context) {
+  case let .right(_, .Sum(sumTypes)):
+    let deducedTypes = sumTypes.flatMap { (label, labeledType) -> (String, Type)? in
+      if let variantCase = cases[label] {
+        switch typeOf(term: variantCase.term, context: add(type: labeledType, to: context)) {
+        case let .right(_, deducedType):
+          return (label, deducedType)
+        default:
+          return nil
+        }
+      } else {
+        return nil
+      }
+    }
+
+    let filteredTypes = deducedTypes.filter { label, deducedType in
+      deducedType != deducedTypes.first!.1
+    }
+    
+    if filteredTypes.isEmpty && deducedTypes.count == sumTypes.count {
+      return .right(context, deducedTypes.first!.1)
+    } else {
+      return .left(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))
+    }
+  default:
+    return .left(.message("Couldn't typecheck case."))
+  }
+}
+
+private func typeOf(fix term: Term, context: TypeContext) -> TypeResult {
+  switch typeOf(term: term, context: context) {
+  case let .right(_, .Function(parameterType, returnType)) where parameterType == returnType:
+    return .right(context, returnType)
+  default:
+    return .left(.message("Couldn't typecheck fix."))
   }
 }
