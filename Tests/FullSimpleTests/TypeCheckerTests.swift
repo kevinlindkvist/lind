@@ -17,9 +17,9 @@ class TypeCheckerTests: XCTestCase {
     case let .right(t):
       switch typeOf(term: t, context: context) {
       case let .right(parsedType):
-        XCTAssertEqual(type, parsedType.1)
+        XCTAssertEqual(type, parsedType.1, "\(t)")
       case let .left(error):
-        XCTFail("Type check failed: \(error)")
+        XCTFail("Type check failed: \(error)\n \(t)")
       }
     case let .left(error):
       XCTFail("Could not parse program: \(error)")
@@ -135,7 +135,7 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testTuple() {
-    check(program: "{0, unit,true}", type: .Product(["1":.Integer, "2":.Unit, "3":.Boolean]))
+    check(program: "{0, unit,true}", type: .Product(["0":.Integer, "1":.Unit, "2":.Boolean]))
   }
 
   func testEmptyTuple() {
@@ -143,32 +143,34 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testTupleNonValue() {
-    check(program: "{(\\x:bool.0) true}", type: .Product(["1":.Integer]))
+    check(program: "{(\\x:bool.0) true}", type: .Product(["0":.Integer]))
   }
 
   func testTupleProjection() {
-    check(program: "{true}.1", type: .Boolean)
+    check(program: "{true}.0", type: .Boolean)
   }
 
   func testLabeledTuple() {
-    check(program: "{0, 7:unit,true}", type: .Product(["1":.Integer,"7":.Unit,"3":.Boolean]))
+    check(program: "{0, 7:unit,true}", type: .Product(["0":.Integer,"7":.Unit,"2":.Boolean]))
   }
 
   func testInvalidTupleProjection() {
+    check(malformedProgram: "{true}.1", context: [:])
     check(malformedProgram: "{true}.2", context: [:])
   }
   
   func testTupleArgument() {
-    check(program: "(\\x:bool.x) {true}.1", type: .Boolean)
+    check(program: "(\\x:bool.x) {true}.0", type: .Boolean)
   }
   
   func testInvalidTupleArgument() {
-    check(malformedProgram: "(\\x:int.x) {true}.1", context: [:])
+    check(malformedProgram: "(\\x:int.x) {true}.0", context: [:])
   }
   
   func testLabeledTupleProjection() {
     check(program: "{0, 7:unit,true}.7", type: .Unit)
-    check(program: "{0, 7:unit,true}.1", type: .Integer)
+    check(program: "{0, 7:unit,true}.0", type: .Integer)
+    check(program: "{0, 7:unit,true}.2", type: .Boolean)
   }
 
   func testLetNested() {
@@ -185,8 +187,8 @@ class TypeCheckerTests: XCTestCase {
   }
   
   func testLetVariablePattern() {
-    check(program: "let x={0,true} in x.1", type: .Integer)
-    check(program: "let x={0,true} in x.2", type: .Boolean)
+    check(program: "let x={0,true} in x.0", type: .Integer)
+    check(program: "let x={0,true} in x.1", type: .Boolean)
   }
 
   func testLetShadowing() {
@@ -198,15 +200,15 @@ class TypeCheckerTests: XCTestCase {
   }
   
   func testLetDeeper() {
-    check(program: "let x={0} in let y=true in let z=unit in x", type: .Product(["1":.Integer]))
-    check(program: "let x={0} in let y=x in let z=y in x.1", type: .Integer)
+    check(program: "let x={0} in let y=true in let z=unit in x", type: .Product(["0":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in x.0", type: .Integer)
   }
 
   func testLetDeepest() {
-    check(program: "let x={0} in let y=x in let z=y in x", type: .Product(["1":.Integer]))
-    check(program: "let x={0} in let y=x in let z=y in y", type: .Product(["1":.Integer]))
-    check(program: "let x={0} in let y=x in let z=y in z", type: .Product(["1":.Integer]))
-    check(program: "let x={0} in let y=x in let z=y in z.1", type: .Integer)
+    check(program: "let x={0} in let y=x in let z=y in x", type: .Product(["0":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in y", type: .Product(["0":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in z", type: .Product(["0":.Integer]))
+    check(program: "let x={0} in let y=x in let z=y in z.0", type: .Integer)
     check(malformedProgram: "let x={0} in let y=x in let z=y in g")
   }
 
@@ -224,7 +226,7 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testNestedProjection() {
-    check(program: "{{{0}}}.1.1.1", type: .Integer)
+    check(program: "{{{0}}}.0.0.0", type: .Integer)
   }
 
   func testVariantCasesMissmatch() {

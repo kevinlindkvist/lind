@@ -104,7 +104,7 @@ private func projection(term: Term) -> () -> TermParser {
   return keyword(.PERIOD) *> separate(parser: identifier, by: keyword(.PERIOD)) >>- { identifiers in
     var term = term
     identifiers.forEach { projection in
-      let pattern: Pattern = .Record([projection:.Variable(name: "x", index: 0)])
+      let pattern: Pattern = .Record([projection:.Variable(name: "x")])
       term = .Let(pattern: pattern, argument: term, body: .Variable(name: "x", index: 0))
     }
     return create(x: term)
@@ -151,12 +151,12 @@ fileprivate func Let() -> TermParser {
 // MARK: Patterns
 
 private func pattern() -> Parser<Pattern, String.CharacterView, ParseContext> {
-  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name, index: 0)) })
+  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name)) })
     <|> (keyword(.OPEN_TUPLE) *>
       separate(parser: patternEntry,
                byAtLeastOne: keyword(.COMMA)) >>- { contents in
                 var values: [String:Pattern] = [:]
-                var counter = 1
+                var counter = 0
                 contents.forEach {
                   if $0.0 == "" {
                     values[String(counter)] = $0.1
@@ -203,7 +203,7 @@ private func fix() -> TermParser {
         return keyword(.EQUALS) *> term >>- { t in
           return keyword(.IN) *> term >>- { body in
             let derivedTerm: Term = .Fix(.Abstraction(parameter: "x", parameterType: termType, body: t))
-            return create(x: .Let(pattern: .Variable(name: name, index: 0), argument: derivedTerm, body: body))
+            return create(x: .Let(pattern: .Variable(name: name), argument: derivedTerm, body: body))
           }
         }
       }
@@ -308,7 +308,7 @@ private func baseType() -> TypeParser {
 fileprivate func sumType() -> TypeParser {
   return (keyword(.OPEN_ANGLE) *> separate(parser: productEntry, byAtLeastOne: keyword(.COMMA)) >>- { contents in
       var values: [String:Type] = [:]
-      var counter = 1
+      var counter = 0
       contents.forEach {
         if $0.0 == "" {
           values[String(counter)] = $0.1
@@ -326,7 +326,7 @@ fileprivate func productType() -> TypeParser {
   return (keyword(.OPEN_TUPLE) *>
     separate(parser: productEntry, by: keyword(.COMMA)) >>- { contents in
       var values: [String:Type] = [:]
-      var counter = 1
+      var counter = 0
       contents.forEach {
         if $0.0 == "" {
           values[String(counter)] = $0.1
@@ -387,7 +387,7 @@ fileprivate func tuple() -> TermParser {
   return (keyword(.OPEN_TUPLE) *>
     separate(parser: tupleEntry, by: keyword(.COMMA)) >>- { contents in
       var values: [String:Term] = [:]
-      var counter = 1
+      var counter = 0
       contents.forEach {
         if $0.0 == "" {
           values[String(counter)] = $0.1

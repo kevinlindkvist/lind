@@ -111,7 +111,7 @@ public func evaluate(term: Term) -> Term {
 
 private func match(pattern: Pattern, argument: Term) -> [String:Term] {
   switch pattern {
-  case let .Variable(name, _):
+  case let .Variable(name):
     return [name: argument]
   case let .Record(contents):
     switch argument {

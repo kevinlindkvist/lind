@@ -119,13 +119,13 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
 
 private func typeOf(pattern: Pattern, argument: Type, context: TypeContext) -> TypeContext? {
   switch (pattern, argument) {
-  case let (.Variable(_, index), type):
-    return [index: type]
+  case let (.Variable, type):
+    return [context.count: type]
   case let (.Record(contents), .Product(types)):
     var updatedContext: TypeContext = [:]
     var encounteredError: Bool = false
     contents.forEach { key, value in
-      if let type = types[key], let subcontext = typeOf(pattern: value, argument: type, context: context) {
+      if let type = types[key], let subcontext = typeOf(pattern: value, argument: type, context: updatedContext) {
         subcontext.forEach { k, v in
           updatedContext[k] = v
         }
