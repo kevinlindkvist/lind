@@ -9,7 +9,7 @@
 import Foundation
 
 public indirect enum Pattern {
-  case Variable(name: String)
+  case Variable(name: String, index: Int)
   case Record([String:Pattern])
 
   var length: Int {
@@ -23,7 +23,7 @@ public indirect enum Pattern {
 
   var variables: [String] {
     switch self {
-    case let .Variable(name):
+    case let .Variable(name, _):
       return [name]
     case let .Record(contents):
       return contents.flatMap { _, pattern in pattern.variables }
@@ -34,7 +34,7 @@ public indirect enum Pattern {
 extension Pattern: CustomStringConvertible {
   public var description: String {
     switch self {
-    case let .Variable(name):
+    case let .Variable(name, _):
       return name
     case let .Record(contents):
       var string = "{"
@@ -98,6 +98,16 @@ public indirect enum Term {
 }
 
 public typealias TermContext = [String:Int]
+
+public struct ParseContext {
+  let terms: TermContext
+  let types: TypeContext
+
+  public init(terms: TermContext, types: TypeContext) {
+    self.terms = terms
+    self.types = types
+  }
+}
 
 extension Term: CustomStringConvertible {
   public var description: String {

@@ -9,22 +9,31 @@
 import Foundation
 import Parser
 
+private func add(type: Type, to context: TypeContext) -> TypeContext {
+  var shiftedContext: TypeContext = [:]
+  context.forEach { key, value in
+    shiftedContext[key+1] = value
+  }
+  shiftedContext[0] = type
+  return shiftedContext
+}
+
 public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   switch term {
-  case let .Variable(name, _):
-    return typeOf(variable: name, context: context)
+  case let .Variable(_, index):
+    return typeOf(variable: index, context: context)
   case let .Abstraction(parameter, type, term):
     return typeOf(parameter: parameter, body: term, type: type, context: context)
   case let .Application(left, right):
     return typeOf(application: (left, right), context: context)
   case .True:
-    return .success(context, .Boolean)
+    return .right(context, .Boolean)
   case .False:
-    return .success(context, .Boolean)
+    return .right(context, .Boolean)
   case let .If(conditional, trueBranch, falseBranch):
     return typeOf(ifElse: (conditional, trueBranch, falseBranch), context: context)
   case .Zero:
-    return .success(context, .Integer)
+    return .right(context, .Integer)
   case let .IsZero(term):
     return typeOf(isZero: term, context: context)
   case let .Succ(term):
@@ -32,51 +41,51 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   case let .Pred(term):
     return typeOf(predOrSucc: term, context: context)
   case .Unit:
-    return .success(context, .Unit)
+    return .right(context, .Unit)
   case let .Tuple(contents):
     var types: [String:Type] = [:]
     var encounteredError = false
     contents.forEach { (key, value) in
       switch typeOf(term: value, context: context) {
-      case let .success(type):
+      case let .right(type):
         types[key] = type.1
         break
-      case .failure:
+      case .left:
         encounteredError = true
         break
       }
     }
 
     if encounteredError {
-      return .failure(.message("Tuple contents has incorrect type."))
+      return .left(.message("Tuple contents has incorrect type."))
     } else {
-      return .success(context, .Product(types))
+      return .right(context, .Product(types))
     }
   case let .Let(pattern, argument, body):
     switch typeOf(term: argument, context: context) {
-    case let .success(_, type):
+    case let .right(_, type):
       if let patternContext = typeOf(pattern: pattern, argument: type, context: context) {
         return typeOf(term: body, context: union(context, patternContext))
       } else {
-        return .failure(.message("Haven't implemented pattern types."))
+        return .left(.message("Haven't implemented pattern types."))
       }
     default:
-      return .failure(.message("Couldn't typecheck pattern argument \(argument)"))
+      return .left(.message("Couldn't typecheck pattern argument \(argument)"))
     }
   case let .Tag(label, t, ascribedType):
     switch (typeOf(term: t, context: context), ascribedType) {
-    case let (.success(_, type), .Sum(labeledTypes)) where type == labeledTypes[label]:
-      return .success(context, ascribedType)
+    case let (.right(_, type), .Sum(labeledTypes)) where type == labeledTypes[label]:
+      return .right(context, ascribedType)
     default:
-      return .failure(.message("Couldn't typecheck tag."))
+      return .left(.message("Couldn't typecheck tag."))
     }
   case let .Case(t, cases):
     switch typeOf(term: t, context: context) {
-    case let .success(_, .Sum(sumTypes)):
+    case let .right(_, .Sum(sumTypes)):
       let deducedTypes = sumTypes.flatMap { (label, labeledType) -> (String, Type)? in
         if let variantCase = cases[label] {
-          switch typeOf(term: variantCase.term, context: union(context, [variantCase.parameter:labeledType])) {
-          case let .success(_, deducedType):
+          switch typeOf(term: variantCase.term, context: add(type: labeledType, to: context)) {
+          case let .right(_, deducedType):
             return (label, deducedType)
           default:
             return nil
@@ -91,27 +100,27 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
       }
       
       if filteredTypes.isEmpty && deducedTypes.count == sumTypes.count {
-        return .success(context, deducedTypes.first!.1)
+        return .right(context, deducedTypes.first!.1)
       } else {
-        return .failure(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))
+        return .left(.message("Couldn't typecheck case, cases that didn't match: \(deducedTypes)."))
       }
     default:
-      return .failure(.message("Couldn't typecheck case."))
+      return .left(.message("Couldn't typecheck case."))
     }
   case let .Fix(body):
     switch typeOf(term: body, context: context) {
-    case let .success(_, .Function(parameterType, returnType)) where parameterType == returnType:
-      return .success(context, returnType)
+    case let .right(_, .Function(parameterType, returnType)) where parameterType == returnType:
+      return .right(context, returnType)
     default:
-      return .failure(.message("Couldn't typecheck fix."))
+      return .left(.message("Couldn't typecheck fix."))
     }
   }
 }
 
 private func typeOf(pattern: Pattern, argument: Type, context: TypeContext) -> TypeContext? {
   switch (pattern, argument) {
-  case let (.Variable(name), type):
-    return [name: type]
+  case let (.Variable(_, index), type):
+    return [index: type]
   case let (.Record(contents), .Product(types)):
     var updatedContext: TypeContext = [:]
     var encounteredError: Bool = false
@@ -130,23 +139,21 @@ private func typeOf(pattern: Pattern, argument: Type, context: TypeContext) -> T
   }
 }
 
-private func typeOf(variable: String, context: TypeContext) -> TypeResult {
+private func typeOf(variable: Int, context: TypeContext) -> TypeResult {
   if let type = context[variable] {
-    return .success(context, type)
+    return .right(context, type)
   } else {
-    return .failure(.message("Could not find \(variable) in \(context)"))
+    return .left(.message("Could not find \(variable) in \(context)"))
   }
 }
 
 private func typeOf(parameter: String, body: Term, type: Type, context: TypeContext) -> TypeResult {
-  var shiftedContext = context
-  shiftedContext[parameter] = type
-  let bodyType = typeOf(term: body, context: shiftedContext)
+  let bodyType = typeOf(term: body, context: add(type: type, to: context))
   switch bodyType {
-  case let .success(_, returnType):
-    return .success(context, .Function(parameterType: type, returnType: returnType))
-  case let .failure(error):
-    return .failure(error)
+  case let .right(_, returnType):
+    return .right(context, .Function(parameterType: type, returnType: returnType))
+  case let .left(error):
+    return .left(error)
   }
 }
 
@@ -154,40 +161,40 @@ private func typeOf(application: (left: Term, right: Term), context: TypeContext
   let leftType = typeOf(term: application.left, context: context)
   let rightType = typeOf(term: application.right, context: context)
   switch (leftType, rightType) {
-  case let (.success(_, .Function(parameterType, returnType)), .success(_, argumentType)) where parameterType == argumentType:
-    return .success(context, returnType)
-  case let (.success(_, .Function(parameterType, returnType)), .success(_, argumentType)):
-    return .failure(.message("Incorrect application types, function: \(parameterType, returnType), argument: \(argumentType)"))
-  case let (.success(c1, t1), .success(c2, t2)):
-    return .failure(.message("Incorrect application\n\(application.left) :: \(t1) - \(c1) \n\(application.right) :: \(t2) - \(c2)"))
-  case let (.success, .failure(error)):
-    return .failure(.message("Could not parse type of \(application.right)\n\(error)"))
-  case let (.failure(error), .success):
-    return .failure(.message("Could not parse type of \(application.left)\n\(error)"))
-  case (.failure, .failure):
-    return .failure(.message("Could not parse type of \(application.left) or \(application.right)"))
+  case let (.right(_, .Function(parameterType, returnType)), .right(_, argumentType)) where parameterType == argumentType:
+    return .right(context, returnType)
+  case let (.right(_, .Function(parameterType, returnType)), .right(_, argumentType)):
+    return .left(.message("Incorrect application types, function: \(parameterType, returnType), argument: \(argumentType)"))
+  case let (.right(c1, t1), .right(c2, t2)):
+    return .left(.message("Incorrect application\n\(application.left) :: \(t1) - \(c1) \n\(application.right) :: \(t2) - \(c2)"))
+  case let (.right, .left(error)):
+    return .left(.message("Could not parse type of \(application.right)\n\(error)"))
+  case let (.left(error), .right):
+    return .left(.message("Could not parse type of \(application.left)\n\(error)"))
+  case (.left, .left):
+    return .left(.message("Could not parse type of \(application.left) or \(application.right)"))
   default:
-    return .failure(.message("Unknown error: \(application)"))
+    return .left(.message("Unknown error: \(application)"))
   }
 }
 
 private func typeOf(isZero: Term, context: TypeContext) -> TypeResult {
   let result = typeOf(term: isZero, context: context)
   switch result {
-  case let .success(_, type) where type == .Integer:
-    return .success(context, .Boolean)
+  case let .right(_, type) where type == .Integer:
+    return .right(context, .Boolean)
   default:
-    return .failure(.message("isZero called on non-integer argument \(result)"))
+    return .left(.message("isZero called on non-integer argument \(result)"))
   }
 }
 
 private func typeOf(predOrSucc: Term, context: TypeContext) -> TypeResult {
   let result = typeOf(term: predOrSucc, context: context)
   switch result {
-  case let .success(_, type) where type == .Integer:
-    return .success(context, .Integer)
+  case let .right(_, type) where type == .Integer:
+    return .right(context, .Integer)
   default:
-    return .failure(.message("pred/succ called on non-integer term: \(result)"))
+    return .left(.message("pred/succ called on non-integer term: \(result)"))
   }
 }
 
@@ -196,16 +203,16 @@ private func typeOf(ifElse: (conditional: Term, trueBranch: Term, falseBranch: T
   let trueBranch = typeOf(term: ifElse.trueBranch, context: context)
   let falseBranch = typeOf(term: ifElse.falseBranch, context: context)
   switch conditionalResult {
-  case let .success(_, type) where type == .Boolean:
+  case let .right(_, type) where type == .Boolean:
     switch (trueBranch, falseBranch) {
-    case let (.success(_, t1), .success(_, t2)) where t1 == t2:
-      return .success(context, t1)
+    case let (.right(_, t1), .right(_, t2)) where t1 == t2:
+      return .right(context, t1)
     default:
-      return .failure(.message("Type of if branches don't match: \(trueBranch),\(falseBranch)"))
+      return .left(.message("Type of if branches don't match: \(trueBranch),\(falseBranch)"))
     }
-  case let .success(_, type):
-    return .failure(.message("Incorrect type of conditional: \(type)"))
-  case let .failure(message):
-    return .failure(message)
+  case let .right(_, type):
+    return .left(.message("Incorrect type of conditional: \(type)"))
+  case let .left(message):
+    return .left(message)
   }
 }

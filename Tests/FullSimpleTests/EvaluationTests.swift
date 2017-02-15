@@ -12,7 +12,7 @@ import XCTest
 class EvaluationTests: XCTestCase {
 
   func check(program: String, expectation: Term) {
-    switch parse(input: program, terms: [:]) {
+    switch parse(input: program, terms: ParseContext(terms: [:], types: [:])) {
       case let .right(term):
         print("\(term)")
         XCTAssertEqual(evaluate(term: term), expectation)

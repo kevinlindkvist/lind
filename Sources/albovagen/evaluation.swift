@@ -7,31 +7,31 @@
 //
 
 import Foundation
-import Result
+import Parswift
 import FullSimple
 
-public typealias Evaluation = Result<((Term, Type), [String:Int], [String:Type]), EvaluationError>
+public typealias Evaluation = Either<EvaluationError, (Term, Type)>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
-    case let .success((term, type), _, _): return term.description + " :: " + type.description
-    case let .failure(message): return message.description
+    case let .right(term, type): return term.description + " :: " + type.description
+    case let .left(message): return message.description
   }
 }
 
 func evaluate(input: String,
               terms: TermContext = [:],
               types: TypeContext = [:]) -> Evaluation {
-  switch parse(input: input, terms: terms) {
+  switch parse(input: input, terms: ParseContext(terms: [:], types: [:])) {
   case let .right(result):
     switch typeOf(term: result, context: types) {
-      case let .success(_, type):
+      case let .right(_, type):
         let evaluatedTerm = evaluate(term: result)
-        return .success(((evaluatedTerm, type), terms, types))
-      case let .failure(error):
-        return .failure(.typeError(error))
+        return .right(evaluatedTerm, type)
+      case let .left(error):
+        return .left(.typeError(error))
     }
   case let .left(error):
-    return .failure(.parseError(error))
+    return .left(.parseError(error))
   }
 }

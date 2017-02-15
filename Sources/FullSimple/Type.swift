@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import Result
+import Parswift
 
-public typealias TypeResult = Result<(TypeContext, Type), TypeError>
+public typealias TypeResult = Either<TypeError, (TypeContext, Type)>
 
 public indirect enum Type {
   case Function(parameterType: Type, returnType: Type)
@@ -21,7 +21,7 @@ public indirect enum Type {
   case Sum([String:Type])
 }
 
-public typealias TypeContext = [String:Type]
+public typealias TypeContext = [Int:Type]
 
 extension Type: Equatable {
 }

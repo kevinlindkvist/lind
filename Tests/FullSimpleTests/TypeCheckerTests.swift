@@ -13,12 +13,12 @@ import Parser
 class TypeCheckerTests: XCTestCase {
 
   func check(program: String, type: Type, context: TypeContext = [:]) {
-    switch parse(input: program, terms: [:]) {
+    switch parse(input: program, terms: ParseContext(terms: [:], types: [:])) {
     case let .right(t):
       switch typeOf(term: t, context: context) {
-      case let .success(parsedType):
+      case let .right(parsedType):
         XCTAssertEqual(type, parsedType.1)
-      case let .failure(error):
+      case let .left(error):
         XCTFail("Type check failed: \(error)")
       }
     case let .left(error):
@@ -27,10 +27,10 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func check(malformedProgram: String, context: TypeContext = [:]) {
-    switch parse(input: malformedProgram, terms: [:]) {
+    switch parse(input: malformedProgram, terms: ParseContext(terms: [:], types: [:])) {
     case let .right(t):
       switch typeOf(term: t, context: [:]) {
-      case let .success(_, type):
+      case let .right(_, type):
         XCTFail("Type check did not fail on malformed program \(t) :: \(type).")
       default:
         break
@@ -42,7 +42,7 @@ class TypeCheckerTests: XCTestCase {
 
   func testVar() {
     check(malformedProgram: "x")
-    check(program: "x", type: .Integer, context:["x":.Integer])
+    check(program: "x", type: .Integer, context:[0:.Integer])
   }
 
   func testAbs() {
@@ -104,8 +104,8 @@ class TypeCheckerTests: XCTestCase {
   }
 
   func testAs() {
-    check(program: "x as bool", type: .Boolean, context: ["x": .Boolean])
-    check(malformedProgram: "x as bool", context: ["x": .Integer])
+    check(program: "x as bool", type: .Boolean, context: [0: .Boolean])
+    check(malformedProgram: "x as bool", context: [0: .Integer])
   }
 
   func testAsLambda() {

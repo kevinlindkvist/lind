@@ -52,17 +52,17 @@ fileprivate enum Keyword: String {
   case CASE_ARROW = "=>"
 }
 
-private typealias TermParser = Parser<Term, String.CharacterView, TermContext>
-private typealias TypeParser = Parser<Type, String.CharacterView, TermContext>
-private typealias StringParser = Parser<String, String.CharacterView, TermContext>
-private typealias TypeBindingParser = Parser<(String, Type), String.CharacterView, TermContext>
+private typealias TermParser = Parser<Term, String.CharacterView, ParseContext>
+private typealias TypeParser = Parser<Type, String.CharacterView, ParseContext>
+private typealias StringParser = Parser<String, String.CharacterView, ParseContext>
+private typealias TypeBindingParser = Parser<(String, Type), String.CharacterView, ParseContext>
 
-public func parse(input: String, terms: TermContext) -> Either<ParseError, Term> {
+public func parse(input: String, terms: ParseContext) -> Either<ParseError, Term> {
   return parse(input: input.characters, with: lind, userState: terms, fileName: "")
 }
 
 public func parseBinding(input: String) -> Either<ParseError, (String, Type)> {
-  return parse(input: input.characters, with: abbreviation, userState: [:], fileName: "")
+  return parse(input: input.characters, with: abbreviation, userState: ParseContext(terms: [:], types: [:]), fileName: "")
 }
 
 private func lind() -> TermParser {
@@ -104,7 +104,7 @@ private func projection(term: Term) -> () -> TermParser {
   return keyword(.PERIOD) *> separate(parser: identifier, by: keyword(.PERIOD)) >>- { identifiers in
     var term = term
     identifiers.forEach { projection in
-      let pattern: Pattern = .Record([projection:.Variable(name: "x")])
+      let pattern: Pattern = .Record([projection:.Variable(name: "x", index: 0)])
       term = .Let(pattern: pattern, argument: term, body: .Variable(name: "x", index: 0))
     }
     return create(x: term)
@@ -136,8 +136,6 @@ fileprivate func As() -> StringParser {
 // MARK: - Assignment
 
 fileprivate func Let() -> TermParser {
-  // Let is a slightly different derived form in that it actually runs
-  // the typechecker to verify the statement.
   return (keyword(.LET) *> pattern >>- { letPattern in
     return keyword(.EQUALS) *> term >>- { t1 in
       return userState >>- { savedContext in
@@ -152,8 +150,8 @@ fileprivate func Let() -> TermParser {
 
 // MARK: Patterns
 
-private func pattern() -> Parser<Pattern, String.CharacterView, TermContext> {
-  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name)) })
+private func pattern() -> Parser<Pattern, String.CharacterView, ParseContext> {
+  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name, index: 0)) })
     <|> (keyword(.OPEN_TUPLE) *>
       separate(parser: patternEntry,
                byAtLeastOne: keyword(.COMMA)) >>- { contents in
@@ -172,7 +170,7 @@ private func pattern() -> Parser<Pattern, String.CharacterView, TermContext> {
       <* keyword(.CLOSE_TUPLE)))()
 }
 
-fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterView, TermContext> {
+fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterView, ParseContext> {
   return (
     attempt(parser: identifier >>- { name in keyword(.COLON) *> pattern >>- { p in create(x: (name, p)) } })
       <|> attempt(parser: pattern >>- { p in create(x: ("", p)) })
@@ -205,7 +203,7 @@ private func fix() -> TermParser {
         return keyword(.EQUALS) *> term >>- { t in
           return keyword(.IN) *> term >>- { body in
             let derivedTerm: Term = .Fix(.Abstraction(parameter: "x", parameterType: termType, body: t))
-            return create(x: .Let(pattern: .Variable(name: name), argument: derivedTerm, body: body))
+            return create(x: .Let(pattern: .Variable(name: name, index: 0), argument: derivedTerm, body: body))
           }
         }
       }
@@ -216,44 +214,44 @@ private func fix() -> TermParser {
 
 // MARK: Context Modifications
 
-private func shiftContext(name: String) -> (TermContext) -> TermContext {
+private func shiftContext(name: String) -> (ParseContext) -> ParseContext {
   return { context in
-    var newContext: TermContext = [:]
-    context.forEach { existingName, index in
-      newContext[existingName] = index + 1
+    var terms: TermContext = [:]
+    context.terms.forEach { existingName, index in
+      terms[existingName] = index + 1
     }
-    newContext[name] = 0
-    return newContext
+    terms[name] = 0
+    return ParseContext(terms: terms, types: context.types)
   }
 }
 
-private func shiftContext(pattern: Pattern) -> (TermContext) -> TermContext {
+private func shiftContext(pattern: Pattern) -> (ParseContext) -> ParseContext {
   return { context in
-    var newContext: TermContext = [:]
-    context.forEach { existingName, index in
-      newContext[existingName] = index + 1
+    var terms: TermContext = [:]
+    context.terms.forEach { existingName, index in
+      terms[existingName] = index + 1
     }
     for (index, patternVariable) in pattern.variables.enumerated() {
-      newContext[patternVariable] = index
+      terms[patternVariable] = index
     }
-    return newContext
+    return ParseContext(terms: terms, types: context.types)
   }
 }
 
-private func addToContext(name: String) -> (TermContext) -> TermContext {
-  return { state in
-    if state[name] != nil {
-      return state
+private func addToContext(name: String) -> (ParseContext) -> ParseContext {
+  return { context in
+    if context.terms[name] != nil {
+      return context
     }
-    var newState = state
-    newState[name] = state.count
-    return newState
+    var terms = context.terms
+    terms[name] = terms.count
+    return ParseContext(terms: terms, types: context.types)
   }
 }
 
 // ΜARK: - Keywords
 
-private func keyword(_ word: Keyword) -> ParserClosure<String, String.CharacterView, TermContext> {
+private func keyword(_ word: Keyword) -> ParserClosure<String, String.CharacterView, ParseContext> {
   return attempt(parser: spaces *> string(string: word.rawValue))
 }
 
@@ -342,7 +340,7 @@ fileprivate func productType() -> TypeParser {
     <* keyword(.CLOSE_TUPLE))();
 }
 
-fileprivate func productEntry() -> Parser<(String, Type), String.CharacterView, TermContext> {
+fileprivate func productEntry() -> Parser<(String, Type), String.CharacterView, ParseContext> {
   return (attempt(parser: identifier >>- { name in keyword(.COLON) *> type >>- { t in create(x: (name, t)) } })
     <|> attempt(parser: type >>- { t in create(x: ("", t)) }))()
 }
@@ -403,7 +401,7 @@ fileprivate func tuple() -> TermParser {
     <* keyword(.CLOSE_TUPLE))();
 }
 
-fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, TermContext> {
+fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, ParseContext> {
   return (attempt(parser: identifier >>- { name in keyword(.COLON) *> term >>- { t in create(x: (name, t)) } })
     <|> attempt(parser: term >>- { t in create(x: ("", t)) }))()
 }
@@ -411,7 +409,7 @@ fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, Te
 
 // MARK: - Variables
 
-private func identifier() -> Parser<String, String.CharacterView, TermContext> {
+private func identifier() -> Parser<String, String.CharacterView, ParseContext> {
   return (spaces *> many1(parser: alphanumeric) >>- { x in
     return create(x: String(x))
     })()
@@ -423,7 +421,7 @@ private func variable() -> TermParser {
       return fail(message: "Variable \"\(name)\" is keyword")
     }
     return modifyState(f: addToContext(name: name)) *> userState >>- { state in
-      let index = state[name]!
+      let index = state.terms[name]!
       return create(x: .Variable(name: name, index: index))
     }
     })()
@@ -451,7 +449,7 @@ private func variantCase() -> TermParser {
   })()
 }
 
-private func caseStatement() -> Parser<Case, String.CharacterView, TermContext> {
+private func caseStatement() -> Parser<Case, String.CharacterView, ParseContext> {
   return (keyword(.OPEN_ANGLE) *> identifier >>- { label in
     return keyword(.EQUALS) *> identifier >>- { parameter in
       return keyword(.CLOSE_ANGLE) *> keyword(.CASE_ARROW) *> userState >>- { savedContext in
