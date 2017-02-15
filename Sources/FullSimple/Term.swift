@@ -94,6 +94,7 @@ public indirect enum Term {
   case Let(pattern: Pattern, argument: Term, body: Term)
   case Tag(label: String, term: Term, ascribedType: Type)
   case Case(term: Term, cases: [String:Case])
+  case Fix(Term)
 }
 
 public typealias TermContext = [String:Int]
@@ -131,6 +132,8 @@ extension Term: CustomStringConvertible {
         return "<\(label)=\(term)> as \(type)"
       case let .Case(term, cases):
         return "case \(term) of\n\t" + cases.map { $0.value.description }.joined(separator: "\n")
+      case let .Fix(term):
+        return "fix \(term)"
     }
   }
 }
@@ -176,6 +179,8 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return leftName == rightName && leftTerm == rightTerm && leftType == rightType
   case let (.Case(leftTerm, leftCases), .Case(rightTerm, rightCases)):
     return leftTerm == rightTerm && leftCases == rightCases
+  case let (.Fix(lhs), .Fix(rhs)):
+    return lhs == rhs
   default:
     return false
   }

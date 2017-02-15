@@ -143,4 +143,5 @@ class EvaluationTests: XCTestCase {
   func testVariantCasesSecond() {
     check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => x | <b=y> => y", expectation: .Unit)
   }
+
 }

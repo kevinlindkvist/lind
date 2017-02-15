@@ -97,6 +97,15 @@ public func evaluate(term: Term) -> Term {
       assertionFailure()
     }
     return term
+  case let .Fix(body):
+    let evaluatedBody = evaluate(term: body)
+    switch evaluatedBody {
+    case let .Abstraction(_, _, body):
+      return evaluate(term: substitute(0, term, body, 0))
+    default:
+      return .Fix(evaluatedBody)
+    }
+    
   }
 }
 

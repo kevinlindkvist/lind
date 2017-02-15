@@ -98,6 +98,13 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
     default:
       return .failure(.message("Couldn't typecheck case."))
     }
+  case let .Fix(body):
+    switch typeOf(term: body, context: context) {
+    case let .success(_, .Function(parameterType, returnType)) where parameterType == returnType:
+      return .success(context, returnType)
+    default:
+      return .failure(.message("Couldn't typecheck fix."))
+    }
   }
 }
 

@@ -18,6 +18,8 @@ fileprivate enum Keyword: String {
   case SUCC = "succ"
   case PRED = "pred"
   case ISZERO = "isZero"
+  case FIX = "fix"
+  case LETREC = "letrec"
   // Values
   case ZERO = "0"
   case UNIT = "unit"
@@ -180,7 +182,7 @@ fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterVie
 // MARK: - Built Ins
 
 fileprivate func builtIn() -> TermParser {
-  return (succ <|> pred <|> isZero <|> ifElse <|> Let <|> variantCase)()
+  return (fix <|> succ <|> pred <|> isZero <|> ifElse <|> Let <|> variantCase)()
 }
 
 private func succ() -> TermParser {
@@ -193,6 +195,22 @@ private func pred() -> TermParser {
 
 private func isZero() -> TermParser {
   return (keyword(.ISZERO) *> spaces *> term >>- { t in create(x: .IsZero(t)) })()
+}
+
+private func fix() -> TermParser {
+  return ((keyword(.FIX) *> term >>- { t in create(x: .Fix(t)) })
+    // The derived convenience form of fix.
+    <|> keyword(.LETREC) *> identifier <* keyword(.COLON) >>- { name in
+      return type >>- { termType in
+        return keyword(.EQUALS) *> term >>- { t in
+          return keyword(.IN) *> term >>- { body in
+            let derivedTerm: Term = .Fix(.Abstraction(parameter: "x", parameterType: termType, body: t))
+            return create(x: .Let(pattern: .Variable(name: name), argument: derivedTerm, body: body))
+          }
+        }
+      }
+    }
+  )()
 }
 
 

@@ -311,4 +311,15 @@ class ParserTests: XCTestCase {
     check(input: "case <a=0> as <a:int> of <a=x> => x | <b=y> => y", expectedTerm:expected)
   }
 
+  func testFix() {
+    check(input: "fix \\x:bool.x", expectedTerm: .Fix(.Abstraction(parameter: "x", parameterType: .Boolean, body: .Variable(name: "x", index: 0))))
+  }
+
+  func testLetrec() {
+    let t1: Term = .Abstraction(parameter: "x", parameterType: .Boolean, body: .Variable(name: "x", index: 0))
+    let argument: Term = .Fix(.Abstraction(parameter: "x", parameterType: .Function(parameterType: .Boolean, returnType: .Boolean), body: t1))
+    let body: Term = .Variable(name: "z", index: 0)
+    check(input: "letrec z: bool->bool = (\\x:bool.x) in z", expectedTerm: .Let(pattern: .Variable(name: "z"), argument: argument, body: body))
+  }
+
 }
