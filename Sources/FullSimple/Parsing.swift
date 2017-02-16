@@ -68,13 +68,14 @@ private func lind() -> TermParser {
 
 private func sequence() -> TermParser {
   return (chainl1(parser: topLevelItem,
-                 oper: modifyState(f: shiftContext(name: "_")) *> keyword(.SEMICOLON)
+                 oper: keyword(.SEMICOLON)
                   *> create(x: { t1, t2 in
                     let abstraction: Term = .Abstraction(parameter: "_",
                                                          parameterType: .Unit,
-                                                         body: t2)
+                                                         body: shift(1, 0, t2))
                     return .Application(left: abstraction, right: t1)
-                  })) <* skipMany(parser: keyword(.SEMICOLON)))()
+                  }))
+    <* skipMany(parser: keyword(.SEMICOLON)))()
 }
 
 private func topLevelItem() -> TermParser {

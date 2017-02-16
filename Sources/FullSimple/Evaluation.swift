@@ -18,9 +18,6 @@ public func evaluate(term: Term) -> Term {
     return term
 
   case let .Application(.Abstraction(parameter, _, body), v2) where isValue(term: v2):
-    if parameter == "_" {
-      return evaluate(term: body)
-    }
     let t2 = termSubstTop(v2, body)
     return evaluate(term: t2)
 
@@ -158,7 +155,7 @@ private func isNumericValue(term: Term) -> Bool {
   }
 }
 
-private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
+func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
   switch t {
     case let .Variable(name, index) where index < c:
       return .Variable(name: name, index: index)
@@ -191,7 +188,7 @@ private func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
   }
 }
 
-private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
+func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int = 0) -> Term {
   switch t {
     case let .Variable(_, index) where index == j+c:
       return shift(c, 0, s)
@@ -226,6 +223,6 @@ private func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int) -> Term {
 
 /// Shifts the term being substituted (`s`) up by one, then substitutes `s` in `t`, 
 /// then shifts the result back down.
-private func termSubstTop(_ s: Term, _ t: Term) -> Term {
+func termSubstTop(_ s: Term, _ t: Term) -> Term {
   return shift(-1, 0, substitute(0, shift(1, 0, s), t, 0))
 }

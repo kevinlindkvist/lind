@@ -61,6 +61,12 @@ class TypeCheckerTests: XCTestCase {
     check(malformedProgram: "(\\x:bool.x) 0")
   }
 
+  func testAssociativity() {
+    let program = "(\\x:bool->bool.\\z:int.z) (\\y:bool.y) 0"
+    check(program: program, type: .Integer)
+    check(malformedProgram: "(\\x:bool->bool.\\z:int.z) ((\\y:bool.y) 0)")
+  }
+
   func testIsZero() {
     check(program: "isZero succ 0", type: .Boolean)
     check(malformedProgram: "isZero isZero 0")

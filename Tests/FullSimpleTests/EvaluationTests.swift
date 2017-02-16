@@ -13,8 +13,15 @@ class EvaluationTests: XCTestCase {
 
   func check(program: String, expectation: Term) {
     switch parse(input: program, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
-      case let .right(term, _):
-        print("\(term)")
+      case .right(var term, let parseContext):
+        var substitutedTerms: [Term] = parseContext.namedTerms
+        for (i, t1) in parseContext.namedTerms.enumerated() {
+          substitutedTerms[i] = t1
+          for (j, t2) in parseContext.namedTerms[i+1..<parseContext.namedTerms.count].enumerated() {
+            substitutedTerms[j] = evaluate(term: substitute(i, t1, t2))
+          }
+          term = substitute(i, t1, term)
+        }
         XCTAssertEqual(evaluate(term: term), expectation)
       case let .left(error): XCTAssertTrue(false, "Could not parse \(program): \(error)")
     }
@@ -26,6 +33,11 @@ class EvaluationTests: XCTestCase {
                                          body: .Variable(name: "y", index: 0))
     let program = "(\\x:unit.x) \\y:unit.y"
     check(program: program, expectation: expectation)
+  }
+
+  func testEvaluateAssociativity() {
+    let program = "(\\x:bool->bool.\\z:int.z) (\\y:bool.y) 0"
+    check(program: program, expectation: .Zero)
   }
 
   func testEvaluateConstant() {
@@ -142,6 +154,18 @@ class EvaluationTests: XCTestCase {
 
   func testVariantCasesSecond() {
     check(program: "case <b=unit> as <a:int,b:unit> of <a=x> => x | <b=y> => y", expectation: .Unit)
+  }
+
+  func testVariableAssignment() {
+    check(program: "x = 0; x", expectation: .Zero)
+  }
+
+  func testVariableAssignmentNested() {
+    check(program: "x = 0; y = true; y", expectation: .True)
+  }
+
+  func testVariableAssignmentNestedOuter() {
+    check(program: "x = 0; y = true; x", expectation: .Zero)
   }
 
 }
