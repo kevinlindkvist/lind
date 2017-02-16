@@ -10,6 +10,19 @@ import Foundation
 
 private typealias BoundTerms = [String:Term]
 
+public func evaluate(term: Term, namedTerms: [Term]) -> Term {
+  var substitutedTerms: [Term] = namedTerms
+  var substitutedTerm = term
+  for (i, t1) in namedTerms.enumerated() {
+    substitutedTerms[i] = t1
+    for (j, t2) in namedTerms[i+1..<namedTerms.count].enumerated() {
+      substitutedTerms[j] = evaluate(term: substitute(i, t1, t2))
+    }
+    substitutedTerm = substitute(i, t1, substitutedTerm)
+  }
+  return evaluate(term: substitutedTerm)
+}
+
 public func evaluate(term: Term) -> Term {
   switch term {
   case .Unit: return .Unit
@@ -17,7 +30,7 @@ public func evaluate(term: Term) -> Term {
   case .Abstraction(_,_,_):
     return term
 
-  case let .Application(.Abstraction(parameter, _, body), v2) where isValue(term: v2):
+  case let .Application(.Abstraction(_, _, body), v2) where isValue(term: v2):
     let t2 = termSubstTop(v2, body)
     return evaluate(term: t2)
 

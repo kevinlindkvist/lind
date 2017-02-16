@@ -13,16 +13,8 @@ class EvaluationTests: XCTestCase {
 
   func check(program: String, expectation: Term) {
     switch parse(input: program, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
-      case .right(var term, let parseContext):
-        var substitutedTerms: [Term] = parseContext.namedTerms
-        for (i, t1) in parseContext.namedTerms.enumerated() {
-          substitutedTerms[i] = t1
-          for (j, t2) in parseContext.namedTerms[i+1..<parseContext.namedTerms.count].enumerated() {
-            substitutedTerms[j] = evaluate(term: substitute(i, t1, t2))
-          }
-          term = substitute(i, t1, term)
-        }
-        XCTAssertEqual(evaluate(term: term), expectation)
+      case let .right(term, parseContext):
+        XCTAssertEqual(evaluate(term: term, namedTerms: parseContext.namedTerms), expectation)
       case let .left(error): XCTAssertTrue(false, "Could not parse \(program): \(error)")
     }
   }
