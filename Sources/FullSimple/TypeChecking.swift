@@ -32,7 +32,7 @@ private func add(pattern: [Int:Type], to context: TypeContext) -> TypeContext {
 public func typeOf(term: Term, context: ParseContext) -> TypeResult {
   var types = context.types
   for (index, namedTerm) in context.namedTerms.enumerated() {
-    switch typeOf(term: namedTerm, context: context.types) {
+    switch typeOf(term: namedTerm, context: types) {
     case let .right(type):
       types[index] = type.1
     case let .left(error):
