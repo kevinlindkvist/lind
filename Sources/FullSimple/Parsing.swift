@@ -88,7 +88,7 @@ private func term() -> TermParser {
 }
 
 private func binding() -> TermParser {
-  return (attempt(parser: (termBinding <|> typeBinding) *> create(x: .Unit)))()
+  return (attempt(parser: termBinding <|> (typeBinding *> create(x: .Unit))))()
 }
 
 private func typeBinding() -> TermParser {
@@ -109,7 +109,7 @@ private func typeBinding() -> TermParser {
 private func termBinding() -> TermParser {
   return (identifier >>- { name in
     return keyword(.EQUALS) *> term >>- { term in
-      return modifyState(f: addToContext(term: term, named: name)) *> create(x: .Unit)
+      return modifyState(f: addToContext(term: term, named: name)) *> create(x: term)
     }
   })()
 }

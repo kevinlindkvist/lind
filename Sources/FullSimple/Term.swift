@@ -103,7 +103,7 @@ public struct ParseContext {
   let terms: TermContext
   let types: TypeContext
   let namedTypes: [String:Type]
-  let namedTerms: [Term]
+  public let namedTerms: [Term]
 
   public init(terms: TermContext, types: TypeContext, namedTypes: [String:Type], namedTerms: [Term]) {
     self.terms = terms

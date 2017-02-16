@@ -29,7 +29,20 @@ private func add(pattern: [Int:Type], to context: TypeContext) -> TypeContext {
   return shiftedContext
 }
 
-public func typeOf(term: Term, context: TypeContext) -> TypeResult {
+public func typeOf(term: Term, context: ParseContext) -> TypeResult {
+  var types = context.types
+  for (index, namedTerm) in context.namedTerms.enumerated() {
+    switch typeOf(term: namedTerm, context: context.types) {
+    case let .right(type):
+      types[index] = type.1
+    case let .left(error):
+      return .left(error)
+    }
+  }
+  return typeOf(term: term, context: types)
+}
+
+private func typeOf(term: Term, context: TypeContext) -> TypeResult {
   switch term {
   case let .Variable(_, index):
     return typeOf(variable: index, context: context)

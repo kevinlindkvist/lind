@@ -10,24 +10,22 @@ import Foundation
 import Parswift
 import FullSimple
 
-public typealias Evaluation = Either<EvaluationError, (Term, Type)>
+public typealias Evaluation = Either<EvaluationError, (Term, Type, ParseContext)>
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
-    case let .right(term, type): return term.description + " :: " + type.description
+    case let .right(term, type, context): return term.description + " :: " + type.description + "\n\(context)"
     case let .left(message): return message.description
   }
 }
 
-func evaluate(input: String,
-              terms: TermContext = [:],
-              types: TypeContext = [:]) -> Evaluation {
-  switch parse(input: input, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
-  case let .right(result, _):
-    switch typeOf(term: result, context: types) {
+func evaluate(input: String, context: ParseContext) -> Evaluation {
+  switch parse(input: input, terms: context) {
+  case let .right(result, updatedContext):
+    switch typeOf(term: result, context: updatedContext) {
       case let .right(_, type):
-        let evaluatedTerm = evaluate(term: result)
-        return .right(evaluatedTerm, type)
+        let evaluatedTerm = evaluate(term: result, namedTerms: updatedContext.namedTerms)
+        return .right(evaluatedTerm, type, updatedContext)
       case let .left(error):
         return .left(.typeError(error))
     }
