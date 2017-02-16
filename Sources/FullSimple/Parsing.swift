@@ -281,9 +281,14 @@ private func addToContext(name: String) -> (ParseContext) -> ParseContext {
 private func addToContext(term: Term, named name: String) -> (ParseContext) -> ParseContext {
   return { context in
     var terms = context.terms
-    terms[name] = terms.count
     var namedTerms = context.namedTerms
-    namedTerms.append(term)
+    if terms[name] == nil {
+      terms[name] = terms.count
+      namedTerms.append(term)
+    } else {
+      namedTerms[terms[name]!] = term
+    }
+    
     return ParseContext(terms: terms, types: context.types, namedTypes: context.namedTypes, namedTerms: namedTerms)
   }
 }
