@@ -31,6 +31,7 @@ fileprivate enum Keyword: String {
   case ARROW = "->"
   // Special characters
   case COLON = ":"
+  case SEMICOLON = ";"
   case PERIOD = "."
   case COMMA = ","
   case BACKSLASH = "\\"
@@ -57,12 +58,8 @@ private typealias TypeParser = Parser<Type, String.CharacterView, ParseContext>
 private typealias StringParser = Parser<String, String.CharacterView, ParseContext>
 private typealias TypeBindingParser = Parser<(String, Type), String.CharacterView, ParseContext>
 
-public func parse(input: String, terms: ParseContext) -> Either<ParseError, Term> {
+public func parse(input: String, terms: ParseContext) -> Either<ParseError, (Term, ParseContext)> {
   return parse(input: input.characters, with: lind, userState: terms, fileName: "")
-}
-
-public func parseBinding(input: String) -> Either<ParseError, (String, Type)> {
-  return parse(input: input.characters, with: abbreviation, userState: ParseContext(terms: [:], types: [:]), fileName: "")
 }
 
 private func lind() -> TermParser {
@@ -70,19 +67,50 @@ private func lind() -> TermParser {
 }
 
 private func sequence() -> TermParser {
-  return chainl1(parser: term,
-                 oper: (spaces *> string(string: ";") <* spaces)
+  return (chainl1(parser: topLevelItem,
+                 oper: modifyState(f: shiftContext(name: "_")) *> keyword(.SEMICOLON)
                   *> create(x: { t1, t2 in
                     let abstraction: Term = .Abstraction(parameter: "_",
                                                          parameterType: .Unit,
                                                          body: t2)
                     return .Application(left: abstraction, right: t1)
-                  }))()
+                  })) <* skipMany(parser: keyword(.SEMICOLON)))()
+}
+
+private func topLevelItem() -> TermParser {
+  return (binding <|> term)()
 }
 
 private func term() -> TermParser {
   return chainl1(parser: nonApplicationTerm,
                  oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
+}
+
+private func binding() -> TermParser {
+  return (attempt(parser: (termBinding <|> typeBinding) *> create(x: .Unit)))()
+}
+
+private func typeBinding() -> TermParser {
+  return (identifier >>- { name in
+    return keyword(.EQUALS) *> type >>- { type in
+      switch type {
+      case let .Base(name):
+        // TODO: Consider introducing more constraints on type abbreviations, so
+        // this doesn't match any arbitrary "identifier = identifier" as a Base type.
+        return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
+      default:
+        return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
+      }
+    }
+  })()
+}
+
+private func termBinding() -> TermParser {
+  return (identifier >>- { name in
+    return keyword(.EQUALS) *> term >>- { term in
+      return modifyState(f: addToContext(term: term, named: name)) *> create(x: .Unit)
+    }
+  })()
 }
 
 private func nonApplicationTerm() -> TermParser {
@@ -221,7 +249,7 @@ private func shiftContext(name: String) -> (ParseContext) -> ParseContext {
       terms[existingName] = index + 1
     }
     terms[name] = 0
-    return ParseContext(terms: terms, types: context.types)
+    return ParseContext(terms: terms, types: context.types, namedTypes: context.namedTypes, namedTerms: context.namedTerms)
   }
 }
 
@@ -234,7 +262,7 @@ private func shiftContext(pattern: Pattern) -> (ParseContext) -> ParseContext {
     for (index, patternVariable) in pattern.variables.enumerated() {
       terms[patternVariable] = index
     }
-    return ParseContext(terms: terms, types: context.types)
+    return ParseContext(terms: terms, types: context.types, namedTypes: context.namedTypes, namedTerms: context.namedTerms)
   }
 }
 
@@ -245,7 +273,25 @@ private func addToContext(name: String) -> (ParseContext) -> ParseContext {
     }
     var terms = context.terms
     terms[name] = terms.count
-    return ParseContext(terms: terms, types: context.types)
+    return ParseContext(terms: terms, types: context.types, namedTypes: context.namedTypes, namedTerms: context.namedTerms)
+  }
+}
+
+private func addToContext(term: Term, named name: String) -> (ParseContext) -> ParseContext {
+  return { context in
+    var terms = context.terms
+    terms[name] = terms.count
+    var namedTerms = context.namedTerms
+    namedTerms.append(term)
+    return ParseContext(terms: terms, types: context.types, namedTypes: context.namedTypes, namedTerms: namedTerms)
+  }
+}
+
+private func addToContext(type: Type, named: String) -> (ParseContext) -> ParseContext {
+  return { context in
+    var namedTypes = context.namedTypes
+    namedTypes[named] = type
+    return ParseContext(terms: context.terms, types: context.types, namedTypes: namedTypes, namedTerms: context.namedTerms)
   }
 }
 
@@ -410,9 +456,9 @@ fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, Pa
 // MARK: - Variables
 
 private func identifier() -> Parser<String, String.CharacterView, ParseContext> {
-  return (spaces *> many1(parser: alphanumeric) >>- { x in
+  return attempt(parser: (spaces *> many1(parser: alphanumeric) >>- { x in
     return create(x: String(x))
-    })()
+    }))()
 }
 
 private func variable() -> TermParser {

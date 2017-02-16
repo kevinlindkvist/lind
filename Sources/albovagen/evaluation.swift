@@ -22,8 +22,8 @@ public func description(evaluation: Evaluation) -> String {
 func evaluate(input: String,
               terms: TermContext = [:],
               types: TypeContext = [:]) -> Evaluation {
-  switch parse(input: input, terms: ParseContext(terms: [:], types: [:])) {
-  case let .right(result):
+  switch parse(input: input, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
+  case let .right(result, _):
     switch typeOf(term: result, context: types) {
       case let .right(_, type):
         let evaluatedTerm = evaluate(term: result)

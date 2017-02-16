@@ -102,10 +102,14 @@ public typealias TermContext = [String:Int]
 public struct ParseContext {
   let terms: TermContext
   let types: TypeContext
+  let namedTypes: [String:Type]
+  let namedTerms: [Term]
 
-  public init(terms: TermContext, types: TypeContext) {
+  public init(terms: TermContext, types: TypeContext, namedTypes: [String:Type], namedTerms: [Term]) {
     self.terms = terms
     self.types = types
+    self.namedTypes = namedTypes
+    self.namedTerms = namedTerms
   }
 }
 

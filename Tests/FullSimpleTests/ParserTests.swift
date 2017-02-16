@@ -18,9 +18,9 @@ class ParserTests: XCTestCase {
   }
 
   fileprivate func check(input: String, expectedResult: Either<ParseError, Term>) {
-    let result = parse(input: input, terms: ParseContext(terms: [:], types: [:]))
+    let result = parse(input: input, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: []))
     switch (result, expectedResult) {
-    case let (.right(t1), .right(t2)):
+    case let (.right(t1, _), .right(t2)):
       XCTAssertEqual(t1, t2, "\n\(t1)\n\(t2)")
     case (.left, .left):
       break
@@ -47,6 +47,7 @@ class ParserTests: XCTestCase {
     check(input: "a b", expectedResult: .right(expected))
     check(input: "a  b", expectedResult: .right(expected))
     check(input: "a     b", expectedResult: .right(expected))
+    check(input: "a     b;", expectedResult: .right(expected))
     check(input: "ab", expectedResult: .right(.Variable(name: "ab", index: 0)))
   }
 
@@ -161,8 +162,9 @@ class ParserTests: XCTestCase {
   func testSequenceApp() {
     let t1: Term = .Application(left: .Variable(name: "a", index: 0),
                                 right: .Variable(name: "b", index: 1))
-    let t2: Term = .Application(left: .Variable(name: "c", index: 2),
-                                right: .Variable(name: "d", index: 3))
+    // c is at index 3 instead of 2 due to the _ parameter that is used in the sequence's derived form.
+    let t2: Term = .Application(left: .Variable(name: "c", index: 3),
+                                right: .Variable(name: "d", index: 4))
     let expected: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: t2),
                                       right: t1)
     check(input: "a b; c d", expectedResult: .right(expected))
@@ -322,4 +324,9 @@ class ParserTests: XCTestCase {
     check(input: "letrec z: bool->bool = (\\x:bool.x) in z", expectedTerm: .Let(pattern: .Variable(name: "z"), argument: argument, body: body))
   }
 
+  func testVariableAssignment() {
+    let x: Term = .Variable(name: "x", index: 1)
+    check(input: "x = 0; x", expectedTerm: .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: x), right: .Unit))
+  }
+  
 }
