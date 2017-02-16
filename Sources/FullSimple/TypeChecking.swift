@@ -18,6 +18,17 @@ private func add(type: Type, to context: TypeContext) -> TypeContext {
   return shiftedContext
 }
 
+private func add(pattern: [Int:Type], to context: TypeContext) -> TypeContext {
+  var shiftedContext: TypeContext = [:]
+  context.forEach { key, value in
+    shiftedContext[key+pattern.count] = value
+  }
+  pattern.forEach { key, value in
+    shiftedContext[key] = value
+  }
+  return shiftedContext
+}
+
 public func typeOf(term: Term, context: TypeContext) -> TypeResult {
   switch term {
   case let .Variable(_, index):
@@ -58,9 +69,9 @@ public func typeOf(term: Term, context: TypeContext) -> TypeResult {
 private func typeOf(pattern: Pattern, argument: Type, context: TypeContext) -> TypeContext? {
   switch (pattern, argument) {
   case let (.Variable, type):
-    return [context.count: type]
+    return union(context, [context.count: type])
   case let (.Record(contents), .Product(types)):
-    var updatedContext: TypeContext = [:]
+    var updatedContext: TypeContext = context
     var encounteredError: Bool = false
     contents.forEach { key, value in
       if let type = types[key], let subcontext = typeOf(pattern: value, argument: type, context: updatedContext) {
@@ -179,10 +190,11 @@ private func typeOf(tuple contents: [String:Term], context: TypeContext) -> Type
 private func typeOf(letTerm pattern: Pattern, argument: Term, body: Term, context: TypeContext) -> TypeResult {
   switch typeOf(term: argument, context: context) {
   case let .right(_, type):
-    if let patternContext = typeOf(pattern: pattern, argument: type, context: context) {
-      return typeOf(term: body, context: union(context, patternContext))
+    if let patternContext = typeOf(pattern: pattern, argument: type, context: [:]) {
+      // Shift the current type context to accommodate the terms typed by the pattern.
+      return typeOf(term: body, context: add(pattern: patternContext, to: context))
     } else {
-      return .left(.message("Haven't implemented pattern types."))
+      return .left(.message("Incorrect pattern types."))
     }
   default:
     return .left(.message("Couldn't typecheck pattern argument \(argument)"))
