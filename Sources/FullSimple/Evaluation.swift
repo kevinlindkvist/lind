@@ -65,7 +65,11 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
     }
   // Variables
   case let .Variable(_, index):
-    return namedTerms[index]
+    if (index < namedTerms.count) {
+      return namedTerms[index]
+    } else {
+      return term
+    }
   // Tuples
   case let .Tuple(contents):
     var evaluatedTerms: [String:Term] = [:]

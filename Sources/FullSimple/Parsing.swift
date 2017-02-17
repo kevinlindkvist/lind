@@ -352,9 +352,17 @@ fileprivate func Else() -> StringParser {
 // MARK: - Types
 
 private func baseType() -> TypeParser {
-  return (bool <|> int <|> unitType <|> productType <|> sumType <|> identifier >>- { typeName in
-    create(x: .Base(typeName: typeName))
-    })()
+  return (bool <|> int <|> unitType <|> productType <|> sumType <|> boundType)()
+}
+
+private func boundType() -> TypeParser {
+  return (alphanumerics >>- { name in
+    if name.characters.first != name.uppercased().characters.first {
+      return fail(message: "Type name did not start with uppercase letter.")
+    } else {
+      return create(x: .Base(typeName: name))
+    }
+  })()
 }
 
 fileprivate func sumType() -> TypeParser {
