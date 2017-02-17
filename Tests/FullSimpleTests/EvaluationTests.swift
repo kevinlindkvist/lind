@@ -160,4 +160,19 @@ class EvaluationTests: XCTestCase {
     check(program: "x = 0; y = true; x", expectation: .Zero)
   }
 
+  func testFix() {
+    let program = "ff = \\ie:int->bool.\\x:int.if isZero x then true else if isZero (pred x) then false else ie (pred (pred x)); iseven = fix ff; iseven 0"
+    check(program: program, expectation: .True)
+  }
+  
+  func testFixRecursionDepths() {
+    let program = "ff = \\ie:int->bool.\\x:int.if isZero x then true else if isZero (pred x) then false else ie (pred (pred x)); iseven = fix ff; iseven "
+    let four = "succ succ succ succ 0"
+    let five = "succ succ succ succ succ 0"
+    let anotherFour = "succ pred succ succ succ succ 0"
+    check(program: program + four, expectation: .True)
+    check(program: program + five, expectation: .False)
+    check(program: program + anotherFour, expectation: .True)
+  }
+
 }

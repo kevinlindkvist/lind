@@ -11,19 +11,6 @@ import Foundation
 private typealias BoundTerms = [String:Term]
 
 public func evaluate(term: Term, namedTerms: [Term]) -> Term {
-  var substitutedTerms: [Term] = namedTerms
-  var substitutedTerm = term
-  for (i, t1) in namedTerms.enumerated() {
-    substitutedTerms[i] = t1
-    for (j, t2) in namedTerms[i+1..<namedTerms.count].enumerated() {
-      substitutedTerms[j] = evaluate(term: substitute(i, t1, t2))
-    }
-    substitutedTerm = substitute(i, t1, substitutedTerm)
-  }
-  return evaluate(term: substitutedTerm)
-}
-
-public func evaluate(term: Term) -> Term {
   switch term {
   case .Unit: return .Unit
   // Application and Abstraction
@@ -32,15 +19,15 @@ public func evaluate(term: Term) -> Term {
 
   case let .Application(.Abstraction(_, _, body), v2) where isValue(term: v2):
     let t2 = termSubstTop(v2, body)
-    return evaluate(term: t2)
+    return evaluate(term: t2, namedTerms: namedTerms)
 
   case let .Application(v1, t2) where isValue(term: v1):
-    let t2p = evaluate(term: t2)
-    return evaluate(term: .Application(left: v1, right: t2p))
+    let t2p = evaluate(term: t2, namedTerms: namedTerms)
+    return evaluate(term: .Application(left: v1, right: t2p), namedTerms: namedTerms)
 
   case let .Application(t1, t2):
-    let t1p = evaluate(term: t1)
-    return evaluate(term: .Application(left: t1p, right: t2))
+    let t1p = evaluate(term: t1, namedTerms: namedTerms)
+    return evaluate(term: .Application(left: t1p, right: t2), namedTerms: namedTerms)
   // Numbers
   case .Zero: return .Zero
     
@@ -49,56 +36,55 @@ public func evaluate(term: Term) -> Term {
   case .IsZero(.Succ(_)):
     return .False
   case let .IsZero(zeroTerm):
-    let evaluatedTerm = evaluate(term: zeroTerm)
-    return evaluate(term: .IsZero(evaluatedTerm))
+    let evaluatedTerm = evaluate(term: zeroTerm, namedTerms: namedTerms)
+    return evaluate(term: .IsZero(evaluatedTerm), namedTerms: namedTerms)
 
   case .Succ(.Zero):
     return .Succ(.Zero)
   case let .Succ(succTerm):
-    return .Succ(evaluate(term: succTerm))
+    return .Succ(evaluate(term: succTerm, namedTerms: namedTerms))
     
   case .Pred(.Zero):
     return .Zero
   case let .Pred(.Succ(succTerm)):
     return succTerm
   case let .Pred(predTerm):
-    let evaluatedTerm = evaluate(term: predTerm)
-    return evaluate(term: .Pred(evaluatedTerm))
+    let evaluatedTerm = evaluate(term: predTerm, namedTerms: namedTerms)
+    return evaluate(term: .Pred(evaluatedTerm), namedTerms: namedTerms)
     
   // Booleans
   case .True: return .True
   case .False: return .False
 
   case let .If(conditional, trueBranch, falseBranch):
-    switch evaluate(term: conditional) {
+    switch evaluate(term: conditional, namedTerms: namedTerms) {
       case .True:
-        return evaluate(term: trueBranch)
+        return evaluate(term: trueBranch, namedTerms: namedTerms)
       default:
-        return evaluate(term: falseBranch)
+        return evaluate(term: falseBranch, namedTerms: namedTerms)
     }
   // Variables
-  case .Variable:
-    return term
+  case let .Variable(_, index):
+    return namedTerms[index]
   // Tuples
   case let .Tuple(contents):
     var evaluatedTerms: [String:Term] = [:]
     for (key,value) in contents {
-      evaluatedTerms[key] = evaluate(term: value)
+      evaluatedTerms[key] = evaluate(term: value, namedTerms: namedTerms)
     }
     return .Tuple(evaluatedTerms)
   case let .Let(p, argument, body):
-    let argumentValue = evaluate(term: argument)
+    let argumentValue = evaluate(term: argument, namedTerms: namedTerms)
     var substitutedTerm = body
     let matches = match(pattern: p, argument: argumentValue)
     for (index, name) in p.variables.enumerated() {
-      print("\(substitutedTerm)")
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
-    return evaluate(term: substitutedTerm)
+    return evaluate(term: substitutedTerm, namedTerms: namedTerms)
   case let .Tag(label, term, type):
-    return .Tag(label: label, term: evaluate(term: term), ascribedType: type)
+    return .Tag(label: label, term: evaluate(term: term, namedTerms: namedTerms), ascribedType: type)
   case let .Case(term, cases):
-    switch evaluate(term: term) {
+    switch evaluate(term: term, namedTerms: namedTerms) {
     case let .Tag(label, t, _):
       // The typechecker makes sure that this case exists.
       let c = cases.filter { $0.value.label == label }.first!
@@ -107,15 +93,12 @@ public func evaluate(term: Term) -> Term {
       assertionFailure()
     }
     return term
-  case let .Fix(body):
-    let evaluatedBody = evaluate(term: body)
-    switch evaluatedBody {
-    case let .Abstraction(_, _, body):
-      return evaluate(term: substitute(0, term, body, 0))
-    default:
-      return .Fix(evaluatedBody)
-    }
-    
+  case let .Fix(.Abstraction(_, _, body)):
+    return substitute(0, term, body)
+  case let .Fix(fixedTerm) where isValue(term: fixedTerm):
+    return .Fix(fixedTerm)
+  case let .Fix(fixedTerm):
+    return evaluate(term: .Fix(evaluate(term: fixedTerm, namedTerms: namedTerms)), namedTerms: namedTerms)
   }
 }
 
@@ -229,6 +212,8 @@ func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int = 0) -> Term {
       return .Tuple(newContents)
     case let .Let(pattern, argument, body):
       return .Let(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c+pattern.length))
+    case let .Fix(body):
+      return .Fix(substitute(j, s, body, c))
     default:
       return t
   }

@@ -258,4 +258,14 @@ class TypeCheckerTests: XCTestCase {
   func testVariableAssignment() {
     check(program: "x = 0; x", type: .Integer)
   }
+
+  func testFix() {
+    let program = "ff = \\ie:int->bool.\\x:int.if isZero x then true else if isZero (pred x) then false else ie (pred (pred x)); iseven = fix ff; iseven 0"
+    check(program: program, type: .Boolean)
+  }
+  
+  func testMalformedFix() {
+    let program = "ff = \\ie:int->bool.\\x:int.if isZero x then true else if isZero (pred x) then false else ie (pred (pred x)); iseven = fix ff; iseven true"
+    check(malformedProgram: program)
+  }
 }
