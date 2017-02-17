@@ -101,10 +101,18 @@ private func typeBinding() -> TermParser {
 
 private func termBinding() -> TermParser {
   return (identifier >>- { name in
-    return keyword(.EQUALS) *> term >>- { term in
-      return modifyState(f: addToContext(term: term, named: name)) *> create(x: .Unit)
+    return userState >>- { savedContext in
+      return keyword(.EQUALS) *> term >>- { term in
+        return modifyState(f: addToContext(term: term, named: name)) *> userState >>- { newState in
+          if savedContext.namedTerms.count == newState.namedTerms.count {
+            return fail(message: "Trying to re-bind \(name)")
+          } else {
+            return create(x: .Unit)
+          }
+        }
+      }
     }
-  })()
+    })()
 }
 
 private func nonApplicationTerm() -> TermParser {

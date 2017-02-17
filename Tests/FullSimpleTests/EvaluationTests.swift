@@ -14,6 +14,7 @@ class EvaluationTests: XCTestCase {
   func check(program: String, expectation: Term) {
     switch parse(input: program, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
       case let .right(term, parseContext):
+        print(term, parseContext)
         XCTAssertEqual(evaluate(term: term, namedTerms: parseContext.namedTerms), expectation)
       case let .left(error): XCTAssertTrue(false, "Could not parse \(program): \(error)")
     }
