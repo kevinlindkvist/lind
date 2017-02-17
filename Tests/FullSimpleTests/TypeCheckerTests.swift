@@ -15,7 +15,7 @@ class TypeCheckerTests: XCTestCase {
   func check(program: String, type: Type, context: TypeContext = [:]) {
     switch parse(input: program, terms: ParseContext(terms: [:], types: context, namedTypes: [:], namedTerms: [])) {
     case let .right(t, parseContext):
-      switch typeOf(term: t, context: parseContext) {
+      switch typeOf(term: t, parsedContext: parseContext) {
       case let .right(parsedType):
         XCTAssertEqual(type, parsedType.1, "\(t)")
       case let .left(error):
@@ -29,7 +29,7 @@ class TypeCheckerTests: XCTestCase {
   func check(malformedProgram: String, context: TypeContext = [:]) {
     switch parse(input: malformedProgram, terms: ParseContext(terms: [:], types: [:], namedTypes: [:], namedTerms: [])) {
     case let .right(t, context):
-      switch typeOf(term: t, context: context) {
+      switch typeOf(term: t, parsedContext: context) {
       case let .right(_, type):
         XCTFail("Type check did not fail on malformed program \(t) :: \(type).")
       default:

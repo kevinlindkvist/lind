@@ -92,16 +92,9 @@ private func binding() -> TermParser {
 }
 
 private func typeBinding() -> TermParser {
-  return (identifier >>- { name in
+  return (typeIdentifier >>- { name in
     return keyword(.EQUALS) *> type >>- { type in
-      switch type {
-      case let .Base(name):
-        // TODO: Consider introducing more constraints on type abbreviations, so
-        // this doesn't match any arbitrary "identifier = identifier" as a Base type.
-        return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
-      default:
-        return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
-      }
+      return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
     }
   })()
 }
@@ -356,12 +349,8 @@ private func baseType() -> TypeParser {
 }
 
 private func boundType() -> TypeParser {
-  return (alphanumerics >>- { name in
-    if name.characters.first != name.uppercased().characters.first {
-      return fail(message: "Type name did not start with uppercase letter.")
-    } else {
+  return (typeIdentifier >>- { name in
       return create(x: .Base(typeName: name))
-    }
   })()
 }
 
@@ -471,7 +460,23 @@ fileprivate func tupleEntry() -> Parser<(String, Term), String.CharacterView, Pa
 
 private func identifier() -> Parser<String, String.CharacterView, ParseContext> {
   return attempt(parser: (spaces *> many1(parser: alphanumeric) >>- { x in
-    return create(x: String(x))
+    let string = String(x)
+    if string.lowercased().characters.first == string.characters.first {
+      return create(x: String(x))
+    } else {
+      return fail(message: "Identifier started with uppercase letter.")
+    }
+    }))()
+}
+
+private func typeIdentifier() -> Parser<String, String.CharacterView, ParseContext> {
+  return attempt(parser: (spaces *> many1(parser: alphanumeric) >>- { x in
+    let string = String(x)
+    if string.characters.first == string.uppercased().characters.first {
+      return create(x: String(x))
+    } else {
+      return fail(message: "Typename did not begin with uppercase letter.")
+    }
     }))()
 }
 

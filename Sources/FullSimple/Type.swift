@@ -9,7 +9,7 @@
 import Foundation
 import Parswift
 
-public typealias TypeResult = Either<TypeError, (TypeContext, Type)>
+public typealias TypeResult = Either<TypeError, (ParseContext, Type)>
 
 public indirect enum Type {
   case Function(parameterType: Type, returnType: Type)
