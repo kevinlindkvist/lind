@@ -176,4 +176,22 @@ class EvaluationTests: XCTestCase {
     check(program: program + anotherFour, expectation: .True)
   }
 
+  func testMutualRecursion() {
+    let program = "ff = \\ieio:{iseven:int->bool, isodd:int->bool}.{iseven : \\x:int.if isZero x then true else ieio.isodd (pred x), isodd : \\x:int.if isZero x then false else ieio.iseven (pred x)}; r = fix ff; iseven = r.iseven; iseven "
+    let zero = "0"
+    let one = "succ 0"
+    check(program: program + zero, expectation: .True)
+    check(program: program + one, expectation: .False)
+  }
+
+  func testMutualRecursionDepth() {
+    let program = "ff = \\ieio:{iseven:int->bool, isodd:int->bool}.{iseven : \\x:int.if isZero x then true else ieio.isodd (pred x), isodd : \\x:int.if isZero x then false else ieio.iseven (pred x)}; r = fix ff; iseven = r.iseven; iseven "
+    let four = "succ succ succ succ 0"
+    let five = "succ succ succ succ succ 0"
+    let anotherFour = "succ pred succ succ succ succ 0"
+    check(program: program + four, expectation: .True)
+    check(program: program + five, expectation: .False)
+    check(program: program + anotherFour, expectation: .True)
+  }
+
 }

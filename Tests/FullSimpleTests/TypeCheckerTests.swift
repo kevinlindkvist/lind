@@ -268,4 +268,9 @@ class TypeCheckerTests: XCTestCase {
     let program = "ff = \\ie:int->bool.\\x:int.if isZero x then true else if isZero (pred x) then false else ie (pred (pred x)); iseven = fix ff; iseven true"
     check(malformedProgram: program)
   }
+
+  func testMutualRecursion() {
+    let program = "ff = \\ieio:{iseven:int->bool, isodd:int->bool}.{iseven : \\x:int.if isZero x then true else ieio.isodd (pred x), isodd : \\x:int.if isZero x then false else ieio.iseven (pred x)}; r = fix ff; iseven = r.iseven; iseven 0"
+    check(program: program, type: .Boolean)
+  }
 }

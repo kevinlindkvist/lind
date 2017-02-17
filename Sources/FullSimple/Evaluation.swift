@@ -77,14 +77,16 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
       evaluatedTerms[key] = evaluate(term: value, namedTerms: namedTerms)
     }
     return .Tuple(evaluatedTerms)
-  case let .Let(p, argument, body):
-    let argumentValue = evaluate(term: argument, namedTerms: namedTerms)
+  case let .Let(p, argument, body) where isValue(term: argument):
+    let matches = match(pattern: p, argument: argument, namedTerms: namedTerms)
     var substitutedTerm = body
-    let matches = match(pattern: p, argument: argumentValue)
     for (index, name) in p.variables.enumerated() {
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
     return evaluate(term: substitutedTerm, namedTerms: namedTerms)
+  case let .Let(p, argument, body):
+    let argumentValue = evaluate(term: argument, namedTerms: namedTerms)
+    return evaluate(term: .Let(pattern: p, argument: argumentValue, body: body), namedTerms: namedTerms)
   case let .Tag(label, term, type):
     return .Tag(label: label, term: evaluate(term: term, namedTerms: namedTerms), ascribedType: type)
   case let .Case(term, cases):
@@ -106,7 +108,7 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
   }
 }
 
-private func match(pattern: Pattern, argument: Term) -> [String:Term] {
+private func match(pattern: Pattern, argument: Term, namedTerms: [Term]) -> [String:Term] {
   switch pattern {
   case let .Variable(name):
     return [name: argument]
@@ -115,7 +117,7 @@ private func match(pattern: Pattern, argument: Term) -> [String:Term] {
     case let .Tuple(arguments):
       var matches: [String:Term] = [:]
       contents.forEach { key, value in
-        match(pattern: value, argument: arguments[key]!).forEach { key, value in
+        match(pattern: value, argument: arguments[key]!, namedTerms: namedTerms).forEach { key, value in
           matches[key] = value
         }
       }
@@ -176,13 +178,15 @@ func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
     case let .IsZero(body):
       return .IsZero(shift(d, c, body))
     case let .Let(pattern, argument, body):
-      return .Let(pattern: pattern, argument: shift(d, c, argument), body: shift(d, c, body))
+      return .Let(pattern: pattern, argument: shift(d, c+pattern.length, argument), body: shift(d, c+pattern.length, body))
     case let .Tuple(contents):
       var newContents: [String:Term] = [:]
       contents.forEach { key, value in
         newContents[key] = shift(d, c, value)
       }
       return .Tuple(newContents)
+    case let .Fix(contents):
+      return .Fix(shift(d, c, contents))
     default:
       return t
   }
