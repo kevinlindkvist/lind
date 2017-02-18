@@ -306,7 +306,7 @@ class ParserTests: XCTestCase {
     let x: Term = .Variable(name: "x", index: 1)
     check(input: "x = 0; x", expect: .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: x), right: .Unit))
   }
-
+  
   func testVariableAssignmentNested() {
     let inner: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: .Unit), right: .Unit)
     let outer: Term = .Application(left: .Abstraction(parameter: "_", parameterType: .Unit, body: .Variable(name: "y", index: 2)), right: inner)

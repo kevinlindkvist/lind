@@ -27,6 +27,25 @@ func check(input: String,
   }
 }
 
+/// Parses `input`, evaluates it, and asserts that the result is equal to `expectedTerm`.
+func check(input: String,
+           expectEvaluated expectedTerm: Term,
+           file: StaticString = #file,
+           line: UInt = #line) {
+  let result = parse(input: input, context: ParseContext())
+  switch (result) {
+  case let .right(parsedTerm, context):
+    let evaluatedTerm = evaluate(term: parsedTerm, namedTerms: context.namedTerms)
+    XCTAssertEqual(evaluatedTerm,
+                   expectedTerm,
+                   "Expected \(evaluatedTerm) to be \(expectedTerm).",
+                   file: file,
+                   line: line)
+  case let .left(error):
+    XCTFail("Could not parse \(input) due to \(error).", file: file, line: line)
+  }
+}
+
 /// Parses `input` and asserts that the parsed term's type is `expectedType` when checked with the
 /// provided `contextTypes` in the context.
 func check(input: String,
