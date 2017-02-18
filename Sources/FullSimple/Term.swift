@@ -111,6 +111,20 @@ public struct ParseContext {
     self.namedTypes = namedTypes
     self.namedTerms = namedTerms
   }
+
+  public init(types: TypeContext) {
+    self.terms = [:]
+    self.types = types
+    self.namedTypes = [:]
+    self.namedTerms = []
+  }
+
+  public init() {
+    self.terms = [:]
+    self.types = [:]
+    self.namedTypes = [:]
+    self.namedTerms = []
+  }
 }
 
 extension Term: CustomStringConvertible {

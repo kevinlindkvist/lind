@@ -20,7 +20,7 @@ public func description(evaluation: Evaluation) -> String {
 }
 
 func evaluate(input: String, context: ParseContext) -> Evaluation {
-  switch parse(input: input, terms: context) {
+  switch parse(input: input, context: context) {
   case let .right(result, updatedContext):
     switch typeOf(term: result, parsedContext: updatedContext) {
       case let .right(_, type):

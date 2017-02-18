@@ -58,8 +58,8 @@ private typealias TypeParser = Parser<Type, String.CharacterView, ParseContext>
 private typealias StringParser = Parser<String, String.CharacterView, ParseContext>
 private typealias TypeBindingParser = Parser<(String, Type), String.CharacterView, ParseContext>
 
-public func parse(input: String, terms: ParseContext) -> Either<ParseError, (Term, ParseContext)> {
-  return parse(input: input.characters, with: lind, userState: terms, fileName: "")
+public func parse(input: String, context: ParseContext) -> Either<ParseError, (Term, ParseContext)> {
+  return parse(input: input.characters, with: lind, userState: context, fileName: "")
 }
 
 private func lind() -> TermParser {
