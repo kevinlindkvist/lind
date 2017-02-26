@@ -1,11 +1,3 @@
-//
-//  TypeCheckerTests.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 1/19/17.
-//  Copyright © 2017 lindkvist. All rights reserved.
-//
-
 import XCTest
 import Parser
 @testable import FullSimple

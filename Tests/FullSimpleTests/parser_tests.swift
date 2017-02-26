@@ -1,27 +1,23 @@
-//
-//  ParserTests.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 9/7/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
-import Result
 import XCTest
 import Parswift
 @testable import FullSimple
 
 class ParserTests: XCTestCase {
 
+  /// Tests parsing an abstraction with a parameter with a base type.
   func testAbsBaseType() {
     let expected: Term = .Application(left: .Abstraction(parameter: "x",
-                                      parameterType: .Boolean,
-    body: .Variable(name: "x", index: 0)), right: .Variable(name: "x", index: 0))
+                                                         parameterType: .Boolean,
+                                                         body: .Variable(name: "x", index: 0)),
+                                      right: .Variable(name: "x", index: 0))
     check(input: "(\\x:bool.x) x", expect: expected)
   }
 
+  /// Tests parsing an application with differing amounts of whitespace.
   func testAppSpaces() {
-    let expected: Term = .Application(left: .Variable(name: "a", index: 0), right: .Variable(name: "b", index: 1))
+    let expected: Term = .Application(left: .Variable(name: "a", index: 0),
+                                      right: .Variable(name: "b", index: 1))
+    
     check(input: "a b", expect: .right(expected))
     check(input: "a  b", expect: .right(expected))
     check(input: "a     b", expect: .right(expected))
@@ -29,30 +25,39 @@ class ParserTests: XCTestCase {
     check(input: "ab", expect: .right(.Variable(name: "ab", index: 0)))
   }
 
+  /// Tests parsing succ terms.
   func testSucc() {
     let expected: Term = .Succ(.Pred(.Zero))
     check(input: "succ(pred 0)", expect: expected)
     check(input: "succ pred 0", expect: expected)
   }
 
+  /// Tests parsing pred terms.
   func testPred() {
     let expected: Term = .Pred(.Succ(.Zero))
     check(input: "pred(succ 0)", expect: expected)
   }
 
+  /// Tests parsing an abstraction with a complex parameter type.
   func testAbsArrowType() {
-    let expected: Term = .Abstraction(parameter: "x", parameterType: .Function(parameterType: .Integer, returnType: .Boolean), body: .Variable(name: "x", index: 0))
+    let expected: Term = .Abstraction(parameter: "x",
+                                      parameterType: .Function(parameterType: .Integer,
+                                                               returnType: .Boolean),
+                                      body: .Variable(name: "x", index: 0))
     check(input: "\\x:int->bool.x", expect: expected)
   }
 
+  /// Tests parsing an if-else statement without any parentheses.
   func testIfElseNoParens() {
     let expected: Term = .If(condition: .Succ(.Pred(.Zero)), trueBranch: .False, falseBranch: .True)
     check(input: "if succ pred 0 then false else true", expect: expected)
   }
 
-  func testIfElse() {
-    let condition: Term = .Application(left:
-      .Abstraction(parameter: "x", parameterType: .Boolean, body: .Variable(name: "x", index: 0)),
+  /// Tests parsing an if-else statement with an application in the conditional. 
+  func testIfElseApplicationConditional() {
+    let condition: Term = .Application(left: .Abstraction(parameter: "x",
+                                                          parameterType: .Boolean,
+                                                          body: .Variable(name: "x", index: 0)),
                                        right: .True)
     let expected: Term = .If(condition: condition, trueBranch: .False, falseBranch: .True)
     check(input: "if (\\x:bool.x) true then false else true", expect: expected)
