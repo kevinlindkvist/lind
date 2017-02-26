@@ -1,14 +1,4 @@
-//
-//  Evaluation.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 12/25/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
 import Foundation
-
-private typealias BoundTerms = [String:Term]
 
 public func evaluate(term: Term, namedTerms: [Term]) -> Term {
   switch term {

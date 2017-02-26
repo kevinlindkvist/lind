@@ -1,82 +1,4 @@
-//
-//  Term.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 12/11/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
 import Foundation
-
-public indirect enum Pattern {
-  case Variable(name: String)
-  case Record([String:Pattern])
-
-  var length: Int {
-    switch self {
-      case .Variable:
-        return 1
-      case let .Record(contents):
-        return contents.map { key, value in value.length }.reduce(0, +)
-    }
-  }
-
-  var variables: [String] {
-    switch self {
-    case let .Variable(name):
-      return [name]
-    case let .Record(contents):
-      return contents.flatMap { _, pattern in pattern.variables }
-    }
-  }
-}
-
-extension Pattern: CustomStringConvertible {
-  public var description: String {
-    switch self {
-    case let .Variable(name):
-      return name
-    case let .Record(contents):
-      var string = "{"
-      contents.forEach { key, value in
-        string += "\(key)=\(value.description),"
-      }
-      return string + "}"
-    }
-  }
-}
-
-extension Pattern: Equatable {
-}
-
-public func ==(lhs: Pattern, rhs: Pattern) -> Bool {
-  switch (lhs, rhs) {
-  case let (.Variable(name), .Variable(otherName)):
-    return name == otherName
-  case let (.Record(contents), .Record(otherContents)):
-    return contents == otherContents
-  default: return false
-  }
-}
-
-public struct Case {
-  let label: String
-  let parameter: String
-  let term: Term
-}
-
-extension Case: CustomStringConvertible {
-  public var description: String {
-    return "<\(label)=\(parameter)> in \(term)"
-  }
-}
-
-extension Case: Equatable {
-}
-
-public func ==(lhs: Case, rhs: Case) -> Bool {
-  return lhs.label == rhs.label && lhs.parameter == rhs.parameter && lhs.term == rhs.term
-}
 
 public indirect enum Term {
   case Unit
@@ -95,36 +17,6 @@ public indirect enum Term {
   case Tag(label: String, term: Term, ascribedType: Type)
   case Case(term: Term, cases: [String:Case])
   case Fix(Term)
-}
-
-public typealias TermContext = [String:Int]
-
-public struct ParseContext {
-  let terms: TermContext
-  let types: TypeContext
-  let namedTypes: [String:Type]
-  public let namedTerms: [Term]
-
-  public init(terms: TermContext, types: TypeContext, namedTypes: [String:Type], namedTerms: [Term]) {
-    self.terms = terms
-    self.types = types
-    self.namedTypes = namedTypes
-    self.namedTerms = namedTerms
-  }
-
-  public init(types: TypeContext) {
-    self.terms = [:]
-    self.types = types
-    self.namedTypes = [:]
-    self.namedTerms = []
-  }
-
-  public init() {
-    self.terms = [:]
-    self.types = [:]
-    self.namedTypes = [:]
-    self.namedTerms = []
-  }
 }
 
 extension Term: CustomStringConvertible {

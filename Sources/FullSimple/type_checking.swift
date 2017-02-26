@@ -1,13 +1,8 @@
-//
-//  LindTypeChecking.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 12/11/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
 import Foundation
+import Parswift
 import Parser
+
+public typealias TypeResult = Either<TypeError, (ParseContext, Type)>
 
 private func add(type: Type, to context: ParseContext) -> ParseContext {
   var shiftedContext: TypeContext = [:]

@@ -1,15 +1,4 @@
-//
-//  Type.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 12/11/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
 import Foundation
-import Parswift
-
-public typealias TypeResult = Either<TypeError, (ParseContext, Type)>
 
 public indirect enum Type {
   case Function(parameterType: Type, returnType: Type)
@@ -20,8 +9,6 @@ public indirect enum Type {
   case Product([String:Type])
   case Sum([String:Type])
 }
-
-public typealias TypeContext = [Int:Type]
 
 extension Type: Equatable {
 }

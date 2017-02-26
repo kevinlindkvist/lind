@@ -1,11 +1,3 @@
-//
-//  TypeError.swift
-//  lind
-//
-//  Created by Kevin Lindkvist on 12/11/16.
-//  Copyright © 2016 lindkvist. All rights reserved.
-//
-
 import Foundation
 
 public enum TypeError: Error {
