@@ -221,4 +221,17 @@ class EvaluationTests: XCTestCase {
     check(input: program + anotherFour, expectEvaluated: .trueTerm)
   }
 
+  /// Tests using letrec to definea a mutually recursive function.
+  func testLetRecMutualRecursion() {
+    let program = "letrec iseven : int->bool = \\x:int.if isZero x then true "
+      + "else if isZero (pred x) then false "
+      + "else iseven (pred (pred x)) in iseven "
+    let four = "succ succ succ succ 0"
+    let five = "succ succ succ succ succ 0"
+    let anotherFour = "succ pred succ succ succ succ 0"
+    check(input: program + four, expectEvaluated: .trueTerm)
+    check(input: program + five, expectEvaluated: .falseTerm)
+    check(input: program + anotherFour, expectEvaluated: .trueTerm)
+  }
+
 }
