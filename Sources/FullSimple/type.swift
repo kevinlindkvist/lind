@@ -1,13 +1,13 @@
 import Foundation
 
 public indirect enum Type {
-  case Function(parameterType: Type, returnType: Type)
-  case Boolean
-  case Integer
-  case Unit
-  case Base(typeName: String)
-  case Product([String:Type])
-  case Sum([String:Type])
+  case function(parameterType: Type, returnType: Type)
+  case boolean
+  case integer
+  case unit
+  case base(typeName: String)
+  case product([String:Type])
+  case sum([String:Type])
 }
 
 extension Type: Equatable {
@@ -15,19 +15,19 @@ extension Type: Equatable {
 
 public func ==(lhs: Type, rhs: Type) -> Bool {
   switch (lhs, rhs) {
-    case (.Boolean, .Boolean):
+    case (.boolean, .boolean):
       return true
-    case (.Integer, .Integer):
+    case (.integer, .integer):
       return true
-    case let (.Function(t1,t2), .Function(t11, t22)):
+    case let (.function(t1,t2), .function(t11, t22)):
       return t1 == t11 && t2 == t22
-    case (.Unit, .Unit):
+    case (.unit, .unit):
       return true
-    case let (.Base(firstType), .Base(secondType)):
+    case let (.base(firstType), .base(secondType)):
       return firstType == secondType
-    case let (.Product(firstContents), .Product(secondContents)):
+    case let (.product(firstContents), .product(secondContents)):
       return firstContents == secondContents
-    case let (.Sum(firstContents), .Sum(secondContents)):
+    case let (.sum(firstContents), .sum(secondContents)):
       return firstContents == secondContents
     default:
       return false
@@ -37,19 +37,19 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
 extension Type: CustomStringConvertible {
   public var description: String {
     switch self {
-      case .Boolean:
+      case .boolean:
         return "bool"
-      case .Integer:
+      case .integer:
         return "int"
-      case let .Function(parameterType, returnType):
+      case let .function(parameterType, returnType):
         return "\(parameterType) => \(returnType)"
-      case .Unit:
+      case .unit:
         return "unit"
-      case let .Base(typeName):
+      case let .base(typeName):
         return typeName
-      case let .Product(productTypes):
+      case let .product(productTypes):
         return "{\(productTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))}"
-      case let .Sum(sumTypes):
+      case let .sum(sumTypes):
         return "<\(sumTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))>"
     }
   }

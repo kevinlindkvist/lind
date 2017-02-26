@@ -61,10 +61,10 @@ private func sequence() -> TermParser {
   return (chainl1(parser: topLevelItem,
                  oper: keyword(.SEMICOLON)
                   *> create(x: { t1, t2 in
-                    let abstraction: Term = .Abstraction(parameter: "_",
-                                                         parameterType: .Unit,
+                    let abstraction: Term = .abstraction(parameter: "_",
+                                                         parameterType: .unit,
                                                          body: shift(1, 0, t2))
-                    return .Application(left: abstraction, right: t1)
+                    return .application(left: abstraction, right: t1)
                   }))
     <* skipMany(parser: keyword(.SEMICOLON)))()
 }
@@ -75,17 +75,17 @@ private func topLevelItem() -> TermParser {
 
 private func term() -> TermParser {
   return chainl1(parser: nonApplicationTerm,
-                 oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .Application(left: t1, right: t2) }))()
+                 oper: string(string: " ") *> spaces *> create(x: { t1, t2 in .application(left: t1, right: t2) }))()
 }
 
 private func binding() -> TermParser {
-  return (attempt(parser: termBinding <|> (typeBinding *> create(x: .Unit))))()
+  return (attempt(parser: termBinding <|> (typeBinding *> create(x: .unit))))()
 }
 
 private func typeBinding() -> TermParser {
   return (typeIdentifier >>- { name in
     return keyword(.EQUALS) *> type >>- { type in
-      return modifyState(f: addToContext(type: type, named: name)) *> create(x: .Unit)
+      return modifyState(f: addToContext(type: type, named: name)) *> create(x: .unit)
     }
   })()
 }
@@ -98,7 +98,7 @@ private func termBinding() -> TermParser {
           if savedContext.namedTerms.count == newState.namedTerms.count {
             return fail(message: "Trying to re-bind \(name)")
           } else {
-            return create(x: .Unit)
+            return create(x: .unit)
           }
         }
       }
@@ -110,9 +110,9 @@ private func nonApplicationTerm() -> TermParser {
   return (atom >>- { term in
     // After an atom is parsed, check if there is an ascription.
     return ascription >>- { type in
-      let body: Term = .Variable(name: "x", index: 0)
-      let abstraction: Term = .Abstraction(parameter: "x", parameterType: type, body: body)
-      return create(x: .Application(left: abstraction, right: term))
+      let body: Term = .variable(name: "x", index: 0)
+      let abstraction: Term = .abstraction(parameter: "x", parameterType: type, body: body)
+      return create(x: .application(left: abstraction, right: term))
       }
       // Check for a projection if there was no ascription.
       <|> projection(term: term)
@@ -125,8 +125,8 @@ private func projection(term: Term) -> () -> TermParser {
   return keyword(.PERIOD) *> separate(parser: identifier, by: keyword(.PERIOD)) >>- { identifiers in
     var term = term
     identifiers.forEach { projection in
-      let pattern: Pattern = .Record([projection:.Variable(name: "x")])
-      term = .Let(pattern: pattern, argument: term, body: .Variable(name: "x", index: 0))
+      let pattern: Pattern = .record([projection:.variable(name: "x")])
+      term = .letTerm(pattern: pattern, argument: term, body: .variable(name: "x", index: 0))
     }
     return create(x: term)
   }
@@ -161,7 +161,7 @@ fileprivate func Let() -> TermParser {
     return keyword(.EQUALS) *> term >>- { t1 in
       return userState >>- { savedContext in
         return modifyState(f: shiftContext(pattern: letPattern)) *> keyword(.IN) *> term >>- { t2 in
-          return modifyState(f: { _ in savedContext}) *> create(x: .Let(pattern: letPattern, argument: t1, body: t2))
+          return modifyState(f: { _ in savedContext}) *> create(x: .letTerm(pattern: letPattern, argument: t1, body: t2))
         }
       }
     }
@@ -172,7 +172,7 @@ fileprivate func Let() -> TermParser {
 // MARK: Patterns
 
 private func pattern() -> Parser<Pattern, String.CharacterView, ParseContext> {
-  return (attempt(parser: identifier >>- { name in create(x: .Variable(name: name)) })
+  return (attempt(parser: identifier >>- { name in create(x: .variable(name: name)) })
     <|> (keyword(.OPEN_TUPLE) *>
       separate(parser: patternEntry,
                byAtLeastOne: keyword(.COMMA)) >>- { contents in
@@ -186,7 +186,7 @@ private func pattern() -> Parser<Pattern, String.CharacterView, ParseContext> {
                   }
                   counter = counter + 1
                 }
-                return create(x: .Record(values))
+                return create(x: .record(values))
       }
       <* keyword(.CLOSE_TUPLE)))()
 }
@@ -205,26 +205,26 @@ fileprivate func builtIn() -> TermParser {
 }
 
 private func succ() -> TermParser {
-  return (keyword(.SUCC) *> spaces *> term >>- { t in create(x: .Succ(t)) })()
+  return (keyword(.SUCC) *> spaces *> term >>- { t in create(x: .succ(t)) })()
 }
 
 private func pred() -> TermParser {
-  return (keyword(.PRED) *> spaces *> term >>- { t in create(x: .Pred(t)) })()
+  return (keyword(.PRED) *> spaces *> term >>- { t in create(x: .pred(t)) })()
 }
 
 private func isZero() -> TermParser {
-  return (keyword(.ISZERO) *> spaces *> term >>- { t in create(x: .IsZero(t)) })()
+  return (keyword(.ISZERO) *> spaces *> term >>- { t in create(x: .isZero(t)) })()
 }
 
 private func fix() -> TermParser {
-  return ((keyword(.FIX) *> term >>- { t in create(x: .Fix(t)) })
+  return ((keyword(.FIX) *> term >>- { t in create(x: .fix(t)) })
     // The derived convenience form of fix.
     <|> keyword(.LETREC) *> identifier <* keyword(.COLON) >>- { name in
       return type >>- { termType in
         return keyword(.EQUALS) *> term >>- { t in
           return keyword(.IN) *> term >>- { body in
-            let derivedTerm: Term = .Fix(.Abstraction(parameter: "x", parameterType: termType, body: t))
-            return create(x: .Let(pattern: .Variable(name: name), argument: derivedTerm, body: body))
+            let derivedTerm: Term = .fix(.abstraction(parameter: "x", parameterType: termType, body: t))
+            return create(x: .letTerm(pattern: .variable(name: name), argument: derivedTerm, body: body))
           }
         }
       }
@@ -310,7 +310,7 @@ private func lambda() -> TermParser {
         // Parse the body.
         return keyword(.PERIOD) *> term >>- { body in
           // Unshift the state after parsing the body.
-          return  modifyState(f: { _ in savedContext}) *> create(x: .Abstraction(parameter: name, parameterType: argumentType, body: body))
+          return  modifyState(f: { _ in savedContext}) *> create(x: .abstraction(parameter: name, parameterType: argumentType, body: body))
         }
       }
     }
@@ -323,7 +323,7 @@ private func ifElse() -> TermParser {
   return (If *> term >>- { conditional in
     return Then *> term >>- { tBranch in
       return Else *> term >>- { fBranch in
-        return create(x: .If(condition: conditional, trueBranch: tBranch, falseBranch: fBranch))
+        return create(x: .ifThenElse(condition: conditional, trueBranch: tBranch, falseBranch: fBranch))
       }
     }
     })()
@@ -349,7 +349,7 @@ private func baseType() -> TypeParser {
 
 private func boundType() -> TypeParser {
   return (typeIdentifier >>- { name in
-      return create(x: .Base(typeName: name))
+      return create(x: .base(typeName: name))
   })()
 }
 
@@ -365,7 +365,7 @@ fileprivate func sumType() -> TypeParser {
         }
         counter = counter + 1
       }
-      return create(x: .Sum(values))
+      return create(x: .sum(values))
     }
     <* keyword(.CLOSE_ANGLE))()
 }
@@ -383,7 +383,7 @@ fileprivate func productType() -> TypeParser {
         }
         counter = counter + 1
       }
-      return create(x: .Product(values))
+      return create(x: .product(values))
     }
     <* keyword(.CLOSE_TUPLE))();
 }
@@ -394,19 +394,19 @@ fileprivate func productEntry() -> Parser<(String, Type), String.CharacterView, 
 }
 
 private func type() -> TypeParser {
-  return chainl1(parser: baseType, oper: keyword(.ARROW) *> create(x: { t1, t2 in .Function(parameterType: t1, returnType: t2)}))()
+  return chainl1(parser: baseType, oper: keyword(.ARROW) *> create(x: { t1, t2 in .function(parameterType: t1, returnType: t2)}))()
 }
 
 fileprivate func bool() -> TypeParser {
-  return (keyword(.BOOL) *> create(x: .Boolean))()
+  return (keyword(.BOOL) *> create(x: .boolean))()
 }
 
 fileprivate func int() -> TypeParser {
-  return (keyword(.INT) *> create(x: .Integer))()
+  return (keyword(.INT) *> create(x: .integer))()
 }
 
 fileprivate func unitType() -> TypeParser {
-  return (keyword(.UNIT) *> create(x: .Unit))()
+  return (keyword(.UNIT) *> create(x: .unit))()
 }
 
 // MARK: - Values
@@ -416,19 +416,19 @@ fileprivate func value() -> TermParser {
 }
 
 private func unit() -> TermParser {
-  return (keyword(.UNIT) *> create(x: .Unit))()
+  return (keyword(.UNIT) *> create(x: .unit))()
 }
 
 private func True() -> TermParser {
-  return (keyword(.TRUE) *> create(x: .True))()
+  return (keyword(.TRUE) *> create(x: .trueTerm))()
 }
 
 private func False() -> TermParser {
-  return (keyword(.FALSE) *> create(x: .False))()
+  return (keyword(.FALSE) *> create(x: .falseTerm))()
 }
 
 fileprivate func zero() -> TermParser {
-  return (keyword(.ZERO) *> create(x: .Zero))()
+  return (keyword(.ZERO) *> create(x: .zero))()
 }
 
 fileprivate func tuple() -> TermParser {
@@ -444,7 +444,7 @@ fileprivate func tuple() -> TermParser {
         }
         counter = counter + 1
       }
-      return create(x: .Tuple(values))
+      return create(x: .tuple(values))
     }
     <* keyword(.CLOSE_TUPLE))();
 }
@@ -486,7 +486,7 @@ private func variable() -> TermParser {
     }
     return modifyState(f: addToContext(name: name)) *> userState >>- { state in
       let index = state.terms[name]!
-      return create(x: .Variable(name: name, index: index))
+      return create(x: .variable(name: name, index: index))
     }
     })()
 }
@@ -497,7 +497,7 @@ private func tag() -> TermParser {
   return (keyword(.OPEN_ANGLE) *> identifier >>- { name in
     return keyword(.EQUALS) *> term >>- { t in
       return keyword(.CLOSE_ANGLE) *> ascription >>- { ascribedType in
-        return create(x: .Tag(label: name, term: t, ascribedType: ascribedType))
+        return create(x: .tag(label: name, term: t, ascribedType: ascribedType))
       }
     }
   })()
@@ -508,7 +508,7 @@ private func variantCase() -> TermParser {
     return keyword(.OF) *> separate(parser: caseStatement, byAtLeastOne: keyword(.BAR)) >>- { cases in
       var taggedCases: [String:Case] = [:]
       cases.forEach { taggedCases[$0.label] = $0 }
-      return create(x: .Case(term: t, cases: taggedCases))
+      return create(x: .caseTerm(term: t, cases: taggedCases))
     }
   })()
 }

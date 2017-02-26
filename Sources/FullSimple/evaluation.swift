@@ -2,86 +2,86 @@ import Foundation
 
 public func evaluate(term: Term, namedTerms: [Term]) -> Term {
   switch term {
-  case .Unit: return .Unit
+  case .unit: return .unit
   // Application and Abstraction
-  case .Abstraction(_,_,_):
+  case .abstraction(_,_,_):
     return term
 
-  case let .Application(.Abstraction(_, _, body), v2) where isValue(term: v2):
+  case let .application(.abstraction(_, _, body), v2) where isValue(term: v2):
     let t2 = termSubstTop(v2, body)
     return evaluate(term: t2, namedTerms: namedTerms)
 
-  case let .Application(v1, t2) where isValue(term: v1):
+  case let .application(v1, t2) where isValue(term: v1):
     let t2p = evaluate(term: t2, namedTerms: namedTerms)
-    return evaluate(term: .Application(left: v1, right: t2p), namedTerms: namedTerms)
+    return evaluate(term: .application(left: v1, right: t2p), namedTerms: namedTerms)
 
-  case let .Application(t1, t2):
+  case let .application(t1, t2):
     let t1p = evaluate(term: t1, namedTerms: namedTerms)
-    return evaluate(term: .Application(left: t1p, right: t2), namedTerms: namedTerms)
+    return evaluate(term: .application(left: t1p, right: t2), namedTerms: namedTerms)
   // Numbers
-  case .Zero: return .Zero
+  case .zero: return .zero
     
-  case .IsZero(.Zero):
-    return .True
-  case .IsZero(.Succ(_)):
-    return .False
-  case let .IsZero(zeroTerm):
+  case .isZero(.zero):
+    return .trueTerm
+  case .isZero(.succ(_)):
+    return .falseTerm
+  case let .isZero(zeroTerm):
     let evaluatedTerm = evaluate(term: zeroTerm, namedTerms: namedTerms)
-    return evaluate(term: .IsZero(evaluatedTerm), namedTerms: namedTerms)
+    return evaluate(term: .isZero(evaluatedTerm), namedTerms: namedTerms)
 
-  case .Succ(.Zero):
-    return .Succ(.Zero)
-  case let .Succ(succTerm):
-    return .Succ(evaluate(term: succTerm, namedTerms: namedTerms))
+  case .succ(.zero):
+    return .succ(.zero)
+  case let .succ(succTerm):
+    return .succ(evaluate(term: succTerm, namedTerms: namedTerms))
     
-  case .Pred(.Zero):
-    return .Zero
-  case let .Pred(.Succ(succTerm)):
+  case .pred(.zero):
+    return .zero
+  case let .pred(.succ(succTerm)):
     return succTerm
-  case let .Pred(predTerm):
+  case let .pred(predTerm):
     let evaluatedTerm = evaluate(term: predTerm, namedTerms: namedTerms)
-    return evaluate(term: .Pred(evaluatedTerm), namedTerms: namedTerms)
+    return evaluate(term: .pred(evaluatedTerm), namedTerms: namedTerms)
     
   // Booleans
-  case .True: return .True
-  case .False: return .False
+  case .trueTerm: return .trueTerm
+  case .falseTerm: return .falseTerm
 
-  case let .If(conditional, trueBranch, falseBranch):
+  case let .ifThenElse(conditional, trueBranch, falseBranch):
     switch evaluate(term: conditional, namedTerms: namedTerms) {
-      case .True:
+      case .trueTerm:
         return evaluate(term: trueBranch, namedTerms: namedTerms)
       default:
         return evaluate(term: falseBranch, namedTerms: namedTerms)
     }
   // Variables
-  case let .Variable(_, index):
+  case let .variable(_, index):
     if (index < namedTerms.count) {
       return namedTerms[index]
     } else {
       return term
     }
   // Tuples
-  case let .Tuple(contents):
+  case let .tuple(contents):
     var evaluatedTerms: [String:Term] = [:]
     for (key,value) in contents {
       evaluatedTerms[key] = evaluate(term: value, namedTerms: namedTerms)
     }
-    return .Tuple(evaluatedTerms)
-  case let .Let(p, argument, body) where isValue(term: argument):
+    return .tuple(evaluatedTerms)
+  case let .letTerm(p, argument, body) where isValue(term: argument):
     let matches = match(pattern: p, argument: argument, namedTerms: namedTerms)
     var substitutedTerm = body
     for (index, name) in p.variables.enumerated() {
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
     return evaluate(term: substitutedTerm, namedTerms: namedTerms)
-  case let .Let(p, argument, body):
+  case let .letTerm(p, argument, body):
     let argumentValue = evaluate(term: argument, namedTerms: namedTerms)
-    return evaluate(term: .Let(pattern: p, argument: argumentValue, body: body), namedTerms: namedTerms)
-  case let .Tag(label, term, type):
-    return .Tag(label: label, term: evaluate(term: term, namedTerms: namedTerms), ascribedType: type)
-  case let .Case(term, cases):
+    return evaluate(term: .letTerm(pattern: p, argument: argumentValue, body: body), namedTerms: namedTerms)
+  case let .tag(label, term, type):
+    return .tag(label: label, term: evaluate(term: term, namedTerms: namedTerms), ascribedType: type)
+  case let .caseTerm(term, cases):
     switch evaluate(term: term, namedTerms: namedTerms) {
-    case let .Tag(label, t, _):
+    case let .tag(label, t, _):
       // The typechecker makes sure that this case exists.
       let c = cases.filter { $0.value.label == label }.first!
       return substitute(0, t, c.value.term, 0)
@@ -89,22 +89,22 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
       assertionFailure()
     }
     return term
-  case let .Fix(.Abstraction(_, _, body)):
+  case let .fix(.abstraction(_, _, body)):
     return substitute(0, term, body)
-  case let .Fix(fixedTerm) where isValue(term: fixedTerm):
-    return .Fix(fixedTerm)
-  case let .Fix(fixedTerm):
-    return evaluate(term: .Fix(evaluate(term: fixedTerm, namedTerms: namedTerms)), namedTerms: namedTerms)
+  case let .fix(fixedTerm) where isValue(term: fixedTerm):
+    return .fix(fixedTerm)
+  case let .fix(fixedTerm):
+    return evaluate(term: .fix(evaluate(term: fixedTerm, namedTerms: namedTerms)), namedTerms: namedTerms)
   }
 }
 
 private func match(pattern: Pattern, argument: Term, namedTerms: [Term]) -> [String:Term] {
   switch pattern {
-  case let .Variable(name):
+  case let .variable(name):
     return [name: argument]
-  case let .Record(contents):
+  case let .record(contents):
     switch argument {
-    case let .Tuple(arguments):
+    case let .tuple(arguments):
       var matches: [String:Term] = [:]
       contents.forEach { key, value in
         match(pattern: value, argument: arguments[key]!, namedTerms: namedTerms).forEach { key, value in
@@ -121,11 +121,11 @@ private func match(pattern: Pattern, argument: Term, namedTerms: [Term]) -> [Str
 
 private func isValue(term: Term) -> Bool {
   switch term {
-  case .Abstraction: return true
-  case .Unit: return true
-  case .True: return true
-  case .False: return true
-  case let .Tuple(contents):
+  case .abstraction: return true
+  case .unit: return true
+  case .trueTerm: return true
+  case .falseTerm: return true
+  case let .tuple(contents):
     for (_, value) in contents {
       if !isValue(term: value) {
         return false
@@ -138,9 +138,9 @@ private func isValue(term: Term) -> Bool {
 
 private func isNumericValue(term: Term) -> Bool {
   switch term {
-  case let .Succ(t) where isNumericValue(term: t):
+  case let .succ(t) where isNumericValue(term: t):
     return true
-  case .Zero:
+  case .zero:
     return true
   default:
     return false
@@ -149,34 +149,34 @@ private func isNumericValue(term: Term) -> Bool {
 
 func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
   switch t {
-    case let .Variable(name, index) where index < c:
-      return .Variable(name: name, index: index)
-    case let .Variable(name, index):
-      return .Variable(name: name, index: index+d)
-    case let .Abstraction(name, type, body):
-      return .Abstraction(parameter: name, parameterType: type, body: shift(d, c+1, body))
-    case let .Application(lhs, rhs):
-      return .Application(left: shift(d, c, lhs), right: shift(d, c, rhs))
-    case let .If(conditional, trueBranch, falseBranch):
-      return .If(condition: shift(d, c, conditional),
+    case let .variable(name, index) where index < c:
+      return .variable(name: name, index: index)
+    case let .variable(name, index):
+      return .variable(name: name, index: index+d)
+    case let .abstraction(name, type, body):
+      return .abstraction(parameter: name, parameterType: type, body: shift(d, c+1, body))
+    case let .application(lhs, rhs):
+      return .application(left: shift(d, c, lhs), right: shift(d, c, rhs))
+    case let .ifThenElse(conditional, trueBranch, falseBranch):
+      return .ifThenElse(condition: shift(d, c, conditional),
                      trueBranch: shift(d, c, trueBranch),
                      falseBranch: shift(d, c, falseBranch))
-    case let .Succ(body):
-      return .Succ(shift(d, c, body))
-    case let .Pred(body):
-      return .Pred(shift(d, c, body))
-    case let .IsZero(body):
-      return .IsZero(shift(d, c, body))
-    case let .Let(pattern, argument, body):
-      return .Let(pattern: pattern, argument: shift(d, c+pattern.length, argument), body: shift(d, c+pattern.length, body))
-    case let .Tuple(contents):
+    case let .succ(body):
+      return .succ(shift(d, c, body))
+    case let .pred(body):
+      return .pred(shift(d, c, body))
+    case let .isZero(body):
+      return .isZero(shift(d, c, body))
+    case let .letTerm(pattern, argument, body):
+      return .letTerm(pattern: pattern, argument: shift(d, c+pattern.length, argument), body: shift(d, c+pattern.length, body))
+    case let .tuple(contents):
       var newContents: [String:Term] = [:]
       contents.forEach { key, value in
         newContents[key] = shift(d, c, value)
       }
-      return .Tuple(newContents)
-    case let .Fix(contents):
-      return .Fix(shift(d, c, contents))
+      return .tuple(newContents)
+    case let .fix(contents):
+      return .fix(shift(d, c, contents))
     default:
       return t
   }
@@ -184,34 +184,34 @@ func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
 
 func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int = 0) -> Term {
   switch t {
-    case let .Variable(_, index) where index == j+c:
+    case let .variable(_, index) where index == j+c:
       return shift(c, 0, s)
-    case let .Variable(name, index):
-      return .Variable(name: name, index: index)
-    case let .Abstraction(name, type, body):
-      return .Abstraction(parameter: name, parameterType: type, body: substitute(j, s, body, c+1))
-    case let .Application(lhs, rhs):
-      return .Application(left: substitute(j, s, lhs, c), right: substitute(j, s, rhs, c))
-    case let .If(conditional, trueBranch, falseBranch):
-      return .If(condition: substitute(j, s, conditional, c),
+    case let .variable(name, index):
+      return .variable(name: name, index: index)
+    case let .abstraction(name, type, body):
+      return .abstraction(parameter: name, parameterType: type, body: substitute(j, s, body, c+1))
+    case let .application(lhs, rhs):
+      return .application(left: substitute(j, s, lhs, c), right: substitute(j, s, rhs, c))
+    case let .ifThenElse(conditional, trueBranch, falseBranch):
+      return .ifThenElse(condition: substitute(j, s, conditional, c),
                      trueBranch: substitute(j, s, trueBranch, c),
                      falseBranch: substitute(j, s, falseBranch, c))
-    case let .Succ(body):
-      return .Succ(substitute(j, s, body, c))
-    case let .Pred(body):
-      return .Pred(substitute(j, s, body, c))
-    case let .IsZero(body):
-      return .IsZero(substitute(j, s, body, c))
-    case let .Tuple(contents):
+    case let .succ(body):
+      return .succ(substitute(j, s, body, c))
+    case let .pred(body):
+      return .pred(substitute(j, s, body, c))
+    case let .isZero(body):
+      return .isZero(substitute(j, s, body, c))
+    case let .tuple(contents):
       var newContents: [String:Term] = [:]
       contents.forEach { key, value in
         newContents[key] = substitute(j, s, value, c)
       }
-      return .Tuple(newContents)
-    case let .Let(pattern, argument, body):
-      return .Let(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c+pattern.length))
-    case let .Fix(body):
-      return .Fix(substitute(j, s, body, c))
+      return .tuple(newContents)
+    case let .letTerm(pattern, argument, body):
+      return .letTerm(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c+pattern.length))
+    case let .fix(body):
+      return .fix(substitute(j, s, body, c))
     default:
       return t
   }

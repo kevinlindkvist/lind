@@ -1,58 +1,58 @@
 import Foundation
 
 public indirect enum Term {
-  case Unit
-  case Abstraction(parameter: String, parameterType: Type, body: Term)
-  case Application(left: Term, right: Term)
-  case True
-  case False
-  case If(condition: Term, trueBranch: Term, falseBranch: Term)
-  case Zero
-  case IsZero(Term)
-  case Succ(Term)
-  case Pred(Term)
-  case Variable(name: String, index: Int)
-  case Tuple([String:Term])
-  case Let(pattern: Pattern, argument: Term, body: Term)
-  case Tag(label: String, term: Term, ascribedType: Type)
-  case Case(term: Term, cases: [String:Case])
-  case Fix(Term)
+  case unit
+  case abstraction(parameter: String, parameterType: Type, body: Term)
+  case application(left: Term, right: Term)
+  case trueTerm
+  case falseTerm
+  case ifThenElse(condition: Term, trueBranch: Term, falseBranch: Term)
+  case zero
+  case isZero(Term)
+  case succ(Term)
+  case pred(Term)
+  case variable(name: String, index: Int)
+  case tuple([String:Term])
+  case letTerm(pattern: Pattern, argument: Term, body: Term)
+  case tag(label: String, term: Term, ascribedType: Type)
+  case caseTerm(term: Term, cases: [String:Case])
+  case fix(Term)
 }
 
 extension Term: CustomStringConvertible {
   public var description: String {
     switch self {
-      case .True:
+      case .trueTerm:
         return "true"
-      case .False:
+      case .falseTerm:
         return "false"
-      case let .If(t1, t2, t3):
+      case let .ifThenElse(t1, t2, t3):
         return "if (\(t1))\n\tthen (\(t2))\n\telse (\(t3))"
-      case .Zero:
+      case .zero:
         return "0"
-      case let .Succ(t):
+      case let .succ(t):
         return "succ(\(t))"
-      case let .Pred(t):
+      case let .pred(t):
         return "pred(\(t))"
-      case let .IsZero(t):
+      case let .isZero(t):
         return "isZero(\(t))"
-      case let .Variable(name, index):
+      case let .variable(name, index):
         return "\(name)(\(index))"
-      case let .Abstraction(parameter, type, body):
+      case let .abstraction(parameter, type, body):
         return "\\\(parameter):\(type).(\(body))"
-      case let .Application(lhs, rhs):
+      case let .application(lhs, rhs):
         return "\(lhs) \(rhs)"
-      case .Unit:
+      case .unit:
         return "unit"
-      case let .Tuple(values):
+      case let .tuple(values):
         return values.description
-      case let .Let(pattern, match, body):
+      case let .letTerm(pattern, match, body):
         return "\(pattern) = \(match) in \(body)"
-      case let .Tag(label, term, type):
+      case let .tag(label, term, type):
         return "<\(label)=\(term)> as \(type)"
-      case let .Case(term, cases):
+      case let .caseTerm(term, cases):
         return "case \(term) of\n\t" + cases.map { $0.value.description }.joined(separator: "\n")
-      case let .Fix(term):
+      case let .fix(term):
         return "fix \(term)"
     }
   }
@@ -69,37 +69,37 @@ extension Term: Equatable {
 
 public func ==(lhs: Term, rhs: Term) -> Bool {
   switch (lhs, rhs) {
-  case (.True, .True):
+  case (.trueTerm, .trueTerm):
     return true
-  case (.False, .False):
+  case (.falseTerm, .falseTerm):
     return true
-  case (.Zero, .Zero):
+  case (.zero, .zero):
     return true
-  case let (.Succ(t1), .Succ(t2)):
+  case let (.succ(t1), .succ(t2)):
     return t1 == t2
-  case let (.Pred(t1), .Pred(t2)):
+  case let (.pred(t1), .pred(t2)):
     return t1 == t2
-  case let (.IsZero(t1), .IsZero(t2)):
+  case let (.isZero(t1), .isZero(t2)):
     return t1 == t2
-  case let (.If(t1,t2,t3), .If(t11, t22, t33)):
+  case let (.ifThenElse(t1,t2,t3), .ifThenElse(t11, t22, t33)):
     return t1 == t11 && t2 == t22 && t3 == t33
-  case let (.Variable(leftName, leftIndex), .Variable(rightName, rightIndex)):
+  case let (.variable(leftName, leftIndex), .variable(rightName, rightIndex)):
     return leftName == rightName && leftIndex == rightIndex
-  case let (.Abstraction(leftValue), .Abstraction(rightValue)):
+  case let (.abstraction(leftValue), .abstraction(rightValue)):
     return leftValue == rightValue
-  case let (.Application(leftValue), .Application(rightValue)):
+  case let (.application(leftValue), .application(rightValue)):
     return leftValue == rightValue
-  case (.Unit, .Unit):
+  case (.unit, .unit):
     return true
-  case let (.Tuple(t1), .Tuple(t2)):
+  case let (.tuple(t1), .tuple(t2)):
     return t1 == t2
-  case let (.Let(p1, a1, b1), .Let(p2, a2, b2)):
+  case let (.letTerm(p1, a1, b1), .letTerm(p2, a2, b2)):
     return p1 == p2 && a1 == a2 && b1 == b2
-  case let (.Tag(leftName, leftTerm, leftType), .Tag(rightName, rightTerm, rightType)):
+  case let (.tag(leftName, leftTerm, leftType), .tag(rightName, rightTerm, rightType)):
     return leftName == rightName && leftTerm == rightTerm && leftType == rightType
-  case let (.Case(leftTerm, leftCases), .Case(rightTerm, rightCases)):
+  case let (.caseTerm(leftTerm, leftCases), .caseTerm(rightTerm, rightCases)):
     return leftTerm == rightTerm && leftCases == rightCases
-  case let (.Fix(lhs), .Fix(rhs)):
+  case let (.fix(lhs), .fix(rhs)):
     return lhs == rhs
   default:
     return false
