@@ -8,6 +8,7 @@ public indirect enum Type {
   case base(typeName: String)
   case product([String:Type])
   case sum([String:Type])
+  case list(contentType: Type)
 }
 
 extension Type: Equatable {
@@ -28,6 +29,8 @@ public func ==(lhs: Type, rhs: Type) -> Bool {
     case let (.product(firstContents), .product(secondContents)):
       return firstContents == secondContents
     case let (.sum(firstContents), .sum(secondContents)):
+      return firstContents == secondContents
+    case let (.list(firstContents), .list(secondContents)):
       return firstContents == secondContents
     default:
       return false
@@ -51,6 +54,8 @@ extension Type: CustomStringConvertible {
         return "{\(productTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))}"
       case let .sum(sumTypes):
         return "<\(sumTypes.map { key, value in "\(key):\(value)" }.joined(separator: ","))>"
+      case let .list(contentType):
+        return "List(\(contentType))"
     }
   }
 }

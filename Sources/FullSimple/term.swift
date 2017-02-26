@@ -17,6 +17,8 @@ public indirect enum Term {
   case tag(label: String, term: Term, ascribedType: Type)
   case caseTerm(term: Term, cases: [String:Case])
   case fix(Term)
+  case list(head: Term, tail: Term, type: Type)
+  case emptyList(type: Type)
 }
 
 extension Term: CustomStringConvertible {
@@ -54,13 +56,11 @@ extension Term: CustomStringConvertible {
         return "case \(term) of\n\t" + cases.map { $0.value.description }.joined(separator: "\n")
       case let .fix(term):
         return "fix \(term)"
+      case let .list(head, tail, type):
+        return "cons[\(type)](\(head), \(tail))"
+      case let .emptyList(type):
+        return "nil[\(type)]"
     }
-  }
-}
-
-extension Term: CustomDebugStringConvertible {
-  public var debugDescription: String {
-    return self.description
   }
 }
 
@@ -101,6 +101,10 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return leftTerm == rightTerm && leftCases == rightCases
   case let (.fix(lhs), .fix(rhs)):
     return lhs == rhs
+  case let (.list(leftHead, leftTail, leftType), .list(rightHead, rightTail, rightType)):
+    return leftHead == rightHead && leftTail == rightTail && leftType == rightType
+  case let (.emptyList(leftType), .emptyList(rightType)):
+    return leftType == rightType
   default:
     return false
   }
