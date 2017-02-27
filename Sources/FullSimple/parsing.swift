@@ -92,10 +92,18 @@ private func binding() -> TermParser {
 
 private func typeBinding() -> TermParser {
   return (typeIdentifier >>- { name in
-    return keyword(.EQUALS) *> type >>- { type in
-      return modifyState(f: addToContext(type: type, named: name)) *> create(x: .unit)
+    return userState >>- { savedContext in
+      return keyword(.EQUALS) *> type >>- { type in
+        return modifyState(f: addToContext(type: type, named: name)) *> userState >>- { newState in
+          if savedContext.namedTypes.count == newState.namedTypes.count {
+            return fail(message: "Trying to re-bind \(name)")
+          } else {
+            return create(x: .unit)
+          }
+        }
+      }
     }
-  })()
+    })()
 }
 
 private func termBinding() -> TermParser {
@@ -138,12 +146,6 @@ private func projection(term: Term) -> () -> TermParser {
     }
     return create(x: term)
   }
-}
-
-// MARK: - Abbreviations
-
-private func abbreviation() -> TypeBindingParser {
-  return (identifier >>- { name in type >>- { type in create(x: (name, type)) }})()
 }
 
 // MARK: - Atoms
