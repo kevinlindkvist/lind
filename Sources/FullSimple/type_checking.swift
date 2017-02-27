@@ -71,6 +71,38 @@ private func typeOf(term: Term, context: ParseContext) -> TypeResult {
     return typeOf(case: t, cases: cases, context: context)
   case let .fix(body):
     return typeOf(fix: body, context: context)
+  case let .nilList(type):
+    return TypeResult.right(context, .list(contentType: real(type: type, context: context.namedTypes)))
+  case let .cons(head, tail, type):
+    let headType = typeOf(term: head, context: context)
+    let tailType = typeOf(term: tail, context: context)
+    switch (headType, tailType) {
+    case let (.right(_, head), .right(_, tail)) where head == type && tail == .list(contentType: type):
+      return .right(context, .list(contentType: real(type: type, context: context.namedTypes)))
+    default:
+      return .left(.message("Incorrect cons types \(headType), \(tailType), annotated \(type)."))
+    }
+  case let .isNil(list, type):
+    switch typeOf(term: list, context: context) {
+    case .right(_, .list(type)) :
+      return .right(context, .boolean)
+    default:
+      return .left(.message("Incorrect isNil type, expected \(type)"))
+    }
+  case let .head(list, type):
+    switch typeOf(term: list, context: context) {
+    case .right(_, .list(type)) :
+    return .right(context, real(type: type, context: context.namedTypes))
+    default:
+      return .left(.message("Incorrect head type, expected \(type)"))
+    }
+  case let .tail(list, type):
+    switch typeOf(term: list, context: context) {
+    case .right(_, .list(type)) :
+      return .right(context, .list(contentType: real(type: type, context: context.namedTypes)))
+    default:
+      return .left(.message("Incorrect tail type, expected \(type)"))
+    }
   }
 }
 

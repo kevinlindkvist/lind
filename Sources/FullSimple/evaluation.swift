@@ -217,6 +217,14 @@ func shift(_ d: Int, _ c: Int, _ t: Term) -> Term {
       return .tuple(newContents)
     case let .fix(contents):
       return .fix(shift(d, c, contents))
+    case let .cons(head, tail, type):
+      return .cons(head: shift(d, c, head), tail: shift(d, c, tail), type: type)
+    case let .head(list, type):
+      return .head(list: shift(d, c, list), type: type)
+    case let .tail(list, type):
+      return .tail(list: shift(d, c, list), type: type)
+    case let .isNil(list, type):
+      return .isNil(list: shift(d, c, list), type: type)
     default:
       return t
   }
@@ -252,6 +260,14 @@ func substitute(_ j: Int, _ s: Term, _ t: Term, _ c: Int = 0) -> Term {
       return .letTerm(pattern: pattern, argument: substitute(j, s, argument, c), body: substitute(j, s, body, c+pattern.length))
     case let .fix(body):
       return .fix(substitute(j, s, body, c))
+    case let .cons(head, tail, type):
+      return .cons(head: substitute(j, s, head, c), tail: substitute(j, s, tail, c), type: type)
+    case let .head(list, type):
+      return .head(list: substitute(j, s, list, c), type: type)
+    case let .tail(list, type):
+      return .tail(list: substitute(j, s, list, c), type: type)
+    case let .isNil(list, type):
+      return .isNil(list: substitute(j, s, list, c), type: type)
     default:
       return t
   }
