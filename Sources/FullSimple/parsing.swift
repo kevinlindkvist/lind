@@ -28,6 +28,8 @@ fileprivate enum Keyword: String {
   case BACKSLASH = "\\"
   case OPEN_TUPLE = "{"
   case CLOSE_TUPLE = "}"
+  case OPEN_LIST = "["
+  case CLOSE_LIST = "]"
   case OPEN_PAREN = "("
   case CLOSE_PAREN = ")"
   case OPEN_ANGLE = "<"
@@ -42,6 +44,12 @@ fileprivate enum Keyword: String {
   case CASE = "case"
   case OF = "of"
   case CASE_ARROW = "=>"
+  case CONS = "cons"
+  case NIL = "nil"
+  case ISNIL = "isnil"
+  case HEAD = "head"
+  case TAIL = "tail"
+  case LIST = "List"
 }
 
 private typealias TermParser = Parser<Term, String.CharacterView, ParseContext>
@@ -201,7 +209,7 @@ fileprivate func patternEntry() -> Parser<(String, Pattern), String.CharacterVie
 // MARK: - Built Ins
 
 fileprivate func builtIn() -> TermParser {
-  return (fix <|> succ <|> pred <|> isZero <|> ifElse <|> Let <|> variantCase)()
+  return (fix <|> succ <|> pred <|> isZero <|> ifElse <|> list <|> Let <|> variantCase)()
 }
 
 private func succ() -> TermParser {
@@ -230,6 +238,54 @@ private func fix() -> TermParser {
       }
     }
   )()
+}
+
+private func list() -> TermParser {
+  return (emptyList <|> cons <|> isNil <|> head <|> tail)()
+}
+
+private func emptyList() -> TermParser {
+  return (keyword(.NIL) *> listType >>- { type in
+    return create(x: .nilList(type: type))
+  })()
+}
+
+private func cons() -> TermParser {
+  return (keyword(.CONS) *> listType >>- { type in
+    return nonApplicationTerm >>- { head in
+      return nonApplicationTerm >>- { tail in
+        return create(x: .cons(head: head, tail: tail, type: type))
+      }
+    }
+  })()
+}
+
+private func head() -> TermParser {
+  return (keyword(.HEAD) *> listType >>- { type in
+    return term >>- { list in
+      return create(x: .head(list: list, type: type))
+    }
+  })()
+}
+
+private func tail() -> TermParser {
+  return (keyword(.TAIL) *> listType >>- { type in
+    return term >>- { list in
+      return create(x: .tail(list: list, type: type))
+    }
+  })()
+}
+
+private func isNil() -> TermParser {
+  return (keyword(.ISNIL) *> listType >>- { type in
+    return term >>- { list in
+      return create(x: .isNil(list: list, type: type))
+    }
+  })()
+}
+
+private func listType() -> TypeParser {
+  return (keyword(.OPEN_LIST) *> type <* keyword(.CLOSE_LIST))()
 }
 
 

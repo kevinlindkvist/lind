@@ -17,8 +17,11 @@ public indirect enum Term {
   case tag(label: String, term: Term, ascribedType: Type)
   case caseTerm(term: Term, cases: [String:Case])
   case fix(Term)
-  case list(head: Term, tail: Term, type: Type)
-  case emptyList(type: Type)
+  case cons(head: Term, tail: Term, type: Type)
+  case head(list: Term, type: Type)
+  case tail(list: Term, type: Type)
+  case isNil(list: Term, type: Type)
+  case nilList(type: Type)
 }
 
 extension Term: CustomStringConvertible {
@@ -56,9 +59,15 @@ extension Term: CustomStringConvertible {
         return "case \(term) of\n\t" + cases.map { $0.value.description }.joined(separator: "\n")
       case let .fix(term):
         return "fix \(term)"
-      case let .list(head, tail, type):
+      case let .cons(head, tail, type):
         return "cons[\(type)](\(head), \(tail))"
-      case let .emptyList(type):
+      case let .head(list, type):
+        return "head[\(type)](\(list))"
+      case let .tail(list, type):
+        return "tail[\(type)](\(list))"
+      case let .isNil(list, type):
+        return "isEmpty[\(type)](\(list))"
+      case let .nilList(type):
         return "nil[\(type)]"
     }
   }
@@ -101,9 +110,15 @@ public func ==(lhs: Term, rhs: Term) -> Bool {
     return leftTerm == rightTerm && leftCases == rightCases
   case let (.fix(lhs), .fix(rhs)):
     return lhs == rhs
-  case let (.list(leftHead, leftTail, leftType), .list(rightHead, rightTail, rightType)):
+  case let (.cons(leftHead, leftTail, leftType), .cons(rightHead, rightTail, rightType)):
     return leftHead == rightHead && leftTail == rightTail && leftType == rightType
-  case let (.emptyList(leftType), .emptyList(rightType)):
+  case let (.head(leftList, leftType), .head(rightList, rightType)):
+    return leftList == rightList && leftType == rightType
+  case let (.tail(leftList, leftType), .tail(rightList, rightType)):
+    return leftList == rightList && leftType == rightType
+  case let (.isNil(leftList, leftType), .isNil(rightList, rightType)):
+    return leftList == rightList && leftType == rightType
+  case let (.nilList(leftType), .nilList(rightType)):
     return leftType == rightType
   default:
     return false

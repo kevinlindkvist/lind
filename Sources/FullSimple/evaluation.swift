@@ -74,6 +74,7 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
       substitutedTerm = substitute(index, matches[name]!, substitutedTerm, 0)
     }
     return evaluate(term: substitutedTerm, namedTerms: namedTerms)
+  // Let bindings
   case let .letTerm(p, argument, body):
     let argumentValue = evaluate(term: argument, namedTerms: namedTerms)
     return evaluate(term: .letTerm(pattern: p, argument: argumentValue, body: body), namedTerms: namedTerms)
@@ -89,12 +90,47 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
       assertionFailure()
     }
     return term
+  // Fix terms
   case let .fix(.abstraction(_, _, body)):
     return substitute(0, term, body)
   case let .fix(fixedTerm) where isValue(term: fixedTerm):
     return .fix(fixedTerm)
   case let .fix(fixedTerm):
-    return evaluate(term: .fix(evaluate(term: fixedTerm, namedTerms: namedTerms)), namedTerms: namedTerms)
+    return evaluate(term: .fix(evaluate(term: fixedTerm, namedTerms: namedTerms)),
+                    namedTerms: namedTerms)
+  // Lists
+  case let .cons(head, tail, type) where !isValue(term: head):
+    let evaluatedHead = evaluate(term: head, namedTerms: namedTerms)
+    return evaluate(term: .cons(head: evaluatedHead, tail: tail, type: type),
+                    namedTerms: namedTerms)
+  case let .cons(head, tail, type) where !isValue(term: tail):
+    let evaluatedTail = evaluate(term: tail, namedTerms: namedTerms)
+    return evaluate(term: .cons(head: head, tail: evaluatedTail, type: type),
+                    namedTerms: namedTerms)
+  case .cons:
+    return term
+  case .isNil(.nilList, _):
+    return .trueTerm
+  case let .isNil(.cons(head, tail, _), _) where isValue(term: head) && isValue(term: tail):
+    return .falseTerm
+  case let .isNil(list, type) where !isValue(term: list):
+    let evaluatedList = evaluate(term: list, namedTerms: namedTerms)
+    return evaluate(term: .isNil(list: evaluatedList, type: type), namedTerms: namedTerms)
+  case .isNil:
+    assertionFailure()
+    return .unit
+  case let .head(.cons(head, tail, _), _) where isValue(term: head) && isValue(term: tail):
+    return head
+  case let .head(list, type):
+    let evaluatedList = evaluate(term: list, namedTerms: namedTerms)
+    return evaluate(term: .head(list: evaluatedList, type: type), namedTerms: namedTerms)
+  case let .tail(.cons(head, tail, _), _) where isValue(term: head) && isValue(term: tail):
+    return tail
+  case let .tail(list, type):
+    let evaluatedList = evaluate(term: list, namedTerms: namedTerms)
+    return evaluate(term: .tail(list: evaluatedList, type: type), namedTerms: namedTerms)
+  case .nilList:
+    return term
   }
 }
 
@@ -131,6 +167,10 @@ private func isValue(term: Term) -> Bool {
         return false
       }
     }
+    return true
+  case let .cons(head, tail, _):
+    return isValue(term: head) && isValue(term: tail)
+  case .nilList:
     return true
   default: return isNumericValue(term: term)
   }
