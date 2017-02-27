@@ -46,7 +46,7 @@ fileprivate enum Keyword: String {
   case CASE_ARROW = "=>"
   case CONS = "cons"
   case NIL = "nil"
-  case ISNIL = "isnil"
+  case ISNIL = "isNil"
   case HEAD = "head"
   case TAIL = "tail"
   case LIST = "List"
@@ -284,6 +284,12 @@ private func isNil() -> TermParser {
   })()
 }
 
+private func wrappedListType() -> TypeParser {
+  return (listType >>- { parsedType in
+    return create(x: .list(contentType: parsedType))
+  })()
+}
+
 private func listType() -> TypeParser {
   return (keyword(.OPEN_LIST) *> type <* keyword(.CLOSE_LIST))()
 }
@@ -400,7 +406,7 @@ fileprivate func Else() -> StringParser {
 // MARK: - Types
 
 private func baseType() -> TypeParser {
-  return (bool <|> int <|> unitType <|> productType <|> sumType <|> boundType)()
+  return (bool <|> int <|> unitType <|> productType <|> sumType <|> wrappedListType <|> boundType)()
 }
 
 private func boundType() -> TypeParser {

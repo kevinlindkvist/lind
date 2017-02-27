@@ -361,4 +361,63 @@ class TypeCheckerTests: XCTestCase {
                   + "r = fix ff; iseven = r.iseven; iseven 0"
     check(input: program, expect: .boolean)
   }
+
+  // MARK: Lists
+
+  /// Tests the type of head.
+  func testHead() {
+    check(input: "head[bool] cons[bool] true nil[bool]", expect: .boolean)
+  }
+
+  /// Tests the type of head with a non-list argument.
+  func testHeadNonListType() {
+    check(input: "head[bool] true", expect: .left(.message("")))
+  }
+
+  /// Tests the type of tail.
+  func testTail() {
+    check(input: "tail[bool] cons[bool] true nil[bool]", expect: .list(contentType: .boolean))
+  }
+
+  /// Tests the type of tail with a non-list argument.
+  func testTailNonListType() {
+    check(input: "tail[bool] 0", expect: .left(.message("")))
+  }
+
+  /// Tests the type of isNil.
+  func testIsNil() {
+    check(input: "isNil[int] nil[int]", expect: .boolean)
+  }
+
+  /// Tests the type of isNil when the argument is not a list.
+  func testIsNilNonListType() {
+    check(input: "isNil[int] 0", expect: .left(.message("")))
+  }
+
+  /// Tests the type of a nil list.
+  func testNil() {
+    check(input: "nil[bool]", expect: .list(contentType: .boolean))
+  }
+
+  /// Tests the type of cons.
+  func testCons() {
+    check(input: "cons[int] 0 cons[int] 0 nil[int]", expect: .list(contentType: .integer))
+  }
+
+  /// Tests that the type of cons fails when the types don't match.
+  func testConsIncorrectTypes() {
+    check(input: "cons[int] 0 cons[bool] 0 nil[int]", expect: .left(.message("")))
+    check(input: "cons[int] true cons[int] 0 nil[int]", expect: .left(.message("")))
+  }
+
+  /// Tests the type of an abstraction where the parameter type is a list.
+  func testListParameter() {
+    check(input: "(\\x:[bool].head[bool] x) cons[bool] true nil[bool]", expect: .boolean)
+  }
+
+  /// Tests the type of an abstraction where the parameter type is a list and the argument is
+  /// an incorrect type.
+  func testListParameterMissmatch() {
+    check(input: "(\\x:[int].head[int] x) cons[bool] true nil[bool]", expect: .left(.message("")))
+  }
 }

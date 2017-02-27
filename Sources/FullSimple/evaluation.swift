@@ -120,12 +120,12 @@ public func evaluate(term: Term, namedTerms: [Term]) -> Term {
     assertionFailure()
     return .unit
   case let .head(.cons(head, tail, _), _) where isValue(term: head) && isValue(term: tail):
-    return head
+    return evaluate(term: head, namedTerms: namedTerms)
   case let .head(list, type):
     let evaluatedList = evaluate(term: list, namedTerms: namedTerms)
     return evaluate(term: .head(list: evaluatedList, type: type), namedTerms: namedTerms)
   case let .tail(.cons(head, tail, _), _) where isValue(term: head) && isValue(term: tail):
-    return tail
+    return evaluate(term: tail, namedTerms: namedTerms)
   case let .tail(list, type):
     let evaluatedList = evaluate(term: list, namedTerms: namedTerms)
     return evaluate(term: .tail(list: evaluatedList, type: type), namedTerms: namedTerms)

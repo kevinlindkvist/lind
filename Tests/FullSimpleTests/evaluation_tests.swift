@@ -234,4 +234,39 @@ class EvaluationTests: XCTestCase {
     check(input: program + anotherFour, expectEvaluated: .trueTerm)
   }
 
+  // MARK: Lists
+  
+  /// Tests evaluating the head of a list.
+  func testHead() {
+    check(input: "head[bool] cons[bool] true nil[bool]", expectEvaluated: .trueTerm)
+  }
+
+  /// Tests the tail of a list.
+  func testTail() {
+    check(input: "tail[bool] cons[bool] true nil[bool]", expectEvaluated: .nilList(type: .boolean))
+  }
+
+  /// Tests evaluating isNil.
+  func testIsNil() {
+    check(input: "isNil[int] nil[int]", expectEvaluated: .trueTerm)
+    check(input: "isNil[int] cons[int] 0 nil[int]", expectEvaluated: .falseTerm)
+  }
+
+  /// Tests evaluating a nil list.
+  func testNil() {
+    check(input: "nil[bool]", expectEvaluated: .nilList(type: .boolean))
+  }
+
+  /// Tests evaluating a list of values.
+  let inner: Term = .cons(head: .zero, tail: .nilList(type: .integer), type: .integer)
+  func testCons() {
+    check(input: "cons[int] 0 cons[int] 0 nil[int]",
+          expect: .cons(head: .zero, tail: inner, type: .integer))
+  }
+
+  /// Tests evaluating an application where the argument is a list.
+  func testListParameter() {
+    check(input: "(\\x:[bool].head[bool] x) cons[bool] true nil[bool]", expectEvaluated: .trueTerm)
+  }
+
 }
