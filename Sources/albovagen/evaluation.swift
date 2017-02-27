@@ -14,7 +14,7 @@ public typealias Evaluation = Either<EvaluationError, (Term, Type, ParseContext)
 
 public func description(evaluation: Evaluation) -> String {
   switch evaluation {
-    case let .right(term, type, context): return term.description + " :: " + type.description + "\n\(context)"
+    case let .right(term, type, _): return "\(term) :: \(type)"
     case let .left(message): return message.description
   }
 }
