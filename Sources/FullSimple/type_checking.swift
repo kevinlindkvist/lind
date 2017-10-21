@@ -1,6 +1,5 @@
 import Foundation
 import Parswift
-import Parser
 
 public typealias TypeResult = Either<TypeError, (ParseContext, Type)>
 
@@ -109,7 +108,9 @@ private func typeOf(term: Term, context: ParseContext) -> TypeResult {
 private func typeOf(pattern: Pattern, argument: Type, context: TypeContext) -> TypeContext? {
   switch (pattern, argument) {
   case let (.variable, type):
-    return union(context, [context.count: type])
+    var newContext = context
+    newContext[context.count] = type
+    return newContext
   case let (.record(contents), .product(types)):
     var updatedContext: TypeContext = context
     var encounteredError: Bool = false
